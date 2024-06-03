@@ -1,0 +1,49 @@
+---
+title: "OCE Testing"
+author: "Ella Crotty"
+header-includes:
+  \usepackage{fvextra}
+  \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,commandchars=\\\{\}}
+output:
+  pdf_document:
+    toc: TRUE
+---
+
+```{r Installs}
+library(oce)
+library(ocedata)
+data(ctd) # Example data to practice OCE functions
+```
+
+# Intro to OCE
+
+- OCE is a package designed to plot common types of oceanographic data
+- There are more updated versions on GitHub, but I installed with default CRAN because `remotes::install_github("dankelly/oce", ref = "develop")` didn't work.
+
+# Links
+
+- [OCE Website](https://dankelley.github.io/oce/)
+- [OCE on CRAN](https://cloud.r-project.org/web/packages/oce/index.html)
+- [OCE on GitHub](https://github.com/dankelley/oce)
+
+# Examples from the README
+
+```{r CTD Plots}
+oce::plot(ctd, which=c(1,2,3,5), type="l", span=150)
+oce::plot(ctd, which=c(1,2,4,5), type="l", span=150)
+```
+
+```{r Mapping}
+par(mar=rep(0.5, 4))
+data(endeavour, package="ocedata")
+data(coastlineWorld, package="oce")
+mapPlot(coastlineWorld, col="darkgreen")
+mapPoints(endeavour$longitude, endeavour$latitude, pch=20, col="blue")
+```
+
+# CTD Practice
+
+```{r}
+
+```
+
