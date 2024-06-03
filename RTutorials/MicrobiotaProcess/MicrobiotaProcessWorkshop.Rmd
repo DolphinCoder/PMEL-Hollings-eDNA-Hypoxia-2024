@@ -1,5 +1,5 @@
 ---
-title: "MicrobiotaProcessWorkshop"
+title: "MicrobiotaProcess Workshop"
 author: "Ella Crotty"
 header-includes:
   \usepackage{fvextra}
@@ -19,7 +19,7 @@ urlcolor: purple
 
 MicrobiotaProcess is an R package for analysis, visualization and biomarker discovery of microbial datasets. It introduces MPSE class, this make it more interoperable with the existing computing ecosystem. Moreover, it introduces a tidy microbiome data structure paradigm and analysis grammar. It provides a wide variety of microbiome data analysis procedures under the unified and common framework (tidy-like framework). 
 
-Need to run `BiocManager::install("MicrobiotaProcess")`
+Need to run `BiocManager::install("MicrobiotaProcess")` and `WGCNA`
 
 ```{r Package Installs}
 suppressPackageStartupMessages({
@@ -29,10 +29,12 @@ suppressPackageStartupMessages({
   library(VennDiagram)
   library(UpSetR)
   library(grid)
+  library(ggtree)
   library(ggnewscale) # Multiple Fill and Colour Scales in 'ggplot2'.
   library(vegan) # Community Ecology Package.
   library(coin) # Conditional Inference Procedures in a Permutation Test Framework.
   library(reshape2) # Flexibly Reshape Data: A Reboot of the Reshape Package.
+  library(WGCNA) # Needed for horrifying correlation plot
 })
 ```
 
@@ -127,7 +129,7 @@ p_rare / prare1 / prare2
 
 These curves are near saturation - this means that there is enough data to detect species.
 
-# Diversity Measures
+# Alpha Diversity 
 
 ```{r Diversity Measures}
 alphaobj <- get_alphaindex(ps)
@@ -207,8 +209,9 @@ upset(upsetda, sets=unique(as.vector(sample_data(ps)$Group)),
       empty.intersections = "on")
 ```
 
-# Beta analysis
+# Beta Diversity
 
+- `beta diversity` metrics can assess differences between communities
 - Principal component analysis (PCA) = statistical procedure to compare groups
 - Principle Coordinate Analysis (PCoA) = statistical procedure to compare groups of samples, which can be based on phylogenetic or count-based distance measures (ex. Bray-Curtis dissimilarity)
 
@@ -275,9 +278,205 @@ pcoaplot1 | pcoaplot2
 distme <- get_dist(ps, distmethod ="bray", method="hellinger")
 sampleda <- data.frame(sample_data(ps), check.names=FALSE)
 sampleda <- sampleda[match(colnames(as.matrix(distme)),rownames(sampleda)),,drop=FALSE]
-sampleda$Group <- factor(sampleda$Group)
+sampleda$Class <- factor(sampleda$Class)
+
 set.seed(1024)
-adores <- adonis(distme ~ Group, data=sampleda, permutation=9999)
+adores <- adonis2(distme ~ Class, # Switched adonis to adonis2 because vegan gave me that warning
+                 data=sampleda, 
+                 permutation=9999)
 data.frame(adores$aov.tab)
+# Well that didn't work. Unclear why.
+
+# Intended output: 
+#>           Df  SumsOfSqs   MeanSqs  F.Model         R2 Pr..F.
+#> Group      1  0.7645291 0.7645291 3.199178 0.07581139  1e-04
+#> Residuals 39  9.3200922 0.2389767       NA 0.92418861     NA
+#> Total     40 10.0846214        NA       NA 1.00000000     NA
+```
+
+```{r Hierarchical Clustering}
+# Hierarchical clustering can also visualize beta diversity using ggtree
+# This gives a phylogenetic tree
+
+# Make the hierarchical clustering object
+hcsample <- get_clust(obj=ps, 
+                      distmethod="bray",
+                      method="hellinger",
+                      hclustmethod="average")
+
+# Visualize with rectangular layout
+cplot1 <- ggclust(obj=hcsample,
+                  layout = "rectangular",
+                  pointsize=1,
+                  fontsize=0,
+                  factorNames=c("Class")) +
+              scale_color_manual(values=c("#00AED7",
+                                          "#FD9347")) +
+              theme_tree2(legend.position="right",
+              plot.title = element_text(face="bold",
+                                        lineheight=25,
+                                        hjust=0.5))
+# Visualize with circular layout
+cplot2 <- ggclust(obj=hcsample,
+                  layout = "circular",
+                  pointsize=1,
+                  fontsize=2,
+                  factorNames=c("Class"),
+                  factorLevels = list("CD", "Control")) + # Added to try to fix the colors
+          scale_color_manual(values=c("#00AED7", 
+                              "#FD9347")) +
+          theme(legend.position="right")
+
+cplot1 | cplot2
+
+# These are supposed to have CD and Control color dots at the end but they don't :(
+```
+
+# Biomarker Detection
+
+```{r}
+# Since the effect size was calculated by randomly re-sampling, 
+# the seed should be set for reproducibly results.
+set.seed(1024)
+deres <- diff_analysis(obj = ps, classgroup = "Class",
+                       mlfun = "lda",
+                       filtermod = "pvalue",
+                       firstcomfun = "kruskal_test",
+                       firstalpha = 0.05,
+                       strictmod = TRUE,
+                       secondcomfun = "wilcox_test",
+                       subclmin = 3,
+                       subclwilc = TRUE,
+                       secondalpha = 0.01,
+                       lda=3)
+deres
+#> The original data: 689 features and 41 samples
+#> The sample data: 1 variables and 41 samples
+#> The taxda contained 1432 by 7 rank
+#> after first test (kruskal_test) number of feature (pvalue<=0.05):71
+#> after second test (wilcox_test) number of significantly discriminative feature:28
+#> after lda, Number of discriminative features: 22 (certain taxonomy classification:15; uncertain taxonomy classication: 7)
+
+# Visualize
+
+diffclade_p <- ggdiffclade(
+                   obj=deres, 
+                   alpha=0.3, 
+                   linewd=0.15,
+                   skpointsize=0.6, 
+                   layout="radial",
+                   taxlevel=3, 
+                   removeUnkown=TRUE,
+                   reduce=TRUE # This argument is to remove the branch of unknown taxonomy.
+               ) +
+               scale_fill_manual(
+                   values=c("#00AED7", "#FD9347")
+               ) +
+               guides(color = guide_legend(
+                                  keywidth = 0.1, 
+                                  keyheight = 0.6,
+                                  order = 3,
+                                  ncol=1)
+               ) +
+               theme(
+                   panel.background=element_rect(fill=NA),
+                   legend.position="right", 
+                   plot.margin=margin(0,0,0,0),
+                   legend.spacing.y=unit(0.02, "cm"), 
+                   legend.title=element_text(size=7),
+                   legend.text=element_text(size=6), 
+                   legend.box.spacing=unit(0.02,"cm")
+               )
+diffclade_p
+# Looks pretty much like the example
+
+# Visualize relative abundance and effect size
+
+diffbox <- ggdiffbox(obj=deres, box_notch=FALSE, 
+             colorlist=c("#00AED7", "#FD9347"), l_xlabtext="relative abundance")
+diffbox
+
+# Now with taxonomic groups
+ggdifftaxbar(obj=deres, xtextsize=1.5, 
+             output="IBD_biomarkder_barplot",
+             coloslist=c("#00AED7", "#FD9347"))
+
+# Now with confidence intervals
+es_p <- ggeffectsize(obj=deres, 
+                     lineheight=0.1,
+                     linewidth=0.3) + 
+        scale_color_manual(values=c("#00AED7", 
+                                    "#FD9347")) 
+es_p
+# All look pretty much like the examples
+```
+
+```{r Terrifying Correlation Plot, eval = F}
+# Currently not working, Error in `calcCurveGrob()`:
+  # ! end points must not be identical
+genustab <- get_taxadf(ps, taxlevel=6)
+genustab <- data.frame(t(otu_table(genustab)), check.names=FALSE)
+genustab <- data.frame(apply(genustab, 2, function(x)x/sum(x)), check.names=FALSE)
+
+cortest <- WGCNA::corAndPvalue(genustab, method="spearman", alternative="two.sided")
+
+cortest$cor[upper.tri(cortest$cor, diag = TRUE)] <- NA
+cortest$p[upper.tri(cortest$p, diag = TRUE)] <- NA
+cortab1 <- na.omit(melt(t(cortest$cor))) %>%
+  dplyr::rename(from=Var1, to=Var2, cor=value) # It was using a different rename that wanted oldname = newname instead of dplyr's newname = oldname
+corptab1 <- na.omit(melt(t(cortest$p))) %>%
+  dplyr::rename(pvalue=value) 
+cortab1$fdr <- p.adjust(corptab1$pvalue, method="fdr")
+
+cortab1 <- cortab1 %>% mutate(correlation=case_when(cor>0 ~ "positive",cor < 0 ~ "negative",TRUE ~ "No"))
+cortab2 <- cortab1 %>% filter(fdr <= 0.05) %>% filter(cor <= -0.5 | cor >= 0.8)
+
+p <- ggdiffclade(
+         obj=deres,
+         alpha=0.3,
+         linewd=0.25,
+         skpointsize=0.2,
+         layout="inward_circular",
+         taxlevel=7,
+         cladetext=0,
+         setColors=FALSE,
+         xlim=16
+     ) +
+     scale_fill_manual(values=c("#00AED7", "#FD9347"),
+                       guide=guide_legend(keywidth=0.5,
+                                          keyheight=0.5,
+                                          order=3,
+                                          override.aes=list(alpha=1))
+     ) +
+     scale_size_continuous(range=c(1, 3),
+                       guide=guide_legend(keywidth=0.5,keyheight=0.5,order=4,
+                                          override.aes=list(shape=21))) +
+     scale_colour_manual(values=rep("white", 100),guide="none")
+
+p2 <- p +
+      new_scale_color() +
+      new_scale("size") +
+      geom_tiplab(size=1, hjust=1) +
+      geom_taxalink(
+          data=cortab2,
+          mapping=aes(taxa1=from,
+                      taxa2=to,
+                      colour=correlation,
+                      size=abs(cor)),
+          alpha=0.4,
+          ncp=10,
+          hratio=1,
+          offset=1.2
+      ) +
+      scale_size_continuous(range = c(0.2, 1),
+                            guide=guide_legend(keywidth=1, keyheight=0.5,
+                                               order=1, override.aes=list(alpha=1))
+      ) +
+      scale_colour_manual(values=c("chocolate2", "#009E73"),
+                          guide=guide_legend(keywidth=0.5,
+                                             keyheight=0.5,
+                                             order=2,
+                                             override.aes=list(alpha=1, size=1)))
+p2
 ```
 
