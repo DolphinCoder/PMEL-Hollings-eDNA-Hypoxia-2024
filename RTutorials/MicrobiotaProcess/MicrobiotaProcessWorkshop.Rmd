@@ -1,0 +1,283 @@
+---
+title: "MicrobiotaProcessWorkshop"
+author: "Ella Crotty"
+header-includes:
+  \usepackage{fvextra}
+  \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,commandchars=\\\{\}}
+output:
+  pdf_document:
+    toc: TRUE
+urlcolor: purple
+---
+
+# Links
+
+- [Workshop Link](https://yulab-smu.top/MicrobiotaProcessWorkshop/articles/MicrobiotaProcessWorkshop.html)
+- [MicrobiotaProcess Documentation](https://www.bioconductor.org/packages/release/bioc/html/MicrobiotaProcess.html)
+
+# Installs
+
+MicrobiotaProcess is an R package for analysis, visualization and biomarker discovery of microbial datasets. It introduces MPSE class, this make it more interoperable with the existing computing ecosystem. Moreover, it introduces a tidy microbiome data structure paradigm and analysis grammar. It provides a wide variety of microbiome data analysis procedures under the unified and common framework (tidy-like framework). 
+
+Need to run `BiocManager::install("MicrobiotaProcess")`
+
+```{r Package Installs}
+suppressPackageStartupMessages({
+  library(MicrobiotaProcess) # an R package for analysis, visualization and biomarker discovery of Microbiome.
+  library(phyloseq) # Handling and analysis of high-throughput microbiome census data.
+  library(tidyverse) # Easily Install and Load the 'Tidyverse'.
+  library(VennDiagram)
+  library(UpSetR)
+  library(grid)
+  library(ggnewscale) # Multiple Fill and Colour Scales in 'ggplot2'.
+  library(vegan) # Community Ecology Package.
+  library(coin) # Conditional Inference Procedures in a Permutation Test Framework.
+  library(reshape2) # Flexibly Reshape Data: A Reboot of the Reshape Package.
+})
+```
+
+This workshop uses the 43 pediatric IBD stool samples as example, obtained from the Integrative Human Microbiome Project Consortium (iHMP).
+
+Data from `https://www.microbiomeanalyst.ca/MicrobiomeAnalyst/resources/data/ibd_data.zip`:
+
+- `ibd_asv_table.txt` - feature table (row features X column samples)
+- `ibd_meta.csv` - metadata file of samples
+- `ibd_taxa.txt` - the taxonomic annotation of features
+
+```{r Import Data}
+# Use import_dada2 of MicrobiotaProcess to import the datasets, and return a phyloseq object.
+
+# MicrobiotaProcess also has other import functions with different input and output formats
+
+otuda <- read.table("./ibd_data/IBD_data/ibd_asv_table.txt", header=T, 
+                    check.names=F, 
+                    comment.char="", 
+                    row.names=1, sep="\t")
+# building the output format of removeBimeraDenovo of dada2
+otuda <- data.frame(t(otuda), 
+                    check.names=F)
+sampleda <- read.csv("./ibd_data/IBD_data/ibd_meta.csv", 
+                     row.names=1, 
+                     comment.char="")
+taxda <- read.table("./ibd_data/IBD_data/ibd_taxa.txt", 
+                    header=T, 
+                    row.names=1, 
+                    check.names=F, comment.char="")
+# the feature names should be the same with rownames of taxda. 
+taxda <- taxda[match(colnames(otuda), rownames(taxda)),]
+psraw <- import_dada2(seqtab=otuda, 
+                      taxatab=taxda, 
+                      sampleda=sampleda)
+# view the reads depth of samples. In this example, 
+# we remove the sample contained less than 20914 otus.
+# sort(rowSums(otu_table(psraw)))
+
+# samples were removed if the reads number is too little.
+psraw <- prune_samples(sample_sums(psraw)>=sort(rowSums(otu_table(psraw)))[3], psraw)
+# then the samples were rarefied to 20914 reads.
+set.seed(1024)
+ps <- rarefy_even_depth(psraw)
+ps
+```
+
+# Data Cleaning
+
+Rarefaction is used to compensate for the effect of sample size on the number of units observed in a sample. `MicrobiotaProcess` can graph rarefaction curves. [Rarefaction](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6819366/) adjusts for different library sizes across samples to improve alpha diversity comparisons. It involves randomly discarding reads from larger samples until all of the samples are statistically comparable.
+
+```{r Rarefaction}
+# for reproducibly random number
+set.seed(1024)
+# Show rarefaction curves
+# Had to replace "Group" with "Class" - the vignette says "Group" to divide into CD and Control, but "Group" doesn't exist and "Class" has CD and Control.
+
+suppressWarnings(rareres <- get_rarecurve(obj=ps, chunks=400)) # This makes a bunch of warnings
+
+p_rare <- ggrarecurve(obj=rareres,
+                      indexNames=c("Observe","Chao1","ACE"),
+                      ) +
+          theme(legend.spacing.y=unit(0.01,"cm"),
+                legend.text=element_text(size=4)) # Plot lines individually
+
+prare1 <- ggrarecurve(obj=rareres, 
+                      factorNames="Class",
+                      indexNames=c("Observe", "Chao1", "ACE")
+                      ) +
+          scale_fill_manual(values=c("#00AED7", "#FD9347"))+
+          scale_color_manual(values=c("#00AED7", "#FD9347"))+
+          theme_bw()+
+          theme(axis.text=element_text(size=8),
+                panel.grid=element_blank(),
+                strip.background =
+                  element_rect(colour=NA,fill="grey"),
+                strip.text.x = element_text(face="bold"))          
+
+prare2 <- ggrarecurve(obj=rareres,
+                      factorNames="Class", # Plot lines by group
+                      shadow=FALSE, # Plot every line instead of the average line
+                      indexNames=c("Observe", "Chao1", "ACE")
+                      ) +
+          scale_color_manual(values=c("#00AED7", "#FD9347"))+
+          theme_bw() +
+          theme(axis.text=element_text(size=8), panel.grid=element_blank(),
+                strip.background = element_rect(colour=NA,fill="grey"),
+                strip.text.x = element_text(face="bold"))
+
+p_rare / prare1 / prare2
+```
+
+These curves are near saturation - this means that there is enough data to detect species.
+
+# Diversity Measures
+
+```{r Diversity Measures}
+alphaobj <- get_alphaindex(ps)
+head(as.data.frame(alphaobj))
+
+# This will make a dataframe of 6 common diversity measures
+```
+
+```{r Plot Diversity Measures}
+p_alpha <- ggbox(alphaobj, geom="violin", factorNames="Class") +
+           scale_fill_manual(values=c("#00AED7", "#FD9347"))+
+           theme(strip.background = element_rect(colour=NA, fill="grey"))
+p_alpha
+```
+
+# Taxonomic Plots
+
+- `ggbartax()` can visualize community compositions
+  - Use `get_taxadf()` first to visualize abundance of specific levels of class
+  
+```{r Taxonomic Group Plots}
+classtaxa <- get_taxadf(obj=ps, taxlevel=3) # So that we can specify the taxonomic level
+
+# The 30 most abundant taxonomy will be visualized by default (parameter `topn=30`). 
+pclass <- ggbartax(obj=classtaxa, facetNames="Class") +
+          xlab(NULL) +
+          ylab("relative abundance (%)") +
+          scale_fill_manual(values=c(colorRampPalette(RColorBrewer::brewer.pal(12,"Set3"))(31))) +
+          guides(fill= guide_legend(keywidth = 0.5, keyheight = 0.5))
+pclass
+
+# Show the abundance in different groups.
+fclass <- ggbartax(obj=classtaxa, facetNames="Class", plotgroup=TRUE, topn=10) + # Plot by group instead of by sample
+          xlab(NULL) +
+          ylab("relative abundance (%)") +
+          scale_fill_manual(values=c(colorRampPalette(RColorBrewer::brewer.pal(12,"Set3"))(31))) +
+          guides(fill= guide_legend(keywidth = 0.5, keyheight = 0.5, ncol=2))
+fclass
+
+# View count instead of percent abundance
+pclass2 <- ggbartax(obj=classtaxa, count=TRUE, facetNames="Class") +
+          xlab(NULL) +
+          ylab("count reads") +
+          scale_fill_manual(values=c(colorRampPalette(RColorBrewer::brewer.pal(12,"Set3"))(31))) +
+          guides(fill= guide_legend(keywidth = 0.5, keyheight = 0.5))
+pclass2
+```
+
+Venn plots can show the differences between groups. MicrobiotaProcess can use VennDiagram or UpSet.
+
+```{r Venn Diagram}
+vennlist <- get_vennlist(obj=ps, factorNames="Class")
+upsetda <- get_upset(obj=ps, factorNames="Class")
+vennp <- venn.diagram(vennlist,
+                      height=5,
+                      width=5, 
+                      filename=NULL, 
+                      fill=c("#00AED7", "#FD9347"),
+                      cat.col=c("#00AED7", "#FD9347"),
+                      alpha = 0.85, 
+                      fontfamily = "serif",
+                      fontface = "bold",
+                      cex = 1.2,
+                      cat.cex = 1.3,
+                      cat.default.pos = "outer",
+                      cat.dist=0.1,
+                      margin = 0.1, 
+                      lwd = 3,
+                      lty ='dotted',
+                      imagetype = "svg")
+grid::grid.draw(vennp)
+# Note: This has different numbers than the example on the website
+
+upset(upsetda, sets=unique(as.vector(sample_data(ps)$Group)), 
+      sets.bar.color = "#56B4E9",
+      order.by = "freq", 
+      empty.intersections = "on")
+```
+
+# Beta analysis
+
+- Principal component analysis (PCA) = statistical procedure to compare groups
+- Principle Coordinate Analysis (PCoA) = statistical procedure to compare groups of samples, which can be based on phylogenetic or count-based distance measures (ex. Bray-Curtis dissimilarity)
+
+**Notes on numbers of PCA**
+
+- PC1 is the component that represents the most variation, PC2 represents the second most
+  - PC1 is strongly correlated with some group of variables that vary together
+- Three samples = PC3 can exist, which is why these plots have PC3 sometimes
+- The axes say how much variance is explained by each principal component
+
+```{r PCA Plots}
+# If the input was normalized, the method parameter should be setted NULL.
+# Get the PCA data
+pcares <- get_pca(obj=ps, method="hellinger")
+
+# Visulizing the result
+pcaplot1 <- ggordpoint(obj=pcares, 
+                       biplot=TRUE, 
+                       speciesannot=TRUE,
+                       factorNames=c("Class"), 
+                       ellipse=TRUE) +
+            scale_color_manual(values=c("#00AED7", "#FD9347")) +
+            scale_fill_manual(values=c("#00AED7", "#FD9347"))
+
+# pc = c(1, 3) to show the first and third principal components.
+pcaplot2 <- ggordpoint(obj=pcares, 
+                       pc=c(1, 3), # Change pc and biplot
+                       biplot=TRUE, 
+                       speciesannot=TRUE, 
+                       factorNames=c("Class"), 
+                       ellipse=TRUE) +
+            scale_color_manual(values=c("#00AED7", "#FD9347")) +
+            scale_fill_manual(values=c("#00AED7", "#FD9347"))
+
+pcaplot1 | pcaplot2
+```
+
+```{r PCoA Plots}
+# distmethod options: "unifrac",  "wunifrac", "manhattan", "euclidean", "canberra", "bray", "kulczynski" ...(vegdist, dist)
+
+# Make PCoA data
+pcoares <- get_pcoa(obj=ps, distmethod="bray", method="hellinger")
+
+# Visualizing the result
+pcoaplot1 <- ggordpoint(obj=pcoares, 
+                        biplot=TRUE, 
+                        speciesannot=TRUE,
+                        factorNames=c("Class"), 
+                        ellipse=TRUE) +
+  scale_color_manual(values=c("#00AED7", "#FD9347")) +
+  scale_fill_manual(values=c("#00AED7", "#FD9347"))
+
+# first and third principal co-ordinates
+pcoaplot2 <- ggordpoint(obj=pcoares, pc=c(1, 3), biplot=TRUE, speciesannot=TRUE,
+                        factorNames=c("Class"), ellipse=TRUE) +
+             scale_color_manual(values=c("#00AED7", "#FD9347")) +
+             scale_fill_manual(values=c("#00AED7", "#FD9347"))
+
+pcoaplot1 | pcoaplot2
+```
+
+```{r Permutational Multivariate Analysis of Variance}
+# Using the vegan package
+distme <- get_dist(ps, distmethod ="bray", method="hellinger")
+sampleda <- data.frame(sample_data(ps), check.names=FALSE)
+sampleda <- sampleda[match(colnames(as.matrix(distme)),rownames(sampleda)),,drop=FALSE]
+sampleda$Group <- factor(sampleda$Group)
+set.seed(1024)
+adores <- adonis(distme ~ Group, data=sampleda, permutation=9999)
+data.frame(adores$aov.tab)
+```
+

@@ -7,6 +7,7 @@ header-includes:
 output:
   pdf_document:
     toc: TRUE
+urlcolor: purple
 ---
 
 ```{r}
@@ -43,7 +44,7 @@ heights_no_na
 ```{r}
 # download.file(url = "https://ndownloader.figshare.com/files/2292169",
               # destfile = "~/Dropbox/Coding/Summer2024/RTutorials/DataCarpentry/RawData/portal_data_joined.csv")
-surveys <- read_csv("~/Dropbox/Coding/Summer2024/RTutorials/DataCarpentry/RawData/portal_data_joined.csv")
+surveys <- read_csv("~/Dropbox/Coding/Summer2024/PMEL-Hollings-eDNA-Hypoxia-2024/RTutorials/DataCarpentry/RawData/portal_data_joined.csv")
 summary(surveys)
 names(surveys)
 rownames(surveys)[1:5]
@@ -217,7 +218,7 @@ plot_combined2 <- plot_combined + plot_annotation(
 
 plot_combined2
 
-ggsave("~/Dropbox/Coding/Summer2024/RTutorials/DataCarpentry/Figures/plot_combined.png", plot_combined2, width = 10, dpi = 300)
+ggsave("~/Dropbox/Coding/Summer2024/PMEL-Hollings-eDNA-Hypoxia-2024/RTutorials/DataCarpentry/Figures/plot_combined.png", plot_combined2, width = 10, dpi = 300)
 ```
 
 [How to query larger online databases](https://datacarpentry.org/R-ecology-lesson/05-r-and-databases.html)

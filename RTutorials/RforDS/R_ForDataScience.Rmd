@@ -7,6 +7,7 @@ header-includes:
 output:
   pdf_document:
     toc: TRUE
+urlcolor: purple
 ---
 
 [Tutorial used](https://r4ds.hadley.nz/data-transform)
