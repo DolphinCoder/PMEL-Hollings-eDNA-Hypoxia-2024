@@ -1,12 +1,13 @@
 ---
-title: “OCNMS CTD Data Exploration”
+title: "“OCNMS CTD Data Exploration”"
 author: "Eleanor (Ella) Crotty"
-header-includes:
-  \usepackage{fvextra}
-  \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,commandchars=\\\{\}}
+header-includes: \usepackage{fvextra} \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,commandchars=\\\{\}}
 output:
+  html_document:
+    toc: yes
+    df_print: paged
   pdf_document:
-    toc: TRUE
+    toc: yes
 urlcolor: blue
 ---
 
@@ -26,7 +27,10 @@ library(colorRamps) # Color palettes
 ```
 
 ```{r Data Imports}
-wd <- "OCNMS_Hypoxia/CTD_Data"
+wd <- "OCNMS_Hypoxia/Data/CTD_Data"
+exp <- "OCNMS_Hypoxia/Outputs"
+pltpath <- "OCNMS_Hypoxia/Plots/CTD_Data_Exploration_Plots"
+
 OME_CTD <- read.csv(here(wd, "OCNMS_OME_ctd_output_copy.csv"))
 OCNMS_OME_CTD <- read.csv(here(wd, "OCNMS_OMEsites_ctd_output_copy.csv"))
 OCNMS_All_CTD <- read.csv(here(wd, "OCNMS_Allsites_ctd_output_copy.csv"))
@@ -135,12 +139,20 @@ mapOCNMS +
   geom_point(data = OME_CTD, aes(x = longitude, y = latitude, group = NA)) + # aes(group = NA) or geom_point(inherit = FALSE) keeps it from looking for a group since the base layer has groups 
   ggtitle("OME CTD Locations")
 
+# Just checking to make sure this is the same
+mapOCNMS +
+  geom_point(data = OCNMS_OME_CTD, aes(x = longitude, y = latitude, group = NA)) + # aes(group = NA) or geom_point(inherit = FALSE) keeps it from looking for a group since the base layer has groups 
+  ggtitle("OCNMS OME CTD Locations")
+
 mapOCNMS +
   geom_point(data = OCNMS_All_CTD, aes(x = longitude, y = latitude, group = NA)) + # aes(group = NA) or geom_point(inherit = FALSE) keeps it from looking for a group since the base layer has groups 
-  ggtitle("All OCNMS CTD Locations")
+  geom_point(data = OME_CTD, aes(x = longitude, y = latitude, group = NA), color = "cornflowerblue") +
+  labs(title = "All OCNMS CTD Locations", caption = "**OME Sampling Sites in Blue", x = "Longitude", y = "Latitude")
+
+ggsave("CTD_Locations.png", path = here(pltpath), dpi = 500)
 ```
 
-```{r Histogram Function}
+```{r Histogram Functions}
 # Histogram function
 histogram_fill <- function(df, var, binwidth, fill = "darkgray") {
   label <- rlang::englue("A histogram of {{var}} in {{df}} with binwidth {binwidth}")
@@ -182,34 +194,161 @@ histogram <- function(df, var, binwidth) {
 }
 ```
 
+```{r Scatterplot Functions}
+scatterplt <- function(df, x, y, shape = 16, alpha = 1) {
+  label <- rlang::englue("A scatterplot of {{x}} vs {{y}} in {{df}}")
+  
+  df |> 
+    ggplot(aes(x = {{ x }}, y = {{ y }})) + 
+    geom_point(color = "blue", shape = shape, alpha = alpha) + 
+    labs(title = label) +
+    theme_bw()
+}
+
+scatterplt_fill <- function(df, x, y, color, shape = 16, alpha = 1) {
+  label <- rlang::englue("A scatterplot of {{x}} vs {{y}} in {{df}}")
+  
+  df |> 
+    ggplot(aes(x = {{ x }}, y = {{ y }}, color = {{ color }})) + 
+    geom_point(shape = shape, alpha = alpha) + 
+    labs(title = label) +
+    theme_bw()
+}
+```
+
+
+# Cleaning
+
+## Add dates & years
+```{r Investigate year distribution}
+OME_CTD <- OME_CTD %>% 
+  mutate(date = as.Date(date)) %>% 
+  mutate(year = as.factor(year(date)))
+
+OME_CTD %>% 
+  group_by(year) %>% 
+  summarize(Observations_OME = n())
+
+OCNMS_OME_CTD <- OCNMS_OME_CTD %>% 
+  mutate(date = as.Date(date)) %>% 
+  mutate(year = as.factor(year(date)))
+
+OCNMS_OME_CTD %>% 
+  group_by(year) %>% 
+  summarize(Observations_OCNMS_filtOME = n())
+
+OCNMS_All_CTD <- OCNMS_All_CTD %>% 
+  mutate(date = as.Date(date)) %>% 
+  mutate(year = as.factor(year(date)))
+
+OCNMS_All_CTD %>% 
+  group_by(year) %>% 
+  summarize(Observations_OCNMS = n())
+```
+## DO Clean
+```{r OME vs. OCNMS}
+# Why is some of it negative???
+histogram_fill(OME_CTD, DO, 0.5, fill = station_name)
+histogram_fill(OME_CTD, DO, 0.5, fill = year)
+histogram_fill(OME_CTD, DO, 0.5, fill = as.factor(month(date)))
+# Shannon says the OME files are redundant and the OCNMS published data probably just eliminated that because the quality score was low or something. Shannon will check with Sam. Use OCNMS_OME_CTD for now. 
+
+# Plot OME vs. OCNMS to see if redundant
+ggplot(OCNMS_OME_CTD, aes(x = date, y = DO)) +
+  geom_point(shape = 1, color = "blue") +
+  theme_bw() +
+  geom_point(data = OME_CTD, aes(x = date, y = DO), color = "yellow", shape = 1)
+# Probably redundant, OME is the only one with 2024 though
+```
+## General Cleaning
+
+### Histograms
+```{r}
+histogram_fill(OCNMS_OME_CTD, depth, 1, fill = year)
+histogram_fill(OCNMS_OME_CTD, temperature, 1, fill = year)
+histogram_fill(OCNMS_OME_CTD, salinity, 1, fill = year)
+histogram_fill(OCNMS_OME_CTD, potential_density, 1, fill = year)
+histogram_fill(OCNMS_OME_CTD, DO, 1, fill = year)
+histogram_fill(OCNMS_OME_CTD, bottom_depth_m, 0.25, fill = station_name)
+```
+
+```{r General Cleaning}
+# While plotting depth, I found 2 rows with depths of -9999 and several other NA values. Remove.
+OCNMS_OME_CTD <- OCNMS_OME_CTD %>% 
+  filter(depth > 0) # This removes 2 rows with NA values + -9999 depth
+
+histogram_fill(OCNMS_OME_CTD, depth, 1, fill = year)
+```
+
+### Scatterplots
+```{r Scatterplots}
+scatterplt(OCNMS_OME_CTD, depth, potential_density, alpha = 0.1)
+scatterplt_fill(OCNMS_OME_CTD, depth, potential_density, color = year)
+
+scatterplt(OCNMS_OME_CTD, temperature, salinity, alpha = 0.1)
+scatterplt_fill(OCNMS_OME_CTD, temperature, salinity, color = year)
+```
+
+
 # Oxygen Data Exploration
+
 ## Histograms
 ```{r Oxygen Histograms}
-histogram_fill(OME_CTD, DO, 0.5, fill = station_name)
-histogram_fill(OME_CTD, DO, 0.5, fill = as.factor(year(date)))
-
 histogram(OCNMS_All_CTD, DO, 0.5)
-histogram_fill(OCNMS_All_CTD, DO, 0.5, fill = as.factor(year(date)))
+
+histogram(OCNMS_All_CTD, DO, 0.5) +
+  facet_wrap(facets = vars(year))
+
+histogram_fill(OCNMS_All_CTD, DO, 0.5, fill = year) 
 
 histogram(OCNMS_OME_CTD, DO, 0.5)
 ```
 
-```{r}
-OCNMS_OME_CTD_D <- OCNMS_OME_CTD %>% 
-  mutate(date = as.Date(date)) %>% 
-  mutate(year = as.factor(year(date)))
+```{r Line Plots}
+# Goal: One line plot per year of dissolved oxygen versus date
 
-OCNMS_OME_CTD_D %>% 
-  group_by(year) %>% 
-  summarize(Observations = n())
+# Graph of depth, oxygen level, and date by year
+OCNMS_OME_CTD %>% 
+  ggplot(aes(x = date, y = DO, color = depth)) +
+    geom_point(shape = 1) +
+    theme_bw() +
+    facet_wrap(facets = vars(year), scales = "free_x", ncol = 1)
 
-OCNMS_All_CTD_D <- OCNMS_All_CTD %>% 
-  mutate(date = as.Date(date)) %>% 
-  mutate(year = as.factor(year(date)))
+ggsave("OCNMS_CTD_Oxygen_FacetYear.png", path = here(pltpath), width = 1000, height = 5000, units = "px")
 
-OCNMS_All_CTD_D %>% 
-  group_by(year) %>% 
-  summarize(Observations = n())
+# What depths do we have?
+depths <- OCNMS_OME_CTD %>% 
+  group_by(depth) %>% 
+  summarize(n = n())
+# Specific depths do repeat, but there are a few around 42 meters. Perhaps near(depth, 42, tol = 1)
+
+ggplot(OCNMS_OME_CTD, aes(x = depth, fill = year)) +
+  geom_histogram(binwidth = 1, color = "black") +
+  scale_x_continuous(limits = c(30, 45), breaks = seq(from = 30, to = 45, by = 1)) +
+  theme_bw()
+ggsave("OCNMS_CTD_Depths.png", path = here(pltpath), width = 3000, height = 2000, units = "px")
+
+# `if_else(condition, if_true_output, if_false_output, NA_val)` - used to transform vectors/data columns
+
+# Logical vector of whether depth is within 1m of 42m
+near42 <- near(OCNMS_OME_CTD$depth, 42, tol = 1)
+sum(near42) # So the resulting DF should have 191 rows
+
+OCNMS_OME_CTD42m <- OCNMS_OME_CTD %>% 
+  filter(near(OCNMS_OME_CTD$depth, 42, tol = 1)) # 191 rows! Epic.
+
+# Graph of oxygen levels around 42 meters for each year
+OCNMS_OME_CTD42m %>% 
+  ggplot(aes(x = date, y = DO, color = depth)) +
+    geom_line() +
+    geom_point(shape = 1) +
+    theme_bw() +
+    facet_wrap(facets = vars(year), scales = "free_x", ncol = 1)
+ggsave("OCNMS_CTD_Oxygen_FacetYear42m.png", path = here(pltpath), width = 1000, height = 5000, units = "px")
 ```
 
+```{r Export CTD Data}
+# OCNMS_OME_CTD is the most useful to me at the moment, since it is clean and only contains the locations of interest
+write.csv(OCNMS_OME_CTD, file = here("OCNMS_Hypoxia", "Outputs", "OCNMS_CTD_CleanData.csv"))
+```
 

@@ -1,0 +1,30 @@
+---
+title: “Mooring TH042 Data Exploration”
+author: "Eleanor (Ella) Crotty"
+header-includes:
+  \usepackage{fvextra}
+  \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,commandchars=\\\{\}}
+output:
+  pdf_document:
+    toc: TRUE
+urlcolor: blue
+---
+
+```{r Package Imports, message = F, warning = F}
+# Warnings and startup messages suppressed
+library(tidyverse)
+library(patchwork)
+library(scales)
+library(ggrepel)
+library(readxl)
+library(here)
+```
+
+```{r Data Imports}
+wd <- "OCNMS_Hypoxia/Data"
+exp <- "OCNMS_Hypoxia/Outputs"
+pltpath <- "OCNMS_Hypoxia/Plots/Mooring_Data_Exploration_Plots"
+
+TH042 <- read.csv(here(wd, "MooringData_CTPO_TH042.csv"))
+```
+
