@@ -1,0 +1,215 @@
+---
+title: “OCNMS CTD Data Exploration”
+author: "Eleanor (Ella) Crotty"
+header-includes:
+  \usepackage{fvextra}
+  \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,commandchars=\\\{\}}
+output:
+  pdf_document:
+    toc: TRUE
+urlcolor: blue
+---
+
+# Setup
+
+```{r Package Imports, message = F, warning = F}
+# Warnings and startup messages suppressed
+library(tidyverse)
+library(patchwork) # Put plots together
+library(scales) # Rescale datetime axes
+library(ggrepel)
+library(readxl)
+library(here) # Project/filepath management
+library(maps)
+library(RColorBrewer) # Color palettes
+library(colorRamps) # Color palettes
+```
+
+```{r Data Imports}
+wd <- "OCNMS_Hypoxia/CTD_Data"
+OME_CTD <- read.csv(here(wd, "OCNMS_OME_ctd_output_copy.csv"))
+OCNMS_OME_CTD <- read.csv(here(wd, "OCNMS_OMEsites_ctd_output_copy.csv"))
+OCNMS_All_CTD <- read.csv(here(wd, "OCNMS_Allsites_ctd_output_copy.csv"))
+
+# Problem: all the longitudes are positive, they need to be negative
+fixlong <- function(df) {
+  df$longitude <- df$longitude*-1
+  df
+}
+
+head(fixlong(OME_CTD))
+
+OME_CTD <- fixlong(OME_CTD)
+OCNMS_OME_CTD <- fixlong(OCNMS_OME_CTD)
+OCNMS_All_CTD <- fixlong(OCNMS_All_CTD)
+# All better!
+
+# Problem #2: OME used oxygen, OCNMS uses dissolved_oxygen
+OCNMS_All_CTD <- OCNMS_All_CTD %>% 
+  rename(DO = dissolved_oxygen)
+OCNMS_OME_CTD <- OCNMS_OME_CTD %>% 
+  rename(DO = dissolved_oxygen)
+OME_CTD <- OME_CTD %>% 
+  rename(DO = oxygen)
+```
+
+```{r Mapping Setup}
+mapUC <- map_data("world", region = c("usa", "canada"))
+
+ggplot(mapUC, aes(x = long, y = lat, group = group)) +
+  geom_polygon(fill = "gray90", color = "black") +
+  coord_sf() # coord_quickmap is an approximation to preserve straight lines, which works best for small areas close to the equator. projection can be defined (see mapproj::mapproject() for list) and R now recommends using coord_sf(). coord_sf() takes xlim, ylim, crs
+```
+
+## Some excerpts from the R for Data Science tutorial
+
+```
+nz <- map_data("nz")
+
+ggplot(nz, aes(x = long, y = lat, group = group)) +
+  geom_polygon(fill = "white", color = "black") +
+  coord_quickmap() # This will fix the weird stretch usually
+```
+
+```
+# Making a ggplot with label changes
+histogram <- function(df, var, binwidth) {
+  label <- rlang::englue("A histogram of {{var}} with binwidth {binwidth}")
+  
+  df |> 
+    ggplot(aes(x = {{ var }})) + 
+    geom_histogram(binwidth = binwidth) + 
+    labs(title = label)
+}
+
+diamonds |> histogram(carat, 0.1)
+diamonds |> histogram(price, 1000)
+```
+
+```
+df <- tribble(
+  ~id, ~measurement, ~value,
+  "A",        "bp1",    100,
+  "B",        "bp1",    140,
+  "B",        "bp2",    115, 
+  "A",        "bp2",    120,
+  "A",        "bp3",    105
+)
+```
+
+# Functions
+
+```{r Map Function}
+# Variable to make a base map of OCNMS, which I can then add data points to
+
+rangeOC <- tribble(
+  ~MinLong, ~MaxLong, ~MinLat, ~MaxLat,
+  min(OME_CTD$longitude), max(OME_CTD$longitude), min(OME_CTD$latitude), max(OME_CTD$latitude)
+)
+
+OCNMS_x <- c(-123.5, -125.5)
+OCNMS_y <- c(47,49)
+
+mapOCNMS <- ggplot(mapUC, aes(x = long, y = lat, group = group)) +
+  geom_polygon(fill = "gray90", color = "black") +
+  coord_sf(xlim = OCNMS_x, 
+           ylim = OCNMS_y) +
+  theme_bw() +
+  theme(text = element_text(size=15),
+        panel.background = element_rect(fill = "azure1", 
+                                        colour = "azure1"),
+        legend.key = element_rect(fill = "white",
+                                         color = "white"),
+        # It added in blue behind the dots in the key and I don't want that
+        panel.grid.major = element_line(size = 0.5, 
+                                        linetype = 'solid', 
+                                        colour = "white"), 
+        panel.grid.minor = element_line(size = 0.25, 
+                                        linetype = 'solid', 
+                                        colour = "white")) # +
+  # coord_quickmap() # This will fix the weird stretch usually, can also do coord_fixed(ratio = 1.3)
+
+mapOCNMS
+
+mapOCNMS +
+  geom_point(data = OME_CTD, aes(x = longitude, y = latitude, group = NA)) + # aes(group = NA) or geom_point(inherit = FALSE) keeps it from looking for a group since the base layer has groups 
+  ggtitle("OME CTD Locations")
+
+mapOCNMS +
+  geom_point(data = OCNMS_All_CTD, aes(x = longitude, y = latitude, group = NA)) + # aes(group = NA) or geom_point(inherit = FALSE) keeps it from looking for a group since the base layer has groups 
+  ggtitle("All OCNMS CTD Locations")
+```
+
+```{r Histogram Function}
+# Histogram function
+histogram_fill <- function(df, var, binwidth, fill = "darkgray") {
+  label <- rlang::englue("A histogram of {{var}} in {{df}} with binwidth {binwidth}")
+  
+  df |> 
+    ggplot(aes(x = {{ var }}, fill = {{fill}})) + 
+    geom_histogram(binwidth = binwidth, color = "black") + 
+    labs(title = label) +
+    theme_bw()
+}
+
+histogram2 <- function(df, var, binwidth, fill = NA) { # Not currently functional
+  label <- rlang::englue("A histogram of {{var}} in {{df}} with binwidth {binwidth}")
+  
+  if (is.na(fill)) {
+    df |> 
+    ggplot(aes(x = {{ var }})) + 
+    geom_histogram(binwidth = binwidth, color = "black", fill = "darkgray") + 
+    labs(title = label) +
+    theme_bw()
+  } else {
+  df |> 
+    ggplot(aes(x = {{ var }}, fill = {{fill}})) + 
+    geom_histogram(binwidth = binwidth, color = "black") + 
+    labs(title = label) +
+    theme_bw()
+  }
+  
+}
+
+histogram <- function(df, var, binwidth) {
+  label <- rlang::englue("A histogram of {{var}} in {{df}} with binwidth {binwidth}")
+  
+  df |> 
+    ggplot(aes(x = {{ var }})) + 
+    geom_histogram(binwidth = binwidth, color = "black", fill = "darkgray") + 
+    labs(title = label) +
+    theme_bw()
+}
+```
+
+# Oxygen Data Exploration
+## Histograms
+```{r Oxygen Histograms}
+histogram_fill(OME_CTD, DO, 0.5, fill = station_name)
+histogram_fill(OME_CTD, DO, 0.5, fill = as.factor(year(date)))
+
+histogram(OCNMS_All_CTD, DO, 0.5)
+histogram_fill(OCNMS_All_CTD, DO, 0.5, fill = as.factor(year(date)))
+
+histogram(OCNMS_OME_CTD, DO, 0.5)
+```
+
+```{r}
+OCNMS_OME_CTD_D <- OCNMS_OME_CTD %>% 
+  mutate(date = as.Date(date)) %>% 
+  mutate(year = as.factor(year(date)))
+
+OCNMS_OME_CTD_D %>% 
+  group_by(year) %>% 
+  summarize(Observations = n())
+
+OCNMS_All_CTD_D <- OCNMS_All_CTD %>% 
+  mutate(date = as.Date(date)) %>% 
+  mutate(year = as.factor(year(date)))
+
+OCNMS_All_CTD_D %>% 
+  group_by(year) %>% 
+  summarize(Observations = n())
+```
+
+
