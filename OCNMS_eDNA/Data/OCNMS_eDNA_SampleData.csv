@@ -1,0 +1,110 @@
+FINAL Sample NAME,Cruise/ Expedition ID,Cruise/ Expedition ID,Collection Date (local),Rossete position,Sampling method,Preservation,Area within region,Depth (m),Altitude (m),"Latitude      (D° M' S"")","Longitude           (D° M' S"")",Start time  (local),End time (local),Sample volume (ml),Temp (°C),pH,Salinity (ppt),Oxygen (µM)
+E1032.OC0821,OC0821,OCNMS Aug 2021,08/25/21,1,Niskin; Sterivex 0.22µm filter,95% EtOH,Teahwhite Head,33.3,,47° 52.694' N,124° 44.139' W,09:48,9:56,1000,7.7,,33.5,2.7 mg/l
+E1033.OC0821,OC0821,OCNMS Aug 2021,08/25/21,3,Niskin; Sterivex 0.22µm filter,95% EtOH,Teahwhite Head,33.0,,47° 52.694' N,124° 44.139' W,09:48,9:56,1000,7.8,,33.5,2.8 mg/l
+E1034.OC0821,OC0821,OCNMS Aug 2021,08/25/21,4,Niskin; Sterivex 0.22µm filter,95% EtOH,Teahwhite Head,33.0,,47° 52.694' N,124° 44.139' W,09:48,9:56,1000,7.8,,33.5,2.9 mg/l
+E1172.OC0622,OC0622,OCNMS June 2022,06/21/22,1,Niskin; Sterivex 0.22µm filter,95% EtOH,Teahwhit Head,32.4,,47˚ 52.699' N,124˚ 44.187' W,13:28,13:43,1000,8.6,,32.4,5.57 mg/L
+E1173.OC0622,OC0622,OCNMS June 2022,06/21/22,2,Niskin; Sterivex 0.22µm filter,95% EtOH,Teahwhit Head,32.2,,47˚ 52.699' N,124˚ 44.187' W,13:28,13:43,1000,8.6,,32.4,5.9 mg/L
+E1174.OC0622,OC0622,OCNMS June 2022,06/21/22,4,Niskin; Sterivex 0.22µm filter,95% EtOH,Teahwhit Head,32.5,,47˚ 52.699' N,124˚ 44.187' W,13:28,13:43,1000,8.6,,32.4,5.93 mg/L
+E1229.OC0822,OC0822,OCNMS August 2022,08/22/22,2,Niskin; Sterivex 0.22µm filter,95% EtOH,Teahwhit Head,32.8,,47°52.532' N,124°43.992' W,10:59,,1000,7.7,,33.3,4.14 mg/L
+E1230.OC0822,OC0822,OCNMS August 2022,08/22/22,3,Niskin; Sterivex 0.22µm filter,95% EtOH,Teahwhit Head,32.9,,47°52.532' N,124°43.992' W,10:59,,1000,7.7,,33.3,4.21 mg/L
+E1231.OC0822,OC0822,OCNMS August 2022,08/22/22,4,Niskin; Sterivex 0.22µm filter,95% EtOH,Teahwhit Head,33.0,,47°52.532' N,124°43.992' W,10:59,,1000,7.7,,33.3,4.34 mg/L
+E1240.OC0922,OC0922,OCNMS Sept 2022,8/23/2022,Port 1,PPS Unit; Programmed Sampling,95% EtOH,Teahwhit Head,34.0,8,47°52.467' N,124°44.070 W,0:00,00:17,1000,,,,
+E1241.OC0922,OC0922,OCNMS Sept 2022,8/23/2022,Port 2,PPS Unit; Programmed Sampling,95% EtOH,Teahwhit Head,34.0,8,47°52.467' N,124°44.070 W,12:00,12:17,1000,,,,
+E1242.OC0922,OC0922,OCNMS Sept 2022,8/24/2022,Port 3,PPS Unit; Programmed Sampling,95% EtOH,Teahwhit Head,34.0,8,47°52.467' N,124°44.070 W,0:00,00:17,1000,,,,
+E1243.OC0922,OC0922,OCNMS Sept 2022,8/24/2022,Port 4,PPS Unit; Programmed Sampling,95% EtOH,Teahwhit Head,34.0,8,47°52.467' N,124°44.070 W,12:00,12:17,1000,,,,
+E1244.OC0922,OC0922,OCNMS Sept 2022,8/25/2022,Port 5,PPS Unit; Programmed Sampling,95% EtOH,Teahwhit Head,34.0,8,47°52.467' N,124°44.070 W,0:00,00:17,1000,,,,
+E1245.OC0922,OC0922,OCNMS Sept 2022,8/26/2022,Port 6,PPS Unit; Programmed Sampling,95% EtOH,Teahwhit Head,34.0,8,47°52.467' N,124°44.070 W,12:00,12:17,1000,,,,
+E1246.OC0922,OC0922,OCNMS Sept 2022,8/28/2022,Port 7,PPS Unit; Programmed Sampling,95% EtOH,Teahwhit Head,34.0,8,47°52.467' N,124°44.070 W,0:00,00:17,1000,,,,
+E1247.OC0922,OC0922,OCNMS Sept 2022,8/29/2022,Port 8,PPS Unit; Programmed Sampling,95% EtOH,Teahwhit Head,34.0,8,47°52.467' N,124°44.070 W,12:00,12:17,1000,,,,
+E1248.OC0922,OC0922,OCNMS Sept 2022,8/31/2022,Port 9,PPS Unit; Programmed Sampling,95% EtOH,Teahwhit Head,34.0,8,47°52.467' N,124°44.070 W,0:00,00:17,1000,,,,
+E1249.OC0922,OC0922,OCNMS Sept 2022,9/1/2022,Port 10,PPS Unit; Programmed Sampling,95% EtOH,Teahwhit Head,34.0,8,47°52.467' N,124°44.070 W,12:00,12:17,1000,,,,
+E1250.OC0922,OC0922,OCNMS Sept 2022,9/3/2022,Port 11,PPS Unit; Programmed Sampling,95% EtOH,Teahwhit Head,34.0,8,47°52.467' N,124°44.070 W,0:00,00:17,1000,,,,
+E1251.OC0922,OC0922,OCNMS Sept 2022,9/4/2022,Port 12,PPS Unit; Programmed Sampling,95% EtOH,Teahwhit Head,34.0,8,47°52.467' N,124°44.070 W,12:00,12:17,1000,,,,
+E1252.OC0922,OC0922,OCNMS Sept 2022,9/6/2022,Port 13,PPS Unit; Programmed Sampling,95% EtOH,Teahwhit Head,34.0,8,47°52.467' N,124°44.070 W,0:00,00:17,1000,,,,
+E1253.OC0922,OC0922,OCNMS Sept 2022,9/7/2022,Port 14,PPS Unit; Programmed Sampling,95% EtOH,Teahwhit Head,34.0,8,47°52.467' N,124°44.070 W,12:00,12:17,1000,,,,
+E1254.OC0922,OC0922,OCNMS Sept 2022,9/9/2022,Port 15,PPS Unit; Programmed Sampling,95% EtOH,Teahwhit Head,34.0,8,47°52.467' N,124°44.070 W,0:00,00:17,1000,,,,
+E1255.OC0922,OC0922,OCNMS Sept 2022,9/10/2022,Port 16,PPS Unit; Programmed Sampling,95% EtOH,Teahwhit Head,34.0,8,47°52.467' N,124°44.070 W,12:00,12:17,1000,,,,
+E1256.OC0922,OC0922,OCNMS Sept 2022,9/12/2022,Port 17,PPS Unit; Programmed Sampling,95% EtOH,Teahwhit Head,34.0,8,47°52.467' N,124°44.070 W,0:00,00:17,1000,,,,
+E1257.OC0922,OC0922,OCNMS Sept 2022,9/13/2022,Port 18,PPS Unit; Programmed Sampling,95% EtOH,Teahwhit Head,34.0,8,47°52.467' N,124°44.070 W,12:00,12:17,1000,,,,
+E1258.OC0922,OC0922,OCNMS Sept 2022,9/15/2022,Port 19,PPS Unit; Programmed Sampling,95% EtOH,Teahwhit Head,34.0,8,47°52.467' N,124°44.070 W,0:00,00:17,1000,,,,
+E1259.OC0922,OC0922,OCNMS Sept 2022,9/16/2022,Port 20,PPS Unit; Programmed Sampling,95% EtOH,Teahwhit Head,34.0,8,47°52.467' N,124°44.070 W,12:00,12:17,1000,,,,
+E1260.OC0922,OC0922,OCNMS Sept 2022,9/17/2022,Port 21,PPS Unit; Programmed Sampling,95% EtOH,Teahwhit Head,34.0,8,47°52.467' N,124°44.070 W,0:00,00:17,1000,,,,
+E1261.OC0922,OC0922,OCNMS Sept 2022,9/17/2022,Port 22,PPS Unit; Programmed Sampling,95% EtOH,Teahwhit Head,34.0,8,47°52.467' N,124°44.070 W,12:00,12:17,1000,,,,
+E1262.OC0922,OC0922,OCNMS Sept 2022,9/18/2022,Port 23,PPS Unit; Programmed Sampling,95% EtOH,Teahwhit Head,34.0,8,47°52.467' N,124°44.070 W,0:00,00:17,1000,,,,
+E1263.OC0922,OC0922,OCNMS Sept 2022,9/18/2022,Port 24,PPS Unit; Programmed Sampling,95% EtOH,Teahwhit Head,34.0,8,47°52.467' N,124°44.070 W,12:00,12:17,1000,,,,
+E1265.OC0922,OC0922,OCNMS Sept 2022,09/20/22,10,Niskin; Sterivex 0.22µm filter,95% EtOH,Teahwhit Head,33.2,,47°52.467' N,124°44.070 W,11:00,,1000,7.9,,33.4,1.69 mg/L
+E1266.OC0922,OC0922,OCNMS Sept 2022,09/20/22,9,Niskin; Sterivex 0.22µm filter,95% EtOH,Teahwhit Head,32.7,,47°52.467' N,124°44.070 W,11:00,,1000,7.9,,33.4,1.58 mg/L
+E1267.OC0922,OC0922,OCNMS Sept 2022,09/20/22,8,Niskin; Sterivex 0.22µm filter,95% EtOH,Teahwhit Head,33.1,,47°52.467' N,124°44.070 W,11:00,,1000,7.9,,33.4,1.68 mg/L
+E1275.OC1021,OC1021,OCNMS Oct 2021,08/26/21,Port 1,PPS Unit; Programmed Sampling,95% EtOH,Teahwhit Head,34.0,8,47° 52.673' N,124° 44.340' W,00:01,00:17,1000,,,,
+E1276.OC1021,OC1021,OCNMS Oct 2021,08/27/21,Port 2,PPS Unit; Programmed Sampling,95% EtOH,Teahwhit Head,34.0,8,47° 52.673' N,124° 44.340' W,12:01,12:24,1000,,,,
+E1277.OC1021,OC1021,OCNMS Oct 2021,08/29/21,Port 3,PPS Unit; Programmed Sampling,95% EtOH,Teahwhit Head,34.0,8,47° 52.673' N,124° 44.340' W,00:01,00:27,1000,,,,
+E1278.OC1021,OC1021,OCNMS Oct 2021,08/30/21,Port 4,PPS Unit; Programmed Sampling,95% EtOH,Teahwhit Head,34.0,8,47° 52.673' N,124° 44.340' W,12:01,12:25,1000,,,,
+E1279.OC1021,OC1021,OCNMS Oct 2021,09/01/21,Port 5,PPS Unit; Programmed Sampling,95% EtOH,Teahwhit Head,34.0,8,47° 52.673' N,124° 44.340' W,00:01,00:22,1000,,,,
+E1280.OC1021,OC1021,OCNMS Oct 2021,09/02/21,Port 6,PPS Unit; Programmed Sampling,95% EtOH,Teahwhit Head,34.0,8,47° 52.673' N,124° 44.340' W,12:02,12:29,1000,,,,
+E1281.OC1021,OC1021,OCNMS Oct 2021,09/04/21,Port 7,PPS Unit; Programmed Sampling,95% EtOH,Teahwhit Head,34.0,8,47° 52.673' N,124° 44.340' W,00:02,00:27,1000,,,,
+E1282.OC1021,OC1021,OCNMS Oct 2021,09/05/21,Port 8,PPS Unit; Programmed Sampling,95% EtOH,Teahwhit Head,34.0,8,47° 52.673' N,124° 44.340' W,12:01,12:27,1000,,,,
+E1283.OC1021,OC1021,OCNMS Oct 2021,09/07/21,Port 9,PPS Unit; Programmed Sampling,95% EtOH,Teahwhit Head,34.0,8,47° 52.673' N,124° 44.340' W,00:02,00:24,1000,,,,
+E1284.OC1021,OC1021,OCNMS Oct 2021,09/08/21,Port 10,PPS Unit; Programmed Sampling,95% EtOH,Teahwhit Head,34.0,8,47° 52.673' N,124° 44.340' W,12:02,12:23,1000,,,,
+E1285.OC1021,OC1021,OCNMS Oct 2021,09/10/21,Port 11,PPS Unit; Programmed Sampling,95% EtOH,Teahwhit Head,34.0,8,47° 52.673' N,124° 44.340' W,00:02,00:29,1000,,,,
+E1286.OC1021,OC1021,OCNMS Oct 2021,09/11/21,Port 12,PPS Unit; Programmed Sampling,95% EtOH,Teahwhit Head,34.0,8,47° 52.673' N,124° 44.340' W,12:02,12:31,1000,,,,
+E1287.OC1021,OC1021,OCNMS Oct 2021,09/13/21,Port 13,PPS Unit; Programmed Sampling,95% EtOH,Teahwhit Head,34.0,8,47° 52.673' N,124° 44.340' W,00:02,00:24,1000,,,,
+E1288.OC1021,OC1021,OCNMS Oct 2021,09/14/21,Port 14,PPS Unit; Programmed Sampling,95% EtOH,Teahwhit Head,34.0,8,47° 52.673' N,124° 44.340' W,12:02,12:30,1000,,,,
+E1289.OC1021,OC1021,OCNMS Oct 2021,09/16/21,Port 15,PPS Unit; Programmed Sampling,95% EtOH,Teahwhit Head,34.0,8,47° 52.673' N,124° 44.340' W,00:02,00:25,1000,,,,
+E1290.OC1021,OC1021,OCNMS Oct 2021,09/17/21,Port 16,PPS Unit; Programmed Sampling,95% EtOH,Teahwhit Head,34.0,8,47° 52.673' N,124° 44.340' W,12:02,12:28,1000,,,,
+E1291.OC1021,OC1021,OCNMS Oct 2021,09/19/21,Port 17,PPS Unit; Programmed Sampling,95% EtOH,Teahwhit Head,34.0,8,47° 52.673' N,124° 44.340' W,00:02,00:29,1000,,,,
+E1292.OC1021,OC1021,OCNMS Oct 2021,09/20/21,Port 18,PPS Unit; Programmed Sampling,95% EtOH,Teahwhit Head,34.0,8,47° 52.673' N,124° 44.340' W,12:01,12:26,1000,,,,
+E1293.OC1021,OC1021,OCNMS Oct 2021,09/22/21,Port 19,PPS Unit; Programmed Sampling,95% EtOH,Teahwhit Head,34.0,8,47° 52.673' N,124° 44.340' W,00:01,00:20,1000,,,,
+E1294.OC1021,OC1021,OCNMS Oct 2021,09/23/21,Port 20,PPS Unit; Programmed Sampling,95% EtOH,Teahwhit Head,34.0,8,47° 52.673' N,124° 44.340' W,12:01,12:23,1000,,,,
+E1295.OC1021,OC1021,OCNMS Oct 2021,09/25/21,Port 21,PPS Unit; Programmed Sampling,95% EtOH,Teahwhit Head,34.0,8,47° 52.673' N,124° 44.340' W,00:01,00:24,1000,,,,
+E1296.OC1021,OC1021,OCNMS Oct 2021,09/26/21,Port 22,PPS Unit; Programmed Sampling,95% EtOH,Teahwhit Head,34.0,8,47° 52.673' N,124° 44.340' W,12:01,12:21,1000,,,,
+E1297.OC1021,OC1021,OCNMS Oct 2021,09/28/21,Port 23,PPS Unit; Programmed Sampling,95% EtOH,Teahwhit Head,34.0,8,47° 52.673' N,124° 44.340' W,00:01,00:28,1000,,,,
+E1298.OC1021,OC1021,OCNMS Oct 2021,09/29/21,Port 24,PPS Unit; Programmed Sampling,95% EtOH,Teahwhit Head,34.0,8,47° 52.673' N,124° 44.340' W,12:01,12:26,1000,,,,
+E1323.OC1021,OC1021,OCNMS Oct 2021,10/08/21,1,Niskin; Sterivex 0.22µm filter,95% EtOH,Teahwhit Head,33.0,,47° 52.673' N,124° 44.340' W,11:15,11:30,1000,7.7,,33.5,2.7 mg/l
+E1324.OC1021,OC1021,OCNMS Oct 2021,10/08/21,2,Niskin; Sterivex 0.22µm filter,95% EtOH,Teahwhit Head,33.0,,47° 52.673' N,124° 44.340' W,11:15,11:30,1000,7.7,,33.5,2.7 mg/l
+E1325.OC1021,OC1021,OCNMS Oct 2021,10/08/21,3,Niskin; Sterivex 0.22µm filter,95% EtOH,Teahwhit Head,33.0,,47° 52.673' N,124° 44.340' W,11:15,11:30,1000,7.8,,33.5,2.8 mg/l
+E1389.OC0722,OC0722,OCNMS July 2022,07/19/22,9,Niskin; Sterivex 0.22µm filter,95% EtOH,Teahwhit Head,32.9,,47˚ 52.699' N,124˚ 44.187' W,12:58,13:22,1000,7.4,,33.8,2.07 mg/L
+E1390.OC0722,OC0722,OCNMS July 2022,07/19/22,10,Niskin; Sterivex 0.22µm filter,95% EtOH,Teahwhit Head,33.3,,47˚ 52.699' N,124˚ 44.187' W,12:58,13:22,1000,7.4,,33.8,2.08 mg/L
+E1391.OC0722,OC0722,OCNMS July 2022,07/19/22,12,Niskin; Sterivex 0.22µm filter,95% EtOH,Teahwhit Head,33.3,,47˚ 52.699' N,124˚ 44.187' W,12:58,13:22,1000,7.4,,33.7,2.08 mg/L
+E1403.OC0722,OC0722,OCNMS July 2022,06/23/22,Port 1,PPS Unit; Programmed Sampling,95% EtOH,Teahwhit Head,33.7,8,47˚ 52.699' N,124˚ 44.187' W,00:00,00:12,1000,,,,
+E1404.OC0722,OC0722,OCNMS July 2022,06/23/22,Port 2,PPS Unit; Programmed Sampling,95% EtOH,Teahwhit Head,33.7,8,47˚ 52.699' N,124˚ 44.187' W,12:00,12:01,87,,,,
+E1406.OC0722,OC0722,OCNMS July 2022,06/24/22,Port 4,PPS Unit; Programmed Sampling,95% EtOH,Teahwhit Head,33.7,8,47˚ 52.699' N,124˚ 44.187' W,12:00,12:14,1000,,,,
+E1408.OC0722,OC0722,OCNMS July 2022,06/26/22,Port 6,PPS Unit; Programmed Sampling,95% EtOH,Teahwhit Head,33.7,8,47˚ 52.699' N,124˚ 44.187' W,12:00,12:00,28,,,,
+E1410.OC0722,OC0722,OCNMS July 2022,06/29/22,Port 8,PPS Unit; Programmed Sampling,95% EtOH,Teahwhit Head,33.7,8,47˚ 52.699' N,124˚ 44.187' W,12:00,12:14,1000,,,,
+E1412.OC0722,OC0722,OCNMS July 2022,07/02/22,Port 10,PPS Unit; Programmed Sampling,95% EtOH,Teahwhit Head,33.7,8,47˚ 52.699' N,124˚ 44.187' W,12:00,12:14,1000,,,,
+E1414.OC0722,OC0722,OCNMS July 2022,07/05/22,Port 12,PPS Unit; Programmed Sampling,95% EtOH,Teahwhit Head,33.7,8,47˚ 52.699' N,124˚ 44.187' W,12:00,12:14,812,,,,
+E1416.OC0722,OC0722,OCNMS July 2022,07/08/22,Port 14,PPS Unit; Programmed Sampling,95% EtOH,Teahwhit Head,33.7,8,47˚ 52.699' N,124˚ 44.187' W,12:00,12:04,216,,,,
+E1418.OC0722,OC0722,OCNMS July 2022,07/11/22,Port 16,PPS Unit; Programmed Sampling,95% EtOH,Teahwhit Head,33.7,8,47˚ 52.699' N,124˚ 44.187' W,12:00,12:16,1000,,,,
+E1420.OC0722,OC0722,OCNMS July 2022,07/14/22,Port 18,PPS Unit; Programmed Sampling,95% EtOH,Teahwhit Head,33.7,8,47˚ 52.699' N,124˚ 44.187' W,12:00,12:13,1000,,,,
+E1422.OC0722,OC0722,OCNMS July 2022,07/17/22,Port 20,PPS Unit; Programmed Sampling,95% EtOH,Teahwhit Head,33.7,8,47˚ 52.699' N,124˚ 44.187' W,12:00,12:08,479,,,,
+E1424.OC0722,OC0722,OCNMS July 2022,07/18/22,Port 22,PPS Unit; Programmed Sampling,95% EtOH,Teahwhit Head,33.7,8,47˚ 52.699' N,124˚ 44.187' W,12:00,12:01,87,,,,
+E1426.OC0722,OC0722,OCNMS July 2022,07/19/22,Port 24,PPS Unit; Programmed Sampling,95% EtOH,Teahwhit Head,33.7,8,47˚ 52.699' N,124˚ 44.187' W,12:00,12:15,1000,,,,
+E1845.OC0623,OC0623,OCNMS June 2023,,11,Niskin; Sterivex 0.22µm filter,95% EtOH,Teahwhit Head,33.5,,47˚ 52.699' N,124˚ 44.187' W,11:00,,1000,8.0,,33.6,3.67 mg/L
+E1846.OC0623,OC0623,OCNMS June 2023,,9,Niskin; Sterivex 0.22µm filter,95% EtOH,Teahwhit Head,34.2,,47˚ 52.699' N,124˚ 44.187' W,11:00,,1000,7.9,,33.6,3.68 mg/L
+E1847.OC0623,OC0623,OCNMS June 2023,,5,Niskin; Sterivex 0.22µm filter,95% EtOH,Teahwhit Head,34.2,,47˚ 52.699' N,124˚ 44.187' W,11:00,,1000,7.9,,33.6,3.69 mg/L
+E1849.OC0723,OC0723,OCNMS July 2023,,Port 1,PPS Unit; Programmed Sampling,95% EtOH,Teahwhit Head,34.0,,47˚ 52.699' N,124˚ 44.187' W,00:01,00:18,1000,,,,
+E1850.OC0723,OC0723,OCNMS July 2023,,Port 2,PPS Unit; Programmed Sampling,95% EtOH,Teahwhit Head,34.0,,47˚ 52.699' N,124˚ 44.187' W,12:01,12:18,1001,,,,
+E1851.OC0723,OC0723,OCNMS July 2023,,Port 3,PPS Unit; Programmed Sampling,95% EtOH,Teahwhit Head,34.0,,47˚ 52.699' N,124˚ 44.187' W,00:01,00:18,1001,,,,
+E1852.OC0723,OC0723,OCNMS July 2023,,Port 4,PPS Unit; Programmed Sampling,95% EtOH,Teahwhit Head,34.0,,47˚ 52.699' N,124˚ 44.187' W,12:01,12:18,1001,,,,
+E1853.OC0723,OC0723,OCNMS July 2023,,Port 5,PPS Unit; Programmed Sampling,95% EtOH,Teahwhit Head,34.0,,47˚ 52.699' N,124˚ 44.187' W,00:01,00:18,1001,,,,
+E1854.OC0723,OC0723,OCNMS July 2023,,Port 6,PPS Unit; Programmed Sampling,95% EtOH,Teahwhit Head,34.0,,47˚ 52.699' N,124˚ 44.187' W,12:01,12:19,1001,,,,
+E1855.OC0723,OC0723,OCNMS July 2023,,Port 7,PPS Unit; Programmed Sampling,95% EtOH,Teahwhit Head,34.0,,47˚ 52.699' N,124˚ 44.187' W,00:01,00:19,1001,,,,
+E1856.OC0723,OC0723,OCNMS July 2023,,Port 8,PPS Unit; Programmed Sampling,95% EtOH,Teahwhit Head,34.0,,47˚ 52.699' N,124˚ 44.187' W,12:01,12:19,1001,,,,
+E1857.OC0723,OC0723,OCNMS July 2023,,Port 9,PPS Unit; Programmed Sampling,95% EtOH,Teahwhit Head,34.0,,47˚ 52.699' N,124˚ 44.187' W,00:01,00:18,1001,,,,
+E1858.OC0723,OC0723,OCNMS July 2023,,Port 10,PPS Unit; Programmed Sampling,95% EtOH,Teahwhit Head,34.0,,47˚ 52.699' N,124˚ 44.187' W,12:01,12:18,1001,,,,
+E1859.OC0723,OC0723,OCNMS July 2023,,Port 11,PPS Unit; Programmed Sampling,95% EtOH,Teahwhit Head,34.0,,47˚ 52.699' N,124˚ 44.187' W,00:01,00:18,1001,,,,
+E1860.OC0723,OC0723,OCNMS July 2023,,Port 12,PPS Unit; Programmed Sampling,95% EtOH,Teahwhit Head,34.0,,47˚ 52.699' N,124˚ 44.187' W,12:01,12:18,1001,,,,
+E1861.OC0723,OC0723,OCNMS July 2023,,Port 13,PPS Unit; Programmed Sampling,95% EtOH,Teahwhit Head,34.0,,47˚ 52.699' N,124˚ 44.187' W,00:01,00:18,1001,,,,
+E1862.OC0723,OC0723,OCNMS July 2023,,Port 14,PPS Unit; Programmed Sampling,95% EtOH,Teahwhit Head,34.0,,47˚ 52.699' N,124˚ 44.187' W,12:01,12:18,1001,,,,
+E1863.OC0723,OC0723,OCNMS July 2023,,Port 15,PPS Unit; Programmed Sampling,95% EtOH,Teahwhit Head,34.0,,47˚ 52.699' N,124˚ 44.187' W,00:01,00:18,1001,,,,
+E1864.OC0723,OC0723,OCNMS July 2023,,Port 16,PPS Unit; Programmed Sampling,95% EtOH,Teahwhit Head,34.0,,47˚ 52.699' N,124˚ 44.187' W,12:01,12:18,1001,,,,
+E1865.OC0723,OC0723,OCNMS July 2023,,Port 17,PPS Unit; Programmed Sampling,95% EtOH,Teahwhit Head,34.0,,47˚ 52.699' N,124˚ 44.187' W,00:01,00:18,1000,,,,
+E1866.OC0723,OC0723,OCNMS July 2023,,Port 18,PPS Unit; Programmed Sampling,95% EtOH,Teahwhit Head,34.0,,47˚ 52.699' N,124˚ 44.187' W,12:00,12:18,1001,,,,
+E1867.OC0723,OC0723,OCNMS July 2023,,Port 19,PPS Unit; Programmed Sampling,95% EtOH,Teahwhit Head,34.0,,47˚ 52.699' N,124˚ 44.187' W,00:00,00:18,1001,,,,
+E1868.OC0723,OC0723,OCNMS July 2023,,Port 20,PPS Unit; Programmed Sampling,95% EtOH,Teahwhit Head,34.0,,47˚ 52.699' N,124˚ 44.187' W,12:01,12:19,1001,,,,
+E1869.OC0723,OC0723,OCNMS July 2023,,Port 21,PPS Unit; Programmed Sampling,95% EtOH,Teahwhit Head,34.0,,47˚ 52.699' N,124˚ 44.187' W,00:01,00:19,1001,,,,
+E1870.OC0723,OC0723,OCNMS July 2023,,Port 22,PPS Unit; Programmed Sampling,95% EtOH,Teahwhit Head,34.0,,47˚ 52.699' N,124˚ 44.187' W,12:01,12:19,1001,,,,
+E1871.OC0723,OC0723,OCNMS July 2023,,Port 23,PPS Unit; Programmed Sampling,95% EtOH,Teahwhit Head,34.0,,47˚ 52.699' N,124˚ 44.187' W,00:01,00:18,1001,,,,
+E1872.OC0723,OC0723,OCNMS July 2023,,Port 24,PPS Unit; Programmed Sampling,95% EtOH,Teahwhit Head,34.0,,47˚ 52.699' N,124˚ 44.187' W,12:01,12:18,1001,,,,
+E1873.OC0723,OC0723,OCNMS July 2023,,3,Niskin; Sterivex 0.22µm filter,95% EtOH,Teahwhit Head,33.6,,47˚ 52.699' N,124˚ 44.187' W,12:54,13:05,1000,8.1,,33.7,3.53 mg/L
+E1874.OC0723,OC0723,OCNMS July 2023,,5,Niskin; Sterivex 0.22µm filter,95% EtOH,Teahwhit Head,33.7,,47˚ 52.699' N,124˚ 44.187' W,12:54,13:05,1000,8.1,,33.7,3.52 mg/L
+E1875.OC0723,OC0723,OCNMS July 2023,,11,Niskin; Sterivex 0.22µm filter,95% EtOH,Teahwhit Head,33.7,,47˚ 52.699' N,124˚ 44.187' W,12:54,13:05,1000,8.1,,33.7,3.53 mg/L

@@ -31,9 +31,15 @@ wd <- "OCNMS_Hypoxia/Data/CTD_Data"
 exp <- "OCNMS_Hypoxia/Outputs"
 pltpath <- "OCNMS_Hypoxia/Plots/CTD_Data_Exploration_Plots"
 
+# read_csv(csv, col_types = cols(date = col_date("%m/%d/%y")))
+# Format is %Y-%m-%eT%H:%M:%SZ
 OME_CTD <- read.csv(here(wd, "OCNMS_OME_ctd_output_copy.csv"))
 OCNMS_OME_CTD <- read.csv(here(wd, "OCNMS_OMEsites_ctd_output_copy.csv"))
 OCNMS_All_CTD <- read.csv(here(wd, "OCNMS_Allsites_ctd_output_copy.csv"))
+
+OME_CTD$date = as.Date(OME_CTD$date, tryFormats = c("%Y-%m-%d"))
+OCNMS_OME_CTD$date = as.POSIXct(OCNMS_OME_CTD$date, tryFormats = c("%Y-%m-%dT%H:%M:%SZ"))
+OCNMS_All_CTD$date = as.POSIXct(OCNMS_All_CTD$date, tryFormats = c("%Y-%m-%dT%H:%M:%SZ"))
 
 # Problem: all the longitudes are positive, they need to be negative
 fixlong <- function(df) {
@@ -221,8 +227,12 @@ scatterplt_fill <- function(df, x, y, color, shape = 16, alpha = 1) {
 
 ## Add dates & years
 ```{r Investigate year distribution}
+# Dates are chr "2005-05-25T22:48:33Z"
+# tryFormats = c("%Y-%m-%eT%H:%M:%SZ")
+# Moving the as.POSIXCT call to import - col_types = cols(date = col_date("%m/%d/%y"))
+
 OME_CTD <- OME_CTD %>% 
-  mutate(date = as.Date(date)) %>% 
+  # mutate(date = as.POSIXct(date, tryFormats = c("%Y-%m-%dT%H:%M:%SZ"))) %>% 
   mutate(year = as.factor(year(date)))
 
 OME_CTD %>% 
@@ -230,7 +240,7 @@ OME_CTD %>%
   summarize(Observations_OME = n())
 
 OCNMS_OME_CTD <- OCNMS_OME_CTD %>% 
-  mutate(date = as.Date(date)) %>% 
+  # mutate(date = as.POSIXct(date)) %>% 
   mutate(year = as.factor(year(date)))
 
 OCNMS_OME_CTD %>% 
@@ -238,7 +248,7 @@ OCNMS_OME_CTD %>%
   summarize(Observations_OCNMS_filtOME = n())
 
 OCNMS_All_CTD <- OCNMS_All_CTD %>% 
-  mutate(date = as.Date(date)) %>% 
+  # mutate(date = as.POSIXct(date)) %>% 
   mutate(year = as.factor(year(date)))
 
 OCNMS_All_CTD %>% 
@@ -374,9 +384,11 @@ OCNMS_OME_CTD$cond = NA
 OCNMS_OME_CTD_TH042$cond = NA
 OCNMS_OME_CTD$pres = NA
 OCNMS_OME_CTD_TH042$pres = NA
+OCNMS_OME_CTD$source = "CTD"
+OCNMS_OME_CTD_TH042$source = "CTD"
 
-OCNMS_OME_CTD <- OCNMS_OME_CTD %>% select("date", "year", "depth", "temperature", "DO", "salinity", "potential_density", "pres", "cond")
-OCNMS_OME_CTD_TH042 <- OCNMS_OME_CTD_TH042 %>% select("date", "year", "depth", "temperature", "DO", "salinity", "potential_density", "pres", "cond")
+OCNMS_OME_CTD <- OCNMS_OME_CTD_TH042 %>% select("source", "date", "year", "depth", "temperature", "DO", "salinity", "potential_density", "pres", "cond", "sampleID")
+OCNMS_OME_CTD_TH042 <- OCNMS_OME_CTD_TH042 %>% select("source", "date", "year", "depth", "temperature", "DO", "salinity", "potential_density", "pres", "cond", "sampleID")
 
 write.csv(OCNMS_OME_CTD, file = here("OCNMS_Hypoxia", "Outputs", "OCNMS_CTD_CleanData.csv"))
 write.csv(OCNMS_OME_CTD_TH042, file = here("OCNMS_Hypoxia", "Outputs", "OCNMS_CTD_TH042_CleanData.csv"))
