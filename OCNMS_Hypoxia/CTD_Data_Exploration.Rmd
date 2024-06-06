@@ -264,7 +264,7 @@ histogram_fill(OME_CTD, DO, 0.5, fill = as.factor(month(date)))
 # Shannon says the OME files are redundant and the OCNMS published data probably just eliminated that because the quality score was low or something. Shannon will check with Sam. Use OCNMS_OME_CTD for now. 
 
 # Plot OME vs. OCNMS to see if redundant
-ggplot(OCNMS_OME_CTD, aes(x = date, y = DO)) +
+ggplot(OCNMS_OME_CTD, aes(x = as.Date(date), y = DO)) +
   geom_point(shape = 1, color = "blue") +
   theme_bw() +
   geom_point(data = OME_CTD, aes(x = date, y = DO), color = "yellow", shape = 1)
@@ -374,6 +374,32 @@ OCNMS_OME_CTD42m %>%
 ggsave("OCNMS_CTD_Oxygen_FacetYearTH42m.png", path = here(pltpath), width = 1000, height = 5000, units = "px")
 ```
 
+# Why no 2022/2023 data?
+
+After filtering for TH042, I only have a few 2021 datapoints
+
+```{r}
+OCNMS_OME_CTD %>% 
+  filter(year %in% c(2021, 2022, 2023)) %>% 
+  group_by(year) %>% 
+  summarize(n = n())
+OCNMS_OME_CTD_TH042 %>% 
+  filter(year %in% c(2021, 2022, 2023)) %>% 
+  group_by(year) %>% 
+  summarize(n = n())
+
+histogram_fill(OCNMS_OME_CTD %>% filter(year %in% c(2021, 2022, 2023)), 
+               depth, 
+               1, 
+               fill = station_id) +
+  facet_wrap(facets = vars(year)) +
+  scale_x_continuous(limits = c(35,46), breaks = seq(from = 35, to = 46, by = 1)) +
+  labs(title = "Number of CTD datapoints at each depth", fill = "Station ID", x = "Depth", y = "# of Datapoints", caption = "42m is the depth of interest")
+
+ggsave(here(pltpath, "WhyNo2022.png"), height = 2000, width = 3000, units = "px")
+```
+
+
 # Export
 
 ```{r Export CTD Data}
@@ -387,10 +413,10 @@ OCNMS_OME_CTD_TH042$pres = NA
 OCNMS_OME_CTD$source = "CTD"
 OCNMS_OME_CTD_TH042$source = "CTD"
 
-OCNMS_OME_CTD <- OCNMS_OME_CTD_TH042 %>% select("source", "date", "year", "depth", "temperature", "DO", "salinity", "potential_density", "pres", "cond", "sampleID")
-OCNMS_OME_CTD_TH042 <- OCNMS_OME_CTD_TH042 %>% select("source", "date", "year", "depth", "temperature", "DO", "salinity", "potential_density", "pres", "cond", "sampleID")
+OCNMS_OME_CTDexp <- OCNMS_OME_CTD %>% select("source", "date", "year", "depth", "temperature", "DO", "salinity", "potential_density", "pres", "cond", "sampleID")
+OCNMS_OME_CTD_TH042exp <- OCNMS_OME_CTD_TH042 %>% select("source", "date", "year", "depth", "temperature", "DO", "salinity", "potential_density", "pres", "cond", "sampleID")
 
-write.csv(OCNMS_OME_CTD, file = here("OCNMS_Hypoxia", "Outputs", "OCNMS_CTD_CleanData.csv"))
-write.csv(OCNMS_OME_CTD_TH042, file = here("OCNMS_Hypoxia", "Outputs", "OCNMS_CTD_TH042_CleanData.csv"))
+write.csv(OCNMS_OME_CTDexp, file = here("OCNMS_Hypoxia", "Outputs", "OCNMS_CTD_CleanData.csv"))
+write.csv(OCNMS_OME_CTD_TH042exp, file = here("OCNMS_Hypoxia", "Outputs", "OCNMS_CTD_TH042_CleanData.csv"))
 ```
 

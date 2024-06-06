@@ -29,6 +29,101 @@ library(here)
 ```
 
 ```{r Data Imports}
+wd <- "OCNMS_Hypoxia/Outputs"
+exp <- "OCNMS_Hypoxia/Outputs"
+pltpath <- "OCNMS_Hypoxia/Plots"
 
+CTD <- read.csv(here(wd, "OCNMS_CTD_TH042_CleanData.csv")) %>% 
+  mutate(date = as.POSIXct(date), year = as.factor(year), source = as.factor(source))
+Mooring <- read.csv(here(wd, "OCNMS_Mooring_CleanData.csv")) %>% 
+  mutate(date = as.POSIXct(date), year = as.factor(year), source = as.factor(source))
+
+EnvData1full <- rbind(CTD, Mooring) %>% 
+  select(-X) %>% 
+  mutate(date = as.POSIXct(date), year = as.factor(year), source = as.factor(source))
+
+EnvData1 <- EnvData1full 
 ```
 
+```{r Data Exploration}
+ctdplt <- ggplot(CTD, aes(x = date, y = DO)) +
+  geom_point(color = "coral2") +
+  scale_x_datetime(date_breaks = "1 year", date_labels = "%Y") +
+  theme_bw()
+morplt <- ggplot(Mooring, aes(x = date, y = DO)) +
+  geom_point(color = "turquoise3") +
+  scale_x_datetime(date_breaks = "2 months", date_labels = "%m-%y") +
+  theme_bw()
+plt1 <- ggplot(EnvData1, aes(x = date, y = DO, color = source)) +
+  geom_point(shape = 1) +
+  scale_x_datetime(date_breaks = "1 year", date_labels = "%Y") +
+  theme_bw()
+
+(ctdplt / morplt / plt1) +
+  plot_annotation(title = "CTD and Mooring Oxygen Data In OCNMS")
+
+ggsave(here(pltpath, "CombinedOxygenSeries.png"), height = 2000, width = 3000, units = "px")
+
+ctdplt2 <- ggplot(CTD, aes(x = date, y = temperature)) +
+  geom_point(color = "coral2") +
+  scale_x_datetime(date_breaks = "1 year", date_labels = "%Y") +
+  theme_bw()
+morplt2 <- ggplot(Mooring, aes(x = date, y = temperature)) +
+  geom_point(color = "turquoise3") +
+  scale_x_datetime(date_breaks = "2 months", date_labels = "%m-%y") +
+  theme_bw()
+plt12 <- ggplot(EnvData1, aes(x = date, y = temperature, color = source)) +
+  geom_point(shape = 1) +
+  scale_x_datetime(date_breaks = "1 year", date_labels = "%Y") +
+  theme_bw()
+
+(ctdplt2 / morplt2 / plt12) +
+  plot_annotation(title = "CTD and Mooring Temperature Data In OCNMS")
+
+ggsave(here(pltpath, "CombinedTemperatureSeries.png"), height = 2000, width = 3000, units = "px")
+```
+
+```{r Data Exploration post-2021}
+CTD2 <- CTD %>% 
+  filter(year %in% c(2021, 2022, 2023))
+Mooring2 <- Mooring  %>% 
+  filter(year %in% c(2021, 2022, 2023))
+EnvData1_yr <- EnvData1  %>% 
+  filter(year %in% c(2021, 2022, 2023))
+
+ctdplt <- ggplot(CTD2, aes(x = date, y = DO)) +
+  geom_point(color = "coral2") +
+  scale_x_datetime(date_breaks = "2 months", date_labels = "%m-%y") +
+  theme_bw()
+morplt <- ggplot(Mooring2, aes(x = date, y = DO)) +
+  geom_point(color = "turquoise3") +
+  scale_x_datetime(date_breaks = "2 months", date_labels = "%m-%y") +
+  theme_bw()
+plt1 <- ggplot(EnvData1_yr, aes(x = date, y = DO, color = source)) +
+  geom_point(shape = 1) +
+  scale_x_datetime(date_breaks = "2 months", date_labels = "%m-%y") +
+  theme_bw()
+
+(ctdplt / morplt / plt1) +
+  plot_annotation(title = "CTD and Mooring Oxygen Data In OCNMS")
+
+ggsave(here(pltpath, "CombinedOxygenSeries_crop.png"), height = 2000, width = 3000, units = "px")
+
+ctdplt2 <- ggplot(CTD2, aes(x = date, y = temperature)) +
+  geom_point(color = "coral2") +
+  scale_x_datetime(date_breaks = "2 months", date_labels = "%m-%y") +
+  theme_bw()
+morplt2 <- ggplot(Mooring2, aes(x = date, y = temperature)) +
+  geom_point(color = "turquoise3") +
+  scale_x_datetime(date_breaks = "2 months", date_labels = "%m-%y") +
+  theme_bw()
+plt12 <- ggplot(EnvData1_yr, aes(x = date, y = temperature, color = source)) +
+  geom_point(shape = 1) +
+  scale_x_datetime(date_breaks = "2 months", date_labels = "%m-%y") +
+  theme_bw()
+
+(ctdplt2 / morplt2 / plt12) +
+  plot_annotation(title = "CTD and Mooring Temperature Data In OCNMS")
+
+ggsave(here(pltpath, "CombinedTemperatureSeries_crop.png"), height = 2000, width = 3000, units = "px")
+```

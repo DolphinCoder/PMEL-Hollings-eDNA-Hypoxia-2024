@@ -208,7 +208,7 @@ ggsave("OCNMS_Mooring_Oxygen_FacetYear.png", path = here(pltpath), width = 3000,
 # Add + reorder columns so that it can bind with the CTD data
 TH042$sampleID = NA
 TH042$source = "Mooring"
-TH042 <- TH042 %>% select("source", "date", "year", "depth", "temperature", "DO", "salinity", "potential_density", "pres", "cond")
+TH042 <- TH042 %>% select("source", "date", "year", "depth", "temperature", "DO", "salinity", "potential_density", "pres", "cond", "sampleID")
 
 write.csv(TH042, file = here("OCNMS_Hypoxia", "Outputs", "OCNMS_Mooring_CleanData.csv"))
 ```
