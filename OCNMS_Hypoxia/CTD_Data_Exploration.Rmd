@@ -299,6 +299,10 @@ scatterplt_fill(OCNMS_OME_CTD, depth, potential_density, color = year)
 
 scatterplt(OCNMS_OME_CTD, temperature, salinity, alpha = 0.1)
 scatterplt_fill(OCNMS_OME_CTD, temperature, salinity, color = year)
+
+scatterplt_fill(OCNMS_OME_CTD, depth, DO, alpha = 0.5, color = station_id) +
+  scale_color_manual(values = c("gray80", "blue"))
+ggsave(here(pltpath, "Depth_DO_Scatterplot_CTD.png"))
 ```
 
 
@@ -346,10 +350,11 @@ ggsave("OCNMS_CTD_Depths.png", path = here(pltpath), width = 3000, height = 2000
 
 # Logical vector of whether depth is within 1m of 42m
 near42 <- near(OCNMS_OME_CTD$depth, 42, tol = 1)
-sum(near42) # So the resulting DF should have 191 rows
+sum(near42) # So the resulting DF should have 191 rows ***Not using this anymore
 
-OCNMS_OME_CTD42m <- OCNMS_OME_CTD %>% 
-  filter(near(OCNMS_OME_CTD$depth, 42, tol = 1)) # 191 rows! Epic.
+OCNMS_OME_CTD42m <- OCNMS_OME_CTD %>% # This is just for graphing, not exporting at the moment, because it also has the CE location
+  filter(39.894 < depth) %>% 
+  filter(depth < 44.898) # 401 observations, much better
 
 # Graph of oxygen levels around 42 meters for each year
 OCNMS_OME_CTD42m %>% 
@@ -361,8 +366,22 @@ OCNMS_OME_CTD42m %>%
 ggsave("OCNMS_CTD_Oxygen_FacetYear42m.png", path = here(pltpath), width = 1000, height = 5000, units = "px")
 
 OCNMS_OME_CTD_TH042 <- OCNMS_OME_CTD %>% 
-  filter(near(OCNMS_OME_CTD$depth, 42, tol = 1)) %>% # 191 rows
-  filter(station_id == "TH042") # 78 rows
+  filter(39.894 < depth) %>% 
+  filter(depth < 44.898)  %>% # 401 rows
+  filter(station_id == "TH042") # 155 rows
+
+OCNMS_OME_CTD_TH042_extended <- OCNMS_OME_CTD %>% 
+  filter(30 < depth) %>% 
+  filter(depth < 45)  %>% # 401 rows
+  filter(station_id == "TH042") # 155 rows
+
+OCNMS_OME_CTD_TH042 %>% 
+  group_by(year) %>% 
+  summarize(n = n(), MeanDepth = mean(depth))
+
+OCNMS_OME_CTD_TH042_extended %>% 
+  group_by(year) %>% 
+  summarize(n = n(), MeanDepth = mean(depth))
 
 # Graph of oxygen levels around 42 meters for each year
 OCNMS_OME_CTD42m %>% 
@@ -376,7 +395,7 @@ ggsave("OCNMS_CTD_Oxygen_FacetYearTH42m.png", path = here(pltpath), width = 1000
 
 # Why no 2022/2023 data?
 
-After filtering for TH042, I only have a few 2021 datapoints
+After filtering for TH042, I only have a few 2021 datapoints. Note 6/6: Fixed this by expanding to the range of the mooring, 39.894-44.898 meters deep.
 
 ```{r}
 OCNMS_OME_CTD %>% 
@@ -393,7 +412,7 @@ histogram_fill(OCNMS_OME_CTD %>% filter(year %in% c(2021, 2022, 2023)),
                1, 
                fill = station_id) +
   facet_wrap(facets = vars(year)) +
-  scale_x_continuous(limits = c(35,46), breaks = seq(from = 35, to = 46, by = 1)) +
+  scale_x_continuous(limits = c(30,46), breaks = seq(from = 30, to = 46, by = 2)) +
   labs(title = "Number of CTD datapoints at each depth", fill = "Station ID", x = "Depth", y = "# of Datapoints", caption = "42m is the depth of interest")
 
 ggsave(here(pltpath, "WhyNo2022.png"), height = 2000, width = 3000, units = "px")
@@ -402,21 +421,39 @@ ggsave(here(pltpath, "WhyNo2022.png"), height = 2000, width = 3000, units = "px"
 
 # Export
 
-```{r Export CTD Data}
+```{r Make CTD Data Compatible With Mooring Data}
 # OCNMS_OME_CTD is the most useful to me at the moment, since it is clean and only contains the locations of interest
 
 # Add + reorder columns to bind with mooring data
-OCNMS_OME_CTD$cond = NA
-OCNMS_OME_CTD_TH042$cond = NA
-OCNMS_OME_CTD$pres = NA
-OCNMS_OME_CTD_TH042$pres = NA
-OCNMS_OME_CTD$source = "CTD"
-OCNMS_OME_CTD_TH042$source = "CTD"
+compatibility = function(df) {
+  df$cond = NA
+  df$pres = NA
+  df$source = "CTD"
+  x <- df %>% 
+    select("source", "date", "year", "depth", "temperature", "DO", "salinity", "potential_density", "pres", "cond", "sampleID")
+  return(x)
+}
 
-OCNMS_OME_CTDexp <- OCNMS_OME_CTD %>% select("source", "date", "year", "depth", "temperature", "DO", "salinity", "potential_density", "pres", "cond", "sampleID")
-OCNMS_OME_CTD_TH042exp <- OCNMS_OME_CTD_TH042 %>% select("source", "date", "year", "depth", "temperature", "DO", "salinity", "potential_density", "pres", "cond", "sampleID")
+# OCNMS_OME_CTD_comptest <- compatibility(OCNMS_OME_CTD) # If this is equal to OCNMS_OME_CTD at the end of the chunk, the function works
 
+#OCNMS_OME_CTD$cond = NA
+#OCNMS_OME_CTD$pres = NA
+#OCNMS_OME_CTD$source = "CTD"
+
+OCNMS_OME_CTDexp <- compatibility(OCNMS_OME_CTD)
+OCNMS_OME_CTD_TH042exp <- compatibility(OCNMS_OME_CTD_TH042)
+OCNMS_OME_CTD_TH042_extended_exp <- compatibility(OCNMS_OME_CTD_TH042_extended)
+
+# OCNMS_OME_CTDexp <- OCNMS_OME_CTD %>% select("source", "date", "year", "depth", "temperature", "DO", "salinity", "potential_density", "pres", "cond", "sampleID")
+# OCNMS_OME_CTD_TH042exp <- OCNMS_OME_CTD_TH042 %>% select("source", "date", "year", "depth", "temperature", "DO", "salinity", "potential_density", "pres", "cond", "sampleID")
+
+# head(OCNMS_OME_CTD_comptest == OCNMS_OME_CTD)
+# mean(OCNMS_OME_CTD_comptest == OCNMS_OME_CTD, na.rm = T) # Mean of 1 = whole dataframe equal. compatibility() works!!!
+```
+
+```{r Export CTD Data}
 write.csv(OCNMS_OME_CTDexp, file = here("OCNMS_Hypoxia", "Outputs", "OCNMS_CTD_CleanData.csv"))
 write.csv(OCNMS_OME_CTD_TH042exp, file = here("OCNMS_Hypoxia", "Outputs", "OCNMS_CTD_TH042_CleanData.csv"))
+write.csv(OCNMS_OME_CTD_TH042_extended_exp, file = here("OCNMS_Hypoxia", "Outputs", "OCNMS_CTD_TH042ext_CleanData.csv"))
 ```
 

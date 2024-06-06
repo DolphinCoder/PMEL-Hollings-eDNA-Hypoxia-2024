@@ -18,6 +18,8 @@ Questions:
 - What units is this dissolved oxygen data in?
 - What is the hypoxic threshold? 
 
+# Setup
+
 ```{r Package Imports, message = F, warning = F}
 # Warnings and startup messages suppressed
 library(tidyverse)
@@ -33,19 +35,25 @@ wd <- "OCNMS_Hypoxia/Outputs"
 exp <- "OCNMS_Hypoxia/Outputs"
 pltpath <- "OCNMS_Hypoxia/Plots"
 
-CTD <- read.csv(here(wd, "OCNMS_CTD_TH042_CleanData.csv")) %>% 
+CTD_short <- read.csv(here(wd, "OCNMS_CTD_TH042_CleanData.csv")) %>% 
+  mutate(date = as.POSIXct(date), year = as.factor(year), source = as.factor(source))
+CTD <- read.csv(here(wd, "OCNMS_CTD_TH042ext_CleanData.csv")) %>% 
   mutate(date = as.POSIXct(date), year = as.factor(year), source = as.factor(source))
 Mooring <- read.csv(here(wd, "OCNMS_Mooring_CleanData.csv")) %>% 
   mutate(date = as.POSIXct(date), year = as.factor(year), source = as.factor(source))
 
-EnvData1full <- rbind(CTD, Mooring) %>% 
+EnvData1short <- rbind(CTD_short, Mooring) %>%    # 39.9 - 44.9 meters deep
   select(-X) %>% 
   mutate(date = as.POSIXct(date), year = as.factor(year), source = as.factor(source))
 
-EnvData1 <- EnvData1full 
+EnvData1 <- rbind(CTD, Mooring)  %>%    # 30-45 meters deep
+  select(-X) %>% 
+  mutate(date = as.POSIXct(date), year = as.factor(year), source = as.factor(source))
 ```
 
-```{r Data Exploration}
+# Time Series (all years)
+
+```{r Data Exploration All Years}
 ctdplt <- ggplot(CTD, aes(x = date, y = DO)) +
   geom_point(color = "coral2") +
   scale_x_datetime(date_breaks = "1 year", date_labels = "%Y") +
@@ -83,6 +91,8 @@ plt12 <- ggplot(EnvData1, aes(x = date, y = temperature, color = source)) +
 ggsave(here(pltpath, "CombinedTemperatureSeries.png"), height = 2000, width = 3000, units = "px")
 ```
 
+# Time Series (2021-2023)
+
 ```{r Data Exploration post-2021}
 CTD2 <- CTD %>% 
   filter(year %in% c(2021, 2022, 2023))
@@ -104,10 +114,10 @@ plt1 <- ggplot(EnvData1_yr, aes(x = date, y = DO, color = source)) +
   scale_x_datetime(date_breaks = "2 months", date_labels = "%m-%y") +
   theme_bw()
 
-(ctdplt / morplt / plt1) +
+(ctdplt / plt1) +
   plot_annotation(title = "CTD and Mooring Oxygen Data In OCNMS")
 
-ggsave(here(pltpath, "CombinedOxygenSeries_crop.png"), height = 2000, width = 3000, units = "px")
+ggsave(here(pltpath, "CombinedOxygenSeries_crop.png"), height = 1000, width = 3000, units = "px")
 
 ctdplt2 <- ggplot(CTD2, aes(x = date, y = temperature)) +
   geom_point(color = "coral2") +
@@ -122,8 +132,17 @@ plt12 <- ggplot(EnvData1_yr, aes(x = date, y = temperature, color = source)) +
   scale_x_datetime(date_breaks = "2 months", date_labels = "%m-%y") +
   theme_bw()
 
-(ctdplt2 / morplt2 / plt12) +
+(ctdplt2 / plt12) +
   plot_annotation(title = "CTD and Mooring Temperature Data In OCNMS")
 
-ggsave(here(pltpath, "CombinedTemperatureSeries_crop.png"), height = 2000, width = 3000, units = "px")
+ggsave(here(pltpath, "CombinedTemperatureSeries_crop.png"), height = 1000, width = 3000, units = "px")
 ```
+
+```{r Export}
+# Export EnvData1short (narrower depth range, full year range), EnvData1 (wider depth, full year), and EnvData1_yr (wider depth, 2021-2023)
+
+write.csv(EnvData1short, file = here("OCNMS_Hypoxia", "Outputs", "EnvironmentalDataset1_Short_AllYears.csv"))
+write.csv(EnvData1, file = here("OCNMS_Hypoxia", "Outputs", "EnvironmentalDataset1_AllYears.csv"))
+write.csv(EnvData1_yr, file = here("OCNMS_Hypoxia", "Outputs", "EnvironmentalDataset1.csv"))
+```
+
