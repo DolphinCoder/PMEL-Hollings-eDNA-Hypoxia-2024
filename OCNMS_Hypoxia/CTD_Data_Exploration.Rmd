@@ -265,11 +265,13 @@ ggplot(OCNMS_OME_CTD, aes(x = date, y = DO)) +
 ### Histograms
 ```{r}
 histogram_fill(OCNMS_OME_CTD, depth, 1, fill = year)
+histogram_fill(OCNMS_OME_CTD, depth, 1, fill = station_id)
 histogram_fill(OCNMS_OME_CTD, temperature, 1, fill = year)
+histogram_fill(OCNMS_OME_CTD, temperature, 1, fill = station_id)
 histogram_fill(OCNMS_OME_CTD, salinity, 1, fill = year)
 histogram_fill(OCNMS_OME_CTD, potential_density, 1, fill = year)
 histogram_fill(OCNMS_OME_CTD, DO, 1, fill = year)
-histogram_fill(OCNMS_OME_CTD, bottom_depth_m, 0.25, fill = station_name)
+histogram_fill(OCNMS_OME_CTD, DO, 0.25, fill = station_id)
 ```
 
 ```{r General Cleaning}
@@ -303,6 +305,8 @@ histogram_fill(OCNMS_All_CTD, DO, 0.5, fill = year)
 
 histogram(OCNMS_OME_CTD, DO, 0.5)
 ```
+
+# Time Series
 
 ```{r Line Plots}
 # Goal: One line plot per year of dissolved oxygen versus date
@@ -345,10 +349,36 @@ OCNMS_OME_CTD42m %>%
     theme_bw() +
     facet_wrap(facets = vars(year), scales = "free_x", ncol = 1)
 ggsave("OCNMS_CTD_Oxygen_FacetYear42m.png", path = here(pltpath), width = 1000, height = 5000, units = "px")
+
+OCNMS_OME_CTD_TH042 <- OCNMS_OME_CTD %>% 
+  filter(near(OCNMS_OME_CTD$depth, 42, tol = 1)) %>% # 191 rows
+  filter(station_id == "TH042") # 78 rows
+
+# Graph of oxygen levels around 42 meters for each year
+OCNMS_OME_CTD42m %>% 
+  ggplot(aes(x = date, y = DO, color = depth)) +
+    geom_line() +
+    geom_point(shape = 1) +
+    theme_bw() +
+    facet_wrap(facets = vars(year), scales = "free_x", ncol = 1)
+ggsave("OCNMS_CTD_Oxygen_FacetYearTH42m.png", path = here(pltpath), width = 1000, height = 5000, units = "px")
 ```
+
+# Export
 
 ```{r Export CTD Data}
 # OCNMS_OME_CTD is the most useful to me at the moment, since it is clean and only contains the locations of interest
+
+# Add + reorder columns to bind with mooring data
+OCNMS_OME_CTD$cond = NA
+OCNMS_OME_CTD_TH042$cond = NA
+OCNMS_OME_CTD$pres = NA
+OCNMS_OME_CTD_TH042$pres = NA
+
+OCNMS_OME_CTD <- OCNMS_OME_CTD %>% select("date", "year", "depth", "temperature", "DO", "salinity", "potential_density", "pres", "cond")
+OCNMS_OME_CTD_TH042 <- OCNMS_OME_CTD_TH042 %>% select("date", "year", "depth", "temperature", "DO", "salinity", "potential_density", "pres", "cond")
+
 write.csv(OCNMS_OME_CTD, file = here("OCNMS_Hypoxia", "Outputs", "OCNMS_CTD_CleanData.csv"))
+write.csv(OCNMS_OME_CTD_TH042, file = here("OCNMS_Hypoxia", "Outputs", "OCNMS_CTD_TH042_CleanData.csv"))
 ```
 

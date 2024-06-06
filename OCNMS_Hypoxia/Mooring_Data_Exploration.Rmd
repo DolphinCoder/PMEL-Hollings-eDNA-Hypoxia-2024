@@ -154,7 +154,7 @@ scatterplt_fill <- function(df, x, y, color, shape = 16, alpha = 1) {
 
 ```{r}
 TH042 <- TH042 %>% 
-  rename(DO = oxy_mg, temperature = temp, salinity = sal)
+  rename(DO = oxy_mg, temperature = temp, salinity = sal, date = time, potential_density = dens)
 ```
 
 # Data Exploration
@@ -164,15 +164,16 @@ TH042 <- TH042 %>%
 histogram_fill(TH042, depth, 0.5, fill = year) # Range 40-45 m - ok to clip CTD data to that?
 histogram_fill(TH042, temperature, 0.5, fill = year)
 histogram_fill(TH042, salinity, 0.1, fill = year)
-histogram_fill(TH042, dens, 0.1, fill = year)
+histogram_fill(TH042, potential_density, 0.1, fill = year)
+histogram_fill(TH042, pres, 0.1, fill = year)
 histogram_fill(TH042, DO, 0.1, fill = year)
 ```
 
 ## Scatterplots
 
 ```{r}
-scatterplt(TH042, dens, salinity, alpha = 0.1)
-scatterplt_fill(TH042, dens, salinity, color = year)
+scatterplt(TH042, potential_density, salinity, alpha = 0.1)
+scatterplt_fill(TH042, potential_density, salinity, color = year)
 ```
 
 
@@ -187,3 +188,26 @@ histogram(TH042, DO, 0.5) +
 
 histogram_fill(TH042, DO, 0.5, fill = year) 
 ```
+
+## Time Series
+
+```{r}
+# Graph of oxygen levels around 42 meters for each year
+TH042 %>% 
+  ggplot(aes(x = date, y = DO, color = depth)) +
+    geom_line() +
+    geom_point(shape = 1) +
+    theme_bw() +
+    facet_wrap(facets = vars(year), scales = "free_x", ncol = 1)
+ggsave("OCNMS_Mooring_Oxygen_FacetYear.png", path = here(pltpath), width = 3000, height = 4000, units = "px")
+```
+
+# Export
+
+```{r Export Mooring Data}
+# Reorder columns so that it can bind with the CTD data
+TH042 <- TH042 %>% select("date", "year", "depth", "temperature", "DO", "salinity", "potential_density", "pres", "cond")
+
+write.csv(TH042, file = here("OCNMS_Hypoxia", "Outputs", "OCNMS_Mooring_CleanData.csv"))
+```
+
