@@ -1,12 +1,13 @@
 ---
-title: “Hypoxia Time Series Creation”
+title: "Hypoxia Time Series Creation"
 author: "Eleanor (Ella) Crotty"
-header-includes:
-  \usepackage{fvextra}
-  \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,commandchars=\\\{\}}
+header-includes: \usepackage{fvextra} \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,commandchars=\\\{\}}
 output:
+  html_document:
+    toc: yes
+    df_print: paged
   pdf_document:
-    toc: TRUE
+    toc: yes
 urlcolor: blue
 ---
 
@@ -38,9 +39,11 @@ pltpath <- "OCNMS_Hypoxia/Plots"
 CTD_short <- read.csv(here(wd, "OCNMS_CTD_TH042_CleanData.csv")) %>% 
   mutate(date = as.POSIXct(date), year = as.factor(year), source = as.factor(source))
 CTD <- read.csv(here(wd, "OCNMS_CTD_TH042ext_CleanData.csv")) %>% 
-  mutate(date = as.POSIXct(date), year = as.factor(year), source = as.factor(source))
+  mutate(date = as.POSIXct(date), year = as.factor(year), source = as.factor(source)) 
 Mooring <- read.csv(here(wd, "OCNMS_Mooring_CleanData.csv")) %>% 
   mutate(date = as.POSIXct(date), year = as.factor(year), source = as.factor(source))
+
+# Group CTD casts together by sampleID (all depths) and average the environmental factors
 
 EnvData1short <- rbind(CTD_short, Mooring) %>%    # 39.9 - 44.9 meters deep
   select(-X) %>% 
@@ -50,6 +53,7 @@ EnvData1 <- rbind(CTD, Mooring)  %>%    # 30-45 meters deep
   select(-X) %>% 
   mutate(date = as.POSIXct(date), year = as.factor(year), source = as.factor(source))
 ```
+
 
 # Time Series (all years)
 

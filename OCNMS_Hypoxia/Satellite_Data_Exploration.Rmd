@@ -1,0 +1,246 @@
+---
+title: "Satellite Data Exploration"
+author: "Eleanor (Ella) Crotty"
+header-includes: \usepackage{fvextra} \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,commandchars=\\\{\}}
+output:
+  pdf_document:
+    toc: yes
+  html_document:
+    toc: yes
+    df_print: paged
+urlcolor: blue
+---
+
+# Setup
+
+```{r Package Imports, message = F, warning = F}
+# Warnings and startup messages suppressed
+library(tidyverse)
+library(patchwork)
+library(scales)
+library(ggrepel)
+library(readxl)
+library(here)
+```
+
+# Import data
+
+## Data sources
+
+[NASA webpage comparing MODIS and VIIRS](https://darktarget.gsfc.nasa.gov/products/viirs-modis/instrument-differences)
+
+**Temperature**
+
+- **Multi-scale Ultra-high Resolution (MUR) SST Analysis fv04.1, Global, 0.01°, 2002-present, Daily**
+  - Multi-sensor merged SST dataset made by NASA JPL
+  - 1 km resolution
+  - Multi-Resolution Variational Analysis (MRVA) method for interpolation
+  - From MODIS
+  - [Link](https://polarwatch.noaa.gov/erddap/griddap/jplMURSST41.html)
+  - [Metadata](https://polarwatch.noaa.gov/erddap/info/jplMURSST41/index.html)
+  - **This seems like the best one to me since it's new and high-resolution**
+  
+- **Sea-Surface Temperature, NOAA ACSPO NOAA-20 VIIRS CoastWatch Co-gridded 4km Daily (degrees C)**
+  - `cw_pass_type = day/night`
+  - Produced by NOAA/NESDIS/Office of Satellite and Product Operations (OSPO) office from Visible and Infrared Imager/Radiometer Suite (VIIRS) sensor
+  - [Link](https://polarwatch.noaa.gov/erddap/griddap/nesdisL3Collatedn20C.html)
+  - [Metadata](https://polarwatch.noaa.gov/erddap/info/nesdisL3Collatedn20C/index.html)
+  - **This seems good also, and is probably day and night - between this and the JPL one I can't tell if they both have day and night.**
+  
+- *AVHRR Pathfinder Version 5.3 L3-Collated (L3C) SST, Global, 0.0417°, 1981-present, Daytime (1 Day Composite)*
+  - These data were provided by GHRSST and the NOAA National Centers for Environmental Information (NCEI).
+  - Sea surface temperature (SST) data produced as part of the AVHRR Pathfinder SST Project. These data were created using Version 5.3 of the Pathfinder algorithm and the file is nearly but not completely compliant with the Global High-Resolution Sea Surface Temperature (GHRSST) Data Specifications V2.0 (GDS2).
+  - [Link](https://coastwatch.pfeg.noaa.gov/erddap/griddap/nceiPH53sstd1day.html)
+  - [Metadata](https://coastwatch.pfeg.noaa.gov/erddap/info/nceiPH53sstd1day/index.html)
+  - *Day only*
+  
+- *Sea-Surface Temperature, NOAA Geo-polar Blended Analysis Night Only, GHRSST, Near Real-Time, Global 5km, 2002-Present, Daily (degree C)*
+  - Night only
+  - Combines multi-satellite retrievals of sea surface temperature into a single analysis of SST. This analysis includes only nighttime data.
+  - NOAA NESDIS CoastWatch
+  - [Link](https://polarwatch.noaa.gov/erddap/griddap/nesdisGeoPolarSSTN5NRT.html)
+  - [Metadata](https://polarwatch.noaa.gov/erddap/info/nesdisGeoPolarSSTN5NRT/index.html)
+  - *Probably not going to use it, night only*
+
+**Chlorophyll-a**
+
+- *Chlorophyll-a, Aqua MODIS, NPP, L3SMI, Global, 4km, Science Quality, 2003-present (1 Day Composite)*
+  - Mean chlorophyll-a, mg/m^3
+  - This dataset has Level 3, Standard Mapped Image, 4km, chlorophyll-a concentration data from NASA's Aqua Spacecraft. Measurements are gathered by the Moderate Resolution Imaging Spectroradiometer (MODIS) carried aboard the spacecraft. This is Science Quality data. This is the August 2015 version of this dataset. *Is it really?*
+  - NOAA NMFS SWFSC ERD
+  - [Link](https://polarwatch.noaa.gov/erddap/griddap/erdMH1chla1day.html)
+  - [Metadata](https://polarwatch.noaa.gov/erddap/info/erdMH1chla1day/index.html)
+  
+- **Chlorophyll, NOAA S-NPP VIIRS, Science Quality, Global 4km, Level 3, 2012-present, Daily**
+  - NOAA CoastWatch
+  - Level-3 Standard Mapped Image (SMI), Global, 4km, Chlorophyll, Daily composite data from the Visible and Infrared Imager/Radiometer Suite (VIIRS). 
+  - These are science quality data with a 15-day latency. 
+  - The data, processed by the NOAA/STAR Ocean Color Team, are produced from MSL12 v1.2 using OC-SDR v04 and were release by CoastWatch as of 2017-08-07. 
+  - VIIRS is a multi-disciplinary instrument that flies on the Suomi-NPP (National Polar-orbiting Partnership) satellite and is the successor to MODIS. Suomi-NPP is the initial spacecraft in the JPSS (Joint Polar Satellite Systems) series of spacecraft. JPSS is our Nation's next generation polar-orbiting operational environmental satellite system. JPSS is a collaborative program between NOAA and its acquisition agent NASA.
+  - [Link](https://polarwatch.noaa.gov/erddap/griddap/nesdisVHNSQchlaDaily.html)
+  - [Metadata](https://polarwatch.noaa.gov/erddap/info/nesdisVHNSQchlaDaily/index.html)
+  - Probably going to use it, it's the successor to MODIS and I don't need pre-2012 data
+  
+**2024-07-07: MODIS didn't end up having all the years I wanted with chlorophyll, and I am experiencing issues getting the VIIRS SST data.**
+  
+**My Filters**
+
+- 2021-01-01 to 2023-12-31
+- 48.51 to 47.12 N
+- -125.68 to -124.18 E
+
+```{r Map Setup}
+mapUC <- map_data("world", region = c("usa", "canada"))
+OCNMS_x <- c(-123.5, -125.5)
+OCNMS_y <- c(47,49)
+
+mapOCNMS <- ggplot(mapUC, aes(x = long, y = lat, group = group)) +
+  geom_polygon(fill = "gray90", color = "black") +
+  coord_sf(xlim = OCNMS_x, 
+           ylim = OCNMS_y) +
+  theme_bw() +
+  theme(text = element_text(size=15),
+        panel.background = element_rect(fill = "azure1", 
+                                        colour = "azure1"),
+        legend.key = element_rect(fill = "white",
+                                         color = "white"),
+        # It added in blue behind the dots in the key and I don't want that
+        panel.grid.major = element_line(linewidth = 0.5, 
+                                        linetype = 'solid', 
+                                        colour = "white"), 
+        panel.grid.minor = element_line(linewidth = 0.25, 
+                                        linetype = 'solid', 
+                                        colour = "white"))
+
+mapTH <- ggplot(mapUC, aes(x = long, y = lat, group = group)) +
+  geom_polygon(fill = "gray90", color = "black") +
+  coord_sf(xlim = c(-124.5, -124.9), 
+           ylim = c(47.6, 48)) +
+  theme_bw() +
+  theme(text = element_text(size=15),
+        panel.background = element_rect(fill = "azure1", 
+                                        colour = "azure1"),
+        legend.key = element_rect(fill = "white",
+                                         color = "white"),
+        # It added in blue behind the dots in the key and I don't want that
+        panel.grid.major = element_line(linewidth = 0.5, 
+                                        linetype = 'solid', 
+                                        colour = "white"), 
+        panel.grid.minor = element_line(linewidth = 0.25, 
+                                        linetype = 'solid', 
+                                        colour = "white"))
+
+mapOCNMS
+mapTH
+```
+
+
+# Import Data
+
+```{r}
+wd <- "OCNMS_Hypoxia/Data"
+exp <- "OCNMS_Hypoxia/Outputs"
+pltpath <- "OCNMS_Hypoxia/Plots"
+
+# Chlorophyll VIIRS
+VIIRS_chlor_import <- read.csv(here(wd, "VIIRS_chlor.csv"))
+# Temperature VIIRS
+# Pending
+# Temperature MODIS
+MODIS_sst_import <- read.csv(here(wd, "MODIS_sst.csv"))
+```
+
+# Clean chlorophyll data
+
+```{r}
+VIIRS_chlor <- VIIRS_chlor_import
+
+head(VIIRS_chlor)
+dim(VIIRS_chlor)
+colnames(VIIRS_chlor) <- c("date", "A", "Latitude", "Longitude", "Chlor_a_mg_m_3")
+dim(VIIRS_chlor)
+head(VIIRS_chlor)
+VIIRS_chlor <- VIIRS_chlor %>% 
+  filter(!is.na(Chlor_a_mg_m_3)) %>% 
+  select(date, Latitude, Longitude, Chlor_a_mg_m_3) %>% 
+  mutate(date = as.POSIXct(date, tz = "utc")) # This data is daily but I am going to combine it with a POSIXct dataset so I'm keeping my options open
+dim(VIIRS_chlor) # Size
+head(VIIRS_chlor)
+#  select()
+```
+
+
+# Clean temperature data
+
+```{r}
+MODIS_sst <- MODIS_sst_import
+
+head(MODIS_sst)
+dim(MODIS_sst)
+colnames(MODIS_sst) <- c("date", "Latitude", "Longitude", "SST_C", "Error_C", "Mask")
+dim(MODIS_sst)
+head(MODIS_sst) # Fun thing that may be an issue in the future: These lat/lon coordinates have different numbers of digits, but probably just gonna average it around the mooring coordinates TBH.
+MODIS_sst <- MODIS_sst %>% 
+  filter(!is.na(SST_C)) %>% 
+  mutate(date = as.POSIXct(date, tz = "utc")) # This data is daily but I am going to combine it with a POSIXct dataset so I'm keeping my options open
+dim(MODIS_sst) # Size
+head(MODIS_sst)
+#  select()
+```
+
+# Merge data
+
+```{r}
+# Merging by coordinates here would be a pain, but I don't have to
+# TH mooring is at lat 47.8762, lon -124.7334. I think I can get decent data by just using near() with a tolerance of a degree or so
+tolr <- 0.1
+
+MODIS_sst_TH <- MODIS_sst %>% 
+  filter(near(Latitude, 47.8762, tol = tolr)) %>% 
+  filter(near(Longitude, -124.7334, tol = tolr))
+
+VIIRS_chlor_TH <- VIIRS_chlor %>% 
+  filter(near(Latitude, 47.8762, tol = tolr)) %>% 
+  filter(near(Longitude, -124.7334, tol = tolr))
+```
+
+
+# Explore data locations
+
+```{r, eval = F}
+SST_TH <- mapTH +
+  geom_point(data = MODIS_sst_TH, aes(x = Longitude, y = Latitude, color = SST_C), alpha = 0.01, inherit.aes = F) +
+  ggtitle("SST") +
+  geom_point(x = -124.7334, y = 47.8762, color = "red") +
+  geom_label(aes(x = -124.70, y = 47.8762, label = "TH"), color = "black")
+
+Chlor_TH <- mapTH +
+  geom_point(data = VIIRS_chlor_TH, aes(x = Longitude, y = Latitude, color = Chlor_a_mg_m_3), alpha = 0.01, inherit.aes = F) +
+  ggtitle("Chlor") +
+  geom_point(x = -124.7334, y = 47.8762, color = "red") +
+  geom_label(aes(x = -124.70, y = 47.8762, label = "TH"), color = "black")
+
+mapTH +
+  geom_jitter(data = MODIS_sst_TH, aes(x = Longitude, y = Latitude, color = SST_C), alpha = 0.01, inherit.aes = F) +
+  ggtitle("SST Jittered") +
+  geom_point(x = -124.7334, y = 47.8762, color = "red")
+
+mapTH +
+  geom_jitter(data = VIIRS_chlor_TH, aes(x = Longitude, y = Latitude, color = Chlor_a_mg_m_3), shape = 1, inherit.aes = F) +
+  ggtitle("Chlor Jittered") +
+  geom_point(x = -124.7334, y = 47.8762, color = "red") +
+  geom_label(aes(x = -124.71, y = 47.8762, label = "TH"), color = "red")
+
+(SST_TH + Chlor_TH) +
+   plot_layout(
+    guides = "collect") & # Gather all the legends
+    # Note & instead of + operator
+  theme(legend.position = "bottom", legend.text = element_text(angle = 45, vjust = 0.1)) 
+
+ggsave(here("OCNMS_Hypoxia", "Plots", "SatelliteDataLocations.png"), height = 2000, width = 3000, units = "px")
+```
+
+```{r}
+# write.csv(SatelliteData, file = here("OCNMS_Hypoxia", "Outputs", "SatelliteData_all.csv"))
+```
+

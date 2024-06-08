@@ -300,9 +300,87 @@ scatterplt_fill(OCNMS_OME_CTD, depth, potential_density, color = year)
 scatterplt(OCNMS_OME_CTD, temperature, salinity, alpha = 0.1)
 scatterplt_fill(OCNMS_OME_CTD, temperature, salinity, color = year)
 
-scatterplt_fill(OCNMS_OME_CTD, depth, DO, alpha = 0.5, color = station_id) +
-  scale_color_manual(values = c("gray80", "blue"))
-ggsave(here(pltpath, "Depth_DO_Scatterplot_CTD.png"))
+# Check to make sure that 30-45 meters is an OK range to take data from and assume it's all about the same
+
+CTD_2021to2023 <- OCNMS_OME_CTD %>% 
+  filter(year %in% c(2021, 2022, 2023))
+
+DOdepth <- scatterplt_fill(CTD_2021to2023, 
+                           depth, 
+                           DO, 
+                           alpha = 0.5, 
+                           color = station_id) +
+  scale_color_manual(values = c("gray80", "blue")) +
+  geom_vline(xintercept = 30)
+
+DOdepthFacet <- scatterplt_fill(CTD_2021to2023, 
+                                depth, 
+                                DO, 
+                                alpha = 0.5, 
+                                color = station_id) +
+  scale_color_manual(values = c("gray80", "blue")) +
+  facet_wrap(facets = vars(year)) +
+  geom_vline(xintercept = 30)
+
+DOdepth / DOdepthFacet
+ggsave(here(pltpath, "Depth_DO_Scatterplot_CTD_full.png"))
+
+TempDepth <- scatterplt_fill(CTD_2021to2023, 
+                depth, 
+                temperature, 
+                alpha = 0.5, 
+                color = station_id) +
+  scale_color_manual(values = c("gray80", "blue")) +
+  geom_vline(xintercept = 30)
+
+TempDepthFacet <- scatterplt_fill(CTD_2021to2023, 
+                depth, 
+                temperature, 
+                alpha = 0.5, 
+                color = station_id) +
+  scale_color_manual(values = c("gray80", "blue")) +
+  facet_wrap(facets = vars(year)) +
+  geom_vline(xintercept = 30)
+
+TempDepth / TempDepthFacet
+ggsave(here(pltpath, "Depth_Temp_Scatterplot_CTD_full.png"))
+
+# What's up with that weirdly non-stratified cast??
+# It's in 2023
+scatterplt_fill(CTD_2021to2023 %>% filter(year == 2023), 
+                depth, 
+                temperature, 
+                alpha = 0.5, 
+                color = sampleID) +
+  geom_vline(xintercept = 30)
+
+scatterplt_fill(CTD_2021to2023 %>% filter(year == 2023), 
+                depth, 
+                DO, 
+                alpha = 0.5, 
+                color = sampleID) +
+  geom_vline(xintercept = 30)
+# 2023-09-28 and 2023-09-29
+
+# Check it out by month - hotter?
+scatterplt_fill(CTD_2021to2023 %>% filter(station_id == "TH042"), 
+                                depth, 
+                                DO, 
+                                alpha = 0.5, 
+                                color = as.factor(month(date))) +
+  facet_wrap(facets = vars(year)) +
+  geom_vline(xintercept = 30) +
+  ggtitle("Depth vs. DO in 2021-2023 CTD Casts")
+
+scatterplt_fill(CTD_2021to2023 %>% filter(station_id == "TH042"), 
+                                depth, 
+                                temperature, 
+                                alpha = 0.5, 
+                                color = as.factor(month(date))) +
+  facet_wrap(facets = vars(year)) +
+  geom_vline(xintercept = 30) +
+  ggtitle("Depth vs. Temp in 2021-2023 CTD Casts")
+# It wasn't like that in September 2022!
 ```
 
 
@@ -364,7 +442,11 @@ OCNMS_OME_CTD42m %>%
     theme_bw() +
     facet_wrap(facets = vars(year), scales = "free_x", ncol = 1)
 ggsave("OCNMS_CTD_Oxygen_FacetYear42m.png", path = here(pltpath), width = 1000, height = 5000, units = "px")
+```
 
+# Filter by depth
+
+```{r}
 OCNMS_OME_CTD_TH042 <- OCNMS_OME_CTD %>% 
   filter(39.894 < depth) %>% 
   filter(depth < 44.898)  %>% # 401 rows
@@ -412,7 +494,6 @@ histogram_fill(OCNMS_OME_CTD %>% filter(year %in% c(2021, 2022, 2023)),
                1, 
                fill = station_id) +
   facet_wrap(facets = vars(year)) +
-  scale_x_continuous(limits = c(30,46), breaks = seq(from = 30, to = 46, by = 2)) +
   labs(title = "Number of CTD datapoints at each depth", fill = "Station ID", x = "Depth", y = "# of Datapoints", caption = "42m is the depth of interest")
 
 ggsave(here(pltpath, "WhyNo2022.png"), height = 2000, width = 3000, units = "px")
@@ -423,6 +504,8 @@ ggsave(here(pltpath, "WhyNo2022.png"), height = 2000, width = 3000, units = "px"
 
 ```{r Make CTD Data Compatible With Mooring Data}
 # OCNMS_OME_CTD is the most useful to me at the moment, since it is clean and only contains the locations of interest
+# Currently using OCNMS_OME_CTD_TH042. Need to average depth.
+OCNMS_OME_CTD_TH042 %>% group_by(date) %>% summarize(depths = n()) # Not averaging many points per day
 
 # Add + reorder columns to bind with mooring data
 compatibility = function(df) {
@@ -443,6 +526,30 @@ compatibility = function(df) {
 OCNMS_OME_CTDexp <- compatibility(OCNMS_OME_CTD)
 OCNMS_OME_CTD_TH042exp <- compatibility(OCNMS_OME_CTD_TH042)
 OCNMS_OME_CTD_TH042_extended_exp <- compatibility(OCNMS_OME_CTD_TH042_extended)
+
+OCNMS_OME_CTD_TH042exp <- OCNMS_OME_CTD_TH042exp %>% 
+  group_by(source, date, year, sampleID) %>% 
+  summarize(temperature = mean(temperature), 
+            DO = mean(DO), 
+            salinity = mean(salinity), 
+            potential_density = mean(potential_density),
+            pres = mean(pres),
+            cond = mean(cond)) %>% 
+  relocate(sampleID, .after = cond) # Now there is one row per day and no depth column
+
+OCNMS_OME_CTD_TH042exp %>% group_by(date) %>% summarize(depths = n()) # Not averaging many points per day
+
+OCNMS_OME_CTD_TH042_extended_exp <- OCNMS_OME_CTD_TH042_extended_exp %>% 
+  group_by(source, date, year, sampleID) %>% 
+  summarize(temperature = mean(temperature), 
+            DO = mean(DO), 
+            salinity = mean(salinity), 
+            potential_density = mean(potential_density),
+            pres = mean(pres),
+            cond = mean(cond)) %>% 
+  relocate(sampleID, .after = cond) # Now there is one row per day and no depth column
+
+OCNMS_OME_CTD_TH042_extended_exp %>% group_by(date) %>% summarize(depths = n()) # Not averaging many points per day
 
 # OCNMS_OME_CTDexp <- OCNMS_OME_CTD %>% select("source", "date", "year", "depth", "temperature", "DO", "salinity", "potential_density", "pres", "cond", "sampleID")
 # OCNMS_OME_CTD_TH042exp <- OCNMS_OME_CTD_TH042 %>% select("source", "date", "year", "depth", "temperature", "DO", "salinity", "potential_density", "pres", "cond", "sampleID")
