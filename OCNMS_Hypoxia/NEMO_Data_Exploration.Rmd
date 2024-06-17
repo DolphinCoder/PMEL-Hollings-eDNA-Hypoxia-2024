@@ -20,3 +20,32 @@ library(readxl)
 library(here)
 library(R.matlab)
 ```
+[MATLAB File Import Tutorial](https://www.kaggle.com/code/rtatman/reading-mat-files-into-r)
+
+[Google Doc of all the variable names](https://docs.google.com/document/d/1SiRRqH9jys-Y2ktuFyQ8E0s6KkJ8H664Lvph6HtfY78/edit)
+
+```{r}
+NEMO21 <- readMat(here("OCNMS_Hypoxia", "Data", "NEMO_Data", "MPall_nemo21a_sn106.mat"))
+# str(NEMO21) # Data structure
+# print(NEMO21)
+```
+
+
+```{r}
+lst <- NEMO21$MPall
+# datenum
+# dox = dissolved oxygen?
+# t = temperature?
+# id
+# yday
+# doxr?
+# z
+# lat
+# lon
+# year
+# cruise
+# comment
+datenum <- lst[[1]] # datenum
+metadata <- lst[[38]]
+```
+
