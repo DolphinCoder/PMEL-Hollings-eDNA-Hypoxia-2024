@@ -85,3 +85,5 @@ write.csv(EnvironmentalData2GapFilled, file = here("OCNMS_Project", "Data", "Env
 ```
 
 Based on the huge gap between the satellite and CTD data, this isn't a great option - ask Simone about models? 
+
+

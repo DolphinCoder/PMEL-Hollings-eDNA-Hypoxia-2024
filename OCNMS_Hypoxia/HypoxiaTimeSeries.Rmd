@@ -142,6 +142,16 @@ plt12 <- ggplot(EnvData1_yr, aes(x = date, y = temperature, color = source)) +
 ggsave(here(pltpath, "CombinedTemperatureSeries_crop.png"), height = 1000, width = 3000, units = "px")
 ```
 
+```{r}
+ggplot(EnvData1_yr, aes(x = date, y = temperature, color = source, shape = source)) +
+  geom_point() +
+  scale_shape_manual(values = c(19, 1)) +
+  scale_x_datetime(date_breaks = "1 month", date_labels = "%m-%y") +
+  theme_bw() +
+  facet_wrap(facets = vars(year), scales = "free_x", ncol = 1)
+```
+
+
 ```{r Export}
 # Export EnvData1short (narrower depth range, full year range), EnvData1 (wider depth, full year), and EnvData1_yr (wider depth, 2021-2023)
 
