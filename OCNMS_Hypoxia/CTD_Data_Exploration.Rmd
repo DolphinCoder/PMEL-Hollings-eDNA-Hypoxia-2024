@@ -371,6 +371,7 @@ scatterplt_fill(CTD_2021to2023 %>% filter(station_id == "TH042"),
   facet_wrap(facets = vars(year)) +
   geom_vline(xintercept = 30) +
   ggtitle("Depth vs. DO in 2021-2023 CTD Casts")
+ggsave(here(pltpath, "Depth_DO_Scatterplot_CTD_YearMonth.png"))
 
 scatterplt_fill(CTD_2021to2023 %>% filter(station_id == "TH042"), 
                                 depth, 
@@ -380,6 +381,7 @@ scatterplt_fill(CTD_2021to2023 %>% filter(station_id == "TH042"),
   facet_wrap(facets = vars(year)) +
   geom_vline(xintercept = 30) +
   ggtitle("Depth vs. Temp in 2021-2023 CTD Casts")
+ggsave(here(pltpath, "Depth_Temp_Scatterplot_CTD_YearMonth.png"))
 # It wasn't like that in September 2022!
 ```
 

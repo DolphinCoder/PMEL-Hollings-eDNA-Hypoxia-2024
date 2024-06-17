@@ -21,8 +21,12 @@ library(scales)
 library(ggrepel)
 library(readxl)
 library(here)
+library(RColorBrewer)
 ```
 
+**Note: A lot of these chunks have eval set to FALSE because they take forever to run, and I generally only want to run them when I've updated them and want their plot output exported.**
+
+[Tutorial from Zack on working with satellite data](https://coastwatch.gitbook.io/satellite-course/tutorials/r-tutorial/1.-how-to-work-with-satellite-data-in-r)
 # Import data
 
 ## Data sources
@@ -137,7 +141,8 @@ mapTH
 
 # Import Data
 
-```{r}
+```{r, eval = F}
+# eval = F so that I can run this code faster when it's already loaded
 wd <- "OCNMS_Hypoxia/Data"
 exp <- "OCNMS_Hypoxia/Outputs"
 pltpath <- "OCNMS_Hypoxia/Plots"
@@ -149,6 +154,23 @@ VIIRS_chlor_import <- read.csv(here(wd, "VIIRS_chlor.csv"))
 # Temperature MODIS
 MODIS_sst_import <- read.csv(here(wd, "MODIS_sst.csv"))
 ```
+
+## VIIRS Temp
+
+The `ncdf4` package reads NetCDF files, which allows for downloading huge datasets and loading parts of them at a time.
+
+I get the same error when trying to download VIIRS as NetCDF:
+Proxy Error
+
+The proxy server received an invalid response from an upstream server.
+The proxy server could not handle the request GET /erddap/griddap/noaacwL3Collatedn20C.nc. *This link also doesn't work*
+
+Reason: Error reading from remote server
+
+**Still not working, giving up for now.**
+
+[Tutorial on `griddap` from Zack](https://docs.ropensci.org/rerddap/articles/Using_rerddap.html)
+
 
 # Clean chlorophyll data
 
@@ -192,20 +214,23 @@ head(MODIS_sst)
 
 ```{r}
 # Merging by coordinates here would be a pain, but I don't have to
-# TH mooring is at lat 47.8762, lon -124.7334. I think I can get decent data by just using near() with a tolerance of a degree or so
+# TH mooring is at lat 47.8762, lon -124.7334. I think I can get decent data by just using near() with a tolerance of a tenth of a degree or so
+# Also, filtering for summer months to make the dataset smaller since none of the other data comes from other months
 tolr <- 0.1
 
 MODIS_sst_TH <- MODIS_sst %>% 
   filter(near(Latitude, 47.8762, tol = tolr)) %>% 
-  filter(near(Longitude, -124.7334, tol = tolr))
+  filter(near(Longitude, -124.7334, tol = tolr)) %>% 
+  filter(month(date) %in% c(05, 06, 07, 08, 09))
 
 VIIRS_chlor_TH <- VIIRS_chlor %>% 
   filter(near(Latitude, 47.8762, tol = tolr)) %>% 
-  filter(near(Longitude, -124.7334, tol = tolr))
+  filter(near(Longitude, -124.7334, tol = tolr)) %>% 
+  filter(month(date) %in% c(05, 06, 07, 08, 09))
 ```
 
 
-# Explore data locations
+## Explore data locations
 
 ```{r, eval = F}
 SST_TH <- mapTH +
@@ -240,6 +265,87 @@ mapTH +
 ggsave(here("OCNMS_Hypoxia", "Plots", "SatelliteDataLocations.png"), height = 2000, width = 3000, units = "px")
 ```
 
+
+
+```{r}
+# Plot a few moments in time + months to see if the temperatures are consistent across this geographic range. If this returns a pretty homogenous temperature, I'll average the TH datasets by day, compressing all the locations into one. I will then join them by day, since both datasets are daily.
+date_select <- as.POSIXct(c("2021-05-02", "2021-06-01", "2021-07-08", "2021-08-08"))
+
+mapTH +
+  geom_point(data = MODIS_sst_TH %>% filter(date %in% date_select), aes(x = Longitude, y = Latitude, color = SST_C), alpha = 1, shape = 1, inherit.aes = F) +
+  ggtitle("SST") +
+  geom_point(x = -124.7334, y = 47.8762, color = "red") +
+  facet_wrap(facets = vars(date))
+
+mapTH +
+  geom_point(data = VIIRS_chlor_TH %>% filter(date %in% date_select), aes(x = Longitude, y = Latitude, color = Chlor_a_mg_m_3), alpha = 1, inherit.aes = F) +
+  ggtitle("Chlor") +
+  geom_point(x = -124.7334, y = 47.8762, color = "red") +
+  facet_wrap(facets = vars(date)) 
+```
+
+```{r}
+# Average the June temperatures to plot
+temp_june <- MODIS_sst_TH %>% 
+  filter(month(date) == 06) %>% 
+  group_by(Latitude, Longitude) %>% 
+  summarize(SST_C = mean(SST_C))
+
+chlor_june <- VIIRS_chlor_TH %>% 
+  filter(month(date) == 06) %>% 
+  group_by(Latitude, Longitude) %>% 
+  summarize(Chlor_a_mg_m_3 = mean(Chlor_a_mg_m_3))
+
+# Average the August temperatures to plot
+temp_aug <- MODIS_sst_TH %>% 
+  filter(month(date) == 08) %>% 
+  group_by(Latitude, Longitude) %>% 
+  summarize(SST_C = mean(SST_C))
+
+chlor_aug <- VIIRS_chlor_TH %>% 
+  filter(month(date) == 08) %>% 
+  group_by(Latitude, Longitude) %>% 
+  summarize(Chlor_a_mg_m_3 = mean(Chlor_a_mg_m_3))
+```
+
+```{r}
+# Plot the June averages
+mapTH +
+  geom_point(data = temp_june, aes(x = Longitude, y = Latitude, color = SST_C), alpha = 1, inherit.aes = F) +
+  ggtitle("SST") +
+  geom_point(x = -124.7334, y = 47.8762, color = "red")
+
+mapTH +
+  geom_point(data = chlor_june, aes(x = Longitude, y = Latitude, color = Chlor_a_mg_m_3), alpha = 1, inherit.aes = F) +
+  ggtitle("Chlor") +
+  geom_point(x = -124.7334, y = 47.8762, color = "red")
+
+# Plot the August averages
+mapTH +
+  geom_point(data = temp_aug, aes(x = Longitude, y = Latitude, color = SST_C), alpha = 1, inherit.aes = F) +
+  ggtitle("SST") +
+  geom_point(x = -124.7334, y = 47.8762, color = "red")
+
+mapTH +
+  geom_point(data = chlor_aug, aes(x = Longitude, y = Latitude, color = Chlor_a_mg_m_3), alpha = 1, inherit.aes = F) +
+  ggtitle("Chlor") +
+  geom_point(x = -124.7334, y = 47.8762, color = "red")
+```
+
+```{r}
+ggplot(data = MODIS_sst %>% filter(month(date) == 06), aes(x = as.Date(date), y = SST_C, color = Latitude)) +
+  geom_point(shape = 1) +
+  facet_wrap(facets = vars(year(date)), scales = "free_x", ncol = 1) +
+  theme_bw()
+
+ggplot(data = MODIS_sst %>% filter(month(date) == 06), aes(x = as.Date(date), y = SST_C, color = Longitude)) +
+  geom_point(shape = 1) +
+  facet_wrap(facets = vars(year(date)), scales = "free_x", ncol = 1) +
+  theme_bw()
+```
+
+
+# Export
 ```{r}
 # write.csv(SatelliteData, file = here("OCNMS_Hypoxia", "Outputs", "SatelliteData_all.csv"))
 ```

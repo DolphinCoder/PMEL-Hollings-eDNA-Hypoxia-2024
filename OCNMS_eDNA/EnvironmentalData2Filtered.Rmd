@@ -1,0 +1,45 @@
+---
+title: "Environmental Data In Dates of Interest"
+author: "Eleanor (Ella) Crotty"
+header-includes:
+  \usepackage{fvextra}
+  \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,commandchars=\\\{\}}
+output:
+  pdf_document:
+    toc: TRUE
+urlcolor: blue
+---
+
+```{r Package Imports, message = F, warning = F}
+# Warnings and startup messages suppressed
+library(tidyverse)
+library(patchwork)
+library(scales)
+library(ggrepel)
+library(readxl)
+library(here)
+```
+
+```{r}
+# Define dates of interest
+
+BottleDates <- as.POSIXct(c("2021-08-25", "2022-06-21", "2022-08-22", "2022-09-20", "2021-10-08", "2022-07-19"))
+# seq() will take POSIXct objects, and by can be specified in seconds. Every 36 hours * * 60 minutes * 60 seconds = sampling every 129600 seconds
+
+by1 <- 129600
+
+PPS_Dates <- c(
+  seq(from = as.POSIXct("2022-08-23"), by = by1, to = as.POSIXct("2022-09-18")), 
+  seq(from = as.POSIXct("2021-08-26"), by = by1, to = as.POSIXct("2021-09-29")), 
+  seq(from = as.POSIXct("2022-06-23"), by = by1, to = as.POSIXct("2022-07-19")), 
+  seq(from = as.POSIXct("2023-10-01"), by = by1, to = as.POSIXct("2023-10-30"))
+  )
+
+DOIV <- c(BottleDates, PPS_Dates)
+DatesOfInterest <- data.frame(date = DOIV)
+
+# This can now be used for filtering joins :)
+
+write.csv(DatesOfInterest, file = here("OCNMS_Project", "Data", "SamplingDates.csv"))
+```
+
