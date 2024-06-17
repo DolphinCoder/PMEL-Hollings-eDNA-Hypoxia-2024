@@ -148,5 +148,6 @@ ggsave(here(pltpath, "CombinedTemperatureSeries_crop.png"), height = 1000, width
 write.csv(EnvData1short, file = here("OCNMS_Hypoxia", "Outputs", "EnvironmentalDataset1_Short_AllYears.csv"))
 write.csv(EnvData1, file = here("OCNMS_Hypoxia", "Outputs", "EnvironmentalDataset1_AllYears.csv"))
 write.csv(EnvData1_yr, file = here("OCNMS_Hypoxia", "Outputs", "EnvironmentalDataset1.csv"))
+write.csv(EnvData1_yr, file = here("OCNMS_Project", "Data", "EnvironmentalDataset1.csv"))
 ```
 

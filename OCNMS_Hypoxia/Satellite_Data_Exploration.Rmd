@@ -86,6 +86,8 @@ library(RColorBrewer)
   - Probably going to use it, it's the successor to MODIS and I don't need pre-2012 data
   
 **2024-07-07: MODIS didn't end up having all the years I wanted with chlorophyll, and I am experiencing issues getting the VIIRS SST data.**
+
+**2024-06-17: VIIRS chlorophyll doesn't have 2023**
   
 **My Filters**
 
@@ -141,7 +143,7 @@ mapTH
 
 # Import Data
 
-```{r, eval = F}
+```{r Import Data, eval = F}
 # eval = F so that I can run this code faster when it's already loaded
 wd <- "OCNMS_Hypoxia/Data"
 exp <- "OCNMS_Hypoxia/Outputs"
@@ -174,7 +176,7 @@ Reason: Error reading from remote server
 
 # Clean chlorophyll data
 
-```{r}
+```{r Clean chlorophyll data}
 VIIRS_chlor <- VIIRS_chlor_import
 
 head(VIIRS_chlor)
@@ -194,12 +196,12 @@ head(VIIRS_chlor)
 
 # Clean temperature data
 
-```{r}
+```{r Clean temperature data}
 MODIS_sst <- MODIS_sst_import
 
 head(MODIS_sst)
 dim(MODIS_sst)
-colnames(MODIS_sst) <- c("date", "Latitude", "Longitude", "SST_C", "Error_C", "Mask")
+colnames(MODIS_sst) <- c("date", "Latitude", "Longitude", "SST_C", "SST_Error_C", "SST_Mask")
 dim(MODIS_sst)
 head(MODIS_sst) # Fun thing that may be an issue in the future: These lat/lon coordinates have different numbers of digits, but probably just gonna average it around the mooring coordinates TBH.
 MODIS_sst <- MODIS_sst %>% 
@@ -212,7 +214,7 @@ head(MODIS_sst)
 
 # Merge data
 
-```{r}
+```{r Filter by location and summer months}
 # Merging by coordinates here would be a pain, but I don't have to
 # TH mooring is at lat 47.8762, lon -124.7334. I think I can get decent data by just using near() with a tolerance of a tenth of a degree or so
 # Also, filtering for summer months to make the dataset smaller since none of the other data comes from other months
@@ -232,7 +234,7 @@ VIIRS_chlor_TH <- VIIRS_chlor %>%
 
 ## Explore data locations
 
-```{r, eval = F}
+```{r Map satellite data grid, eval = F}
 SST_TH <- mapTH +
   geom_point(data = MODIS_sst_TH, aes(x = Longitude, y = Latitude, color = SST_C), alpha = 0.01, inherit.aes = F) +
   ggtitle("SST") +
@@ -262,12 +264,12 @@ mapTH +
     # Note & instead of + operator
   theme(legend.position = "bottom", legend.text = element_text(angle = 45, vjust = 0.1)) 
 
-ggsave(here("OCNMS_Hypoxia", "Plots", "SatelliteDataLocations.png"), height = 2000, width = 3000, units = "px")
+ggsave(here("OCNMS_Hypoxia", "Plots", "SatelliteExploration_Plots", "SatelliteDataLocations.png"), height = 2000, width = 3000, units = "px")
 ```
 
+## Visualize temperature data
 
-
-```{r}
+```{r Map a few days}
 # Plot a few moments in time + months to see if the temperatures are consistent across this geographic range. If this returns a pretty homogenous temperature, I'll average the TH datasets by day, compressing all the locations into one. I will then join them by day, since both datasets are daily.
 date_select <- as.POSIXct(c("2021-05-02", "2021-06-01", "2021-07-08", "2021-08-08"))
 
@@ -284,7 +286,7 @@ mapTH +
   facet_wrap(facets = vars(date)) 
 ```
 
-```{r}
+```{r Average June and August temperatures}
 # Average the June temperatures to plot
 temp_june <- MODIS_sst_TH %>% 
   filter(month(date) == 06) %>% 
@@ -308,45 +310,144 @@ chlor_aug <- VIIRS_chlor_TH %>%
   summarize(Chlor_a_mg_m_3 = mean(Chlor_a_mg_m_3))
 ```
 
-```{r}
+```{r Map temperature and chlorophyll}
+rectback <- annotate("rect", xmin=-124.725, xmax=-124.694, ymin=47.89, ymax=47.86, color="black", fill="white")
+
 # Plot the June averages
 mapTH +
   geom_point(data = temp_june, aes(x = Longitude, y = Latitude, color = SST_C), alpha = 1, inherit.aes = F) +
-  ggtitle("SST") +
-  geom_point(x = -124.7334, y = 47.8762, color = "red")
+  ggtitle("SST June Averages") +
+  geom_point(x = -124.7334, y = 47.8762, color = "red") + 
+  rectback +
+  annotate("text", x = -124.71, y = 47.8762, label = "TH")
 
 mapTH +
   geom_point(data = chlor_june, aes(x = Longitude, y = Latitude, color = Chlor_a_mg_m_3), alpha = 1, inherit.aes = F) +
-  ggtitle("Chlor") +
-  geom_point(x = -124.7334, y = 47.8762, color = "red")
+  ggtitle("Chlorophyll June Averages") +
+  geom_point(x = -124.7334, y = 47.8762, color = "red") + 
+  rectback +
+  annotate("text", x = -124.71, y = 47.8762, label = "TH")
 
 # Plot the August averages
 mapTH +
   geom_point(data = temp_aug, aes(x = Longitude, y = Latitude, color = SST_C), alpha = 1, inherit.aes = F) +
-  ggtitle("SST") +
-  geom_point(x = -124.7334, y = 47.8762, color = "red")
+  ggtitle("SST August Averages") +
+  geom_point(x = -124.7334, y = 47.8762, color = "red") + 
+  rectback +
+  annotate("text", x = -124.71, y = 47.8762, label = "TH")
+ggsave(here("OCNMS_Hypoxia", "Plots", "SatelliteExploration_Plots", "SatelliteTempsAugust.png"), height = 2000, width = 2500, units = "px")
 
 mapTH +
   geom_point(data = chlor_aug, aes(x = Longitude, y = Latitude, color = Chlor_a_mg_m_3), alpha = 1, inherit.aes = F) +
-  ggtitle("Chlor") +
-  geom_point(x = -124.7334, y = 47.8762, color = "red")
+  ggtitle("Chlorophyll August Averages") +
+  geom_point(x = -124.7334, y = 47.8762, color = "red") + 
+  rectback +
+  annotate("text", x = -124.71, y = 47.8762, label = "TH")
+ggsave(here("OCNMS_Hypoxia", "Plots", "SatelliteExploration_Plots", "SatelliteChlorAugust.png"), height = 2000, width = 2500, units = "px")
 ```
 
-```{r}
-ggplot(data = MODIS_sst %>% filter(month(date) == 06), aes(x = as.Date(date), y = SST_C, color = Latitude)) +
-  geom_point(shape = 1) +
+```{r Plot temperature time series}
+ggplot(data = MODIS_sst %>% filter(month(date) %in% c(05,06,07,08,09)), aes(x = as.Date(date), y = SST_C)) +
+  geom_point(shape = 1, alpha = 0.1) +
   facet_wrap(facets = vars(year(date)), scales = "free_x", ncol = 1) +
-  theme_bw()
+  theme_bw() +
+  ggtitle("Temperature Time Series (Unfiltered)")
+ggsave(here("OCNMS_Hypoxia", "Plots", "SatelliteExploration_Plots", "SatelliteTempExplUnfiltered.png"), height = 1000, width = 2000, units = "px")
 
-ggplot(data = MODIS_sst %>% filter(month(date) == 06), aes(x = as.Date(date), y = SST_C, color = Longitude)) +
-  geom_point(shape = 1) +
+ggplot(data = MODIS_sst_TH %>% filter(month(date) %in% c(05,06,07,08,09)), aes(x = as.Date(date), y = SST_C)) +
+  geom_point(shape = 1, alpha = 0.1) +
   facet_wrap(facets = vars(year(date)), scales = "free_x", ncol = 1) +
-  theme_bw()
+  theme_bw() +
+  ggtitle("Temperature Time Series (Within 0.1 Degrees of TH)")
+ggsave(here("OCNMS_Hypoxia", "Plots", "SatelliteExploration_Plots", "SatelliteTempExplFiltered.png"), height = 1000, width = 2000, units = "px")
+```
+
+```{r Plot time series as boxplot}
+ggplot(data = MODIS_sst %>% filter(month(date) == 6), aes(x = as.factor(as.Date(date)), y = SST_C)) +
+  geom_boxplot() +
+  facet_wrap(facets = vars(year(date)), scales = "free_x", ncol = 1) +
+  theme_bw() +
+  ggtitle("Temperature Time Series (Within 0.1 Degrees of TH)")
+ggsave(here("OCNMS_Hypoxia", "Plots", "SatelliteExploration_Plots", "SatelliteTempExplUnFilteredBox.png"), height = 1000, width = 2000, units = "px")
+
+ggplot(data = MODIS_sst_TH %>% filter(month(date) == 6), aes(x = as.factor(as.Date(date)), y = SST_C)) +
+  geom_boxplot() +
+  facet_wrap(facets = vars(year(date)), scales = "free_x", ncol = 1) +
+  theme_bw() +
+  ggtitle("Temperature Time Series (Within 0.1 Degrees of TH)")
+ggsave(here("OCNMS_Hypoxia", "Plots", "SatelliteExploration_Plots", "SatelliteTempExplFilteredBox.png"), height = 1000, width = 2000, units = "px")
+```
+
+## Visualize chlorophyll data
+
+```{r Plot temperature time series}
+ggplot(data = VIIRS_chlor %>% filter(month(date) %in% c(06,07,08)), aes(x = as.Date(date), y = Chlor_a_mg_m_3)) +
+  geom_point(shape = 1, alpha = 0.1) +
+  facet_wrap(facets = vars(year(date)), scales = "free_x", ncol = 1) +
+  theme_bw() +
+  ggtitle("Chlorophyll Time Series (Unfiltered)")
+ggsave(here("OCNMS_Hypoxia", "Plots", "SatelliteExploration_Plots", "SatelliteChlorExplUnfiltered.png"), height = 1000, width = 2000, units = "px")
+
+ggplot(data = VIIRS_chlor_TH %>% filter(month(date) %in% c(06,07,08)), aes(x = as.Date(date), y = Chlor_a_mg_m_3)) +
+  geom_point(shape = 1, alpha = 0.1) +
+  facet_wrap(facets = vars(year(date)), scales = "free_x", ncol = 1) +
+  theme_bw() +
+  ggtitle("Chlorophyll Time Series (Within 0.1 Degrees of TH)")
+ggsave(here("OCNMS_Hypoxia", "Plots", "SatelliteExploration_Plots", "SatelliteChlorExplFiltered.png"), height = 1000, width = 2000, units = "px")
+```
+
+```{r Plot time series as boxplot}
+ggplot(data = VIIRS_chlor %>% filter(month(date) == 6), aes(x = as.factor(as.Date(date)), y = Chlor_a_mg_m_3)) +
+  geom_boxplot() +
+  facet_wrap(facets = vars(year(date)), scales = "free_x", ncol = 1) +
+  theme_bw() +
+  ggtitle("Chlorophyll Time Series (Within 0.1 Degrees of TH)")
+ggsave(here("OCNMS_Hypoxia", "Plots", "SatelliteExploration_Plots", "SatelliteChlorExplUnFilteredBox.png"), height = 1000, width = 2000, units = "px")
+
+ggplot(data = VIIRS_chlor_TH %>% filter(month(date) == 6), aes(x = as.factor(as.Date(date)), y = Chlor_a_mg_m_3)) +
+  geom_boxplot() +
+  facet_wrap(facets = vars(year(date)), scales = "free_x", ncol = 1) +
+  theme_bw() +
+  ggtitle("Chlorophyll Time Series (Within 0.1 Degrees of TH)")
+ggsave(here("OCNMS_Hypoxia", "Plots", "SatelliteExploration_Plots", "SatelliteChlorExplFilteredBox.png"), height = 1000, width = 2000, units = "px")
+```
+## Compress & merge
+```{r Compress}
+head(VIIRS_chlor_TH)
+head(MODIS_sst_TH)
+
+MODIS_sst_TH_merge <- MODIS_sst_TH %>% 
+  group_by(date) %>% 
+  summarize(SST_C = mean(SST_C), Mean_SST_Error = mean(SST_Error_C), SST_Mask = mean(SST_Mask))
+
+VIIRS_chlor_TH_merge <- VIIRS_chlor_TH %>% 
+  group_by(date) %>% 
+  summarize(Chlor_a_mg_m_3 = mean(Chlor_a_mg_m_3))
+
+head(VIIRS_chlor_TH_merge)
+head(MODIS_sst_TH_merge)
+
+ggplot(data = MODIS_sst_TH_merge %>% filter(month(date) %in% c(05,06,07,08,09)), aes(x = as.Date(date), y = SST_C)) +
+  geom_point() +
+  facet_wrap(facets = vars(year(date)), scales = "free_x", ncol = 1) +
+  theme_bw() +
+  ggtitle("Temperature Time Series (Within 0.1 Degrees of TH)")
+ggsave(here("OCNMS_Hypoxia", "Plots", "SatelliteExploration_Plots", "SatelliteTempSummarized.png"), height = 1000, width = 2000, units = "px")
+
+ggplot(data = VIIRS_chlor_TH_merge %>% filter(month(date) %in% c(05,06,07,08,09)), aes(x = as.Date(date), y = Chlor_a_mg_m_3)) +
+  geom_point() +
+  facet_wrap(facets = vars(year(date)), scales = "free_x", ncol = 1) +
+  theme_bw() +
+  ggtitle("Chlorophyll Time Series (Within 0.1 Degrees of TH)")
+```
+
+```{r Merge}
+SatelliteData <- full_join(MODIS_sst_TH_merge, VIIRS_chlor_TH_merge, by = join_by(date)) %>% select(date, SST_C, Chlor_a_mg_m_3, Mean_SST_Error) # SST_Mask was all 1 so I deleted it
 ```
 
 
 # Export
 ```{r}
-# write.csv(SatelliteData, file = here("OCNMS_Hypoxia", "Outputs", "SatelliteData_all.csv"))
+write.csv(SatelliteData, file = here("OCNMS_Hypoxia", "Outputs", "SatelliteData_all.csv"))
 ```
 
