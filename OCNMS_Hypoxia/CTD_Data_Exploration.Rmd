@@ -38,8 +38,8 @@ OCNMS_OME_CTD <- read.csv(here(wd, "OCNMS_OMEsites_ctd_output_copy.csv"))
 OCNMS_All_CTD <- read.csv(here(wd, "OCNMS_Allsites_ctd_output_copy.csv"))
 
 OME_CTD$date = as.Date(OME_CTD$date, tryFormats = c("%Y-%m-%d"))
-OCNMS_OME_CTD$date = as.POSIXct(OCNMS_OME_CTD$date, tryFormats = c("%Y-%m-%dT%H:%M:%SZ"))
-OCNMS_All_CTD$date = as.POSIXct(OCNMS_All_CTD$date, tryFormats = c("%Y-%m-%dT%H:%M:%SZ"))
+OCNMS_OME_CTD$date = as.POSIXct(OCNMS_OME_CTD$date, tryFormats = c("%Y-%m-%dT%H:%M:%SZ"), tz = "UTC")
+OCNMS_All_CTD$date = as.POSIXct(OCNMS_All_CTD$date, tryFormats = c("%Y-%m-%dT%H:%M:%SZ"), tz = "UTC")
 
 # Problem: all the longitudes are positive, they need to be negative
 fixlong <- function(df) {
@@ -411,8 +411,15 @@ OCNMS_OME_CTD %>%
     geom_point(shape = 1) +
     theme_bw() +
     facet_wrap(facets = vars(year), scales = "free_x", ncol = 1)
-
 ggsave("OCNMS_CTD_Oxygen_FacetYear.png", path = here(pltpath), width = 1000, height = 5000, units = "px")
+
+OCNMS_OME_CTD %>% 
+  filter(year %in% c(2021, 2022, 2023)) %>% 
+  ggplot(aes(x = date, y = DO, color = depth)) +
+    geom_point(shape = 1) +
+    theme_bw() +
+    facet_wrap(facets = vars(year), scales = "free_x", ncol = 1)
+ggsave("OCNMS_CTD_Oxygen_FacetYear_2020s.png", path = here(pltpath), width = 1500, height = 2000, units = "px")
 
 # What depths do we have?
 depths <- OCNMS_OME_CTD %>% 
@@ -562,7 +569,7 @@ OCNMS_OME_CTD_TH042_extended_exp %>% group_by(date) %>% summarize(depths = n()) 
 
 ```{r Export CTD Data}
 write.csv(OCNMS_OME_CTDexp, file = here("OCNMS_Hypoxia", "Outputs", "OCNMS_CTD_CleanData.csv"))
-write.csv(OCNMS_OME_CTD_TH042exp, file = here("OCNMS_Hypoxia", "Outputs", "OCNMS_CTD_TH042_CleanData.csv"))
-write.csv(OCNMS_OME_CTD_TH042_extended_exp, file = here("OCNMS_Hypoxia", "Outputs", "OCNMS_CTD_TH042ext_CleanData.csv"))
+write.csv(OCNMS_OME_CTD_TH042exp, file = here("OCNMS_Hypoxia", "Outputs", "OCNMS_CTD_TH042_CleanData.csv")) 
+write.csv(OCNMS_OME_CTD_TH042_extended_exp, file = here("OCNMS_Hypoxia", "Outputs", "OCNMS_CTD_TH042ext_CleanData.csv")) # going to use this from here on out
 ```
 

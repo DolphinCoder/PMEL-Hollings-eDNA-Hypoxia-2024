@@ -49,11 +49,17 @@ lst <- NEMO23$MPall
 # year
 # cruise
 # comment
-datenum <- c(lst[[1]]) # datenums as vector
-metadata <- lst[[38]]
-dates <- as.POSIXct((datenum - 719529)*86400, origin = "1970-01-01", tz = "UTC") # subtract to get origin = January 0, 0000 (this is a made up date so as.POSIXct won't handle it natively), need to multiply by seconds in a day to go from datenum (days since made up Matlab epoch) to POSIXct (seconds since Unix epoch). Just kinda hoping they were using UTC here.
-print(length(datenum) == length(dates))
+datenum23 <- c(lst[[1]]) # datenums as vector
+metadata23 <- lst[[38]]
+dates23 <- as.POSIXct((datenum23 - 719529)*86400, origin = "1970-01-01", tz = "UTC") # subtract to get origin = January 0, 0000 (this is a made up date so as.POSIXct won't handle it natively), need to multiply by seconds in a day to go from datenum (days since made up Matlab epoch) to POSIXct (seconds since Unix epoch). Just kinda hoping they were using UTC here.
+print(length(datenum23) == length(dates23))
 
 # These look pretty much correct, starting in May 2023
+
+dox23 <- c(lst[[11]])
+```
+
+```{r}
+data.frame(dates23, dox23)
 ```
 

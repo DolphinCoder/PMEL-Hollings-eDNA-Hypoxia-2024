@@ -37,21 +37,21 @@ exp <- "OCNMS_Hypoxia/Outputs"
 pltpath <- "OCNMS_Hypoxia/Plots"
 
 CTD_short <- read.csv(here(wd, "OCNMS_CTD_TH042_CleanData.csv")) %>% 
-  mutate(date = as.POSIXct(date), year = as.factor(year), source = as.factor(source))
+  mutate(date = as.POSIXct(date, tz = "UTC"), year = as.factor(year), source = as.factor(source)) # only 39.9-44.9 meters, not priority
 CTD <- read.csv(here(wd, "OCNMS_CTD_TH042ext_CleanData.csv")) %>% 
-  mutate(date = as.POSIXct(date), year = as.factor(year), source = as.factor(source)) 
+  mutate(date = as.POSIXct(date, tz = "UTC"), year = as.factor(year), source = as.factor(source)) # priority
 Mooring <- read.csv(here(wd, "OCNMS_Mooring_CleanData.csv")) %>% 
-  mutate(date = as.POSIXct(date), year = as.factor(year), source = as.factor(source))
+  mutate(date = as.POSIXct(date, tz = "UTC"), year = as.factor(year), source = as.factor(source))
 
 # Group CTD casts together by sampleID (all depths) and average the environmental factors
 
 EnvData1short <- rbind(CTD_short, Mooring) %>%    # 39.9 - 44.9 meters deep
   select(-X) %>% 
-  mutate(date = as.POSIXct(date), year = as.factor(year), source = as.factor(source))
+  mutate(year = as.factor(year), source = as.factor(source))
 
 EnvData1 <- rbind(CTD, Mooring)  %>%    # 30-45 meters deep
   select(-X) %>% 
-  mutate(date = as.POSIXct(date), year = as.factor(year), source = as.factor(source))
+  mutate(year = as.factor(year), source = as.factor(source))
 ```
 
 
@@ -157,7 +157,7 @@ ggplot(EnvData1_yr, aes(x = date, y = temperature, color = source, shape = sourc
 
 write.csv(EnvData1short, file = here("OCNMS_Hypoxia", "Outputs", "EnvironmentalDataset1_Short_AllYears.csv"))
 write.csv(EnvData1, file = here("OCNMS_Hypoxia", "Outputs", "EnvironmentalDataset1_AllYears.csv"))
-write.csv(EnvData1_yr, file = here("OCNMS_Hypoxia", "Outputs", "EnvironmentalDataset1.csv"))
+write.csv(EnvData1_yr, file = here("OCNMS_Hypoxia", "Outputs", "EnvironmentalDataset1.csv")) # Mostly using this from here on out
 write.csv(EnvData1_yr, file = here("OCNMS_Project", "Data", "EnvironmentalDataset1.csv"))
 ```
 

@@ -1,0 +1,635 @@
+FINAL Sample NAME,Sequential G3 Sample No.,Biological Replicate No. (if applicable),Technical Replicate No. (if applicable),Negative control,Cruise/ Expedition ID,Cruise/ Expedition ID,Collection Date (UTC),Collection Date (local),Field Sample Name,Dive No./ Station No./ Cast No.,Rosette position,Sampling method,Preservation,Region,Area within region,Additional Description Sampling Location,Depth (m),Altitude (m),"Latitude      (D° M' S"")","Longitude           (D° M' S"")",Latitude & Longitude (D.D°),Start time  (local),End time (local),Start time (UTC),End time (UTC),Sample volume (ml),Temp (°C),pH,Salinity (ppt),Oxygen (µM),Methane (nmol/L),Other chem,Other chem (units X),Personnel Responsible for Collecting Sample,Field Notes,Extracted,Elution Volume (µl),Extraction Yield (ng/µl),Extraction/PCR Notes,WS & BS Sample Location,Sent for Sequencing,Sequencing completed,Sequencing Notes
+E1031.NC.OC0821,1031,,,TRUE,OC0821,OCNMS Aug 2021,,08/25/21,NC Start,-,,Sterivex 0.22µm filter,95% EtOH,,,,-,-,-,-,-,-,-,-,-,1000,-,,-,-,,,,Emily Norton and Shannon Brown,,FALSE,100,OCNMS_ExtractionSheet,,Lab -20˚C,FALSE,FALSE,
+E1032.OC0821,1032,,,FALSE,OC0821,OCNMS Aug 2021,,08/25/21,TH042-01,TH042,1,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhite Head,,33.3,,47° 52.694' N,124° 44.139' W,,09:48,9:56,16:48,16:56,1000,7.7,,33.5,2.7 mg/l,,,,Emily Norton and Shannon Brown,,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1033.OC0821,1033,,,FALSE,OC0821,OCNMS Aug 2021,,08/25/21,TH042-02,TH042,3,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhite Head,,33.0,,47° 52.694' N,124° 44.139' W,,09:48,9:56,16:48,16:56,1000,7.8,,33.5,2.8 mg/l,,,,Emily Norton and Shannon Brown,,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1034.OC0821,1034,,,FALSE,OC0821,OCNMS Aug 2021,,08/25/21,TH042-03,TH042,4,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhite Head,,33.0,,47° 52.694' N,124° 44.139' W,,09:48,9:56,16:48,16:56,1000,7.8,,33.5,2.9 mg/l,,,,Emily Norton and Shannon Brown,,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1035.OC0821,1035,,,FALSE,OC0821,OCNMS Aug 2021,,08/25/21,TH042-04,TH042,5,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhite Head,,32.9,,47° 52.694' N,124° 44.139' W,,09:48,9:56,16:48,16:56,1000,7.8,,33.5,3.0 mg/l,,,,Emily Norton and Shannon Brown,,FALSE,100,OCNMS_ExtractionSheet,,Lab -20˚C,FALSE,FALSE,
+E1036.OC0821,1036,,,FALSE,OC0821,OCNMS Aug 2021,,08/25/21,TH042-05,TH042,7,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhite Head,,32.8,,47° 52.694' N,124° 44.139' W,,09:48,9:56,16:48,16:56,1000,7.9,,33.5,3.1 mg/l,,,,Emily Norton and Shannon Brown,Niskin failed leak test,FALSE,100,OCNMS_ExtractionSheet,,Lab -20˚C,FALSE,FALSE,
+E1037.OC0821,1037,,,FALSE,OC0821,OCNMS Aug 2021,,08/25/21,TH042-06,TH042,8,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhite Head,,32.8,,47° 52.694' N,124° 44.139' W,,09:48,9:56,16:48,16:56,1000,7.9,,33.5,3.2 mg/l,,,,Emily Norton and Shannon Brown,Niskin failed leak test,FALSE,100,OCNMS_ExtractionSheet,,Lab -20˚C,FALSE,FALSE,
+E1038.OC0821,1038,,,FALSE,OC0821,OCNMS Aug 2021,,08/25/21,TH042-07,TH042,9,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhite Head,,32.4,,47° 52.694' N,124° 44.139' W,,09:48,9:56,16:48,16:56,1000,8.0,,33.4,3.3 mg/l,,,,Emily Norton and Shannon Brown,Niskin failed leak test,FALSE,100,OCNMS_ExtractionSheet,,Lab -20˚C,FALSE,FALSE,
+E1039.OC0821,1039,,,FALSE,OC0821,OCNMS Aug 2021,,08/25/21,TH042-08,TH042,10,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhite Head,,32.0,,47° 52.694' N,124° 44.139' W,,09:48,9:56,16:48,16:56,1000,8.0,,33.4,3.5 mg/l,,,,Emily Norton and Shannon Brown,,FALSE,100,OCNMS_ExtractionSheet,,Lab -20˚C,FALSE,FALSE,
+E1040.OC0821,1040,,,FALSE,OC0821,OCNMS Aug 2021,,08/25/21,TH042-09,TH042,11,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhite Head,,31.2,,47° 52.694' N,124° 44.139' W,,09:48,9:56,16:48,16:56,1000,8.1,,33.4,3.6 mg/l,,,,Emily Norton and Shannon Brown,Bottom of Niskin not secure; leaked,FALSE,100,OCNMS_ExtractionSheet,,Lab -20˚C,FALSE,FALSE,
+E1041.OC0821,1041,,,FALSE,OC0821,OCNMS Aug 2021,,08/25/21,TH042-10,TH042,12,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhite Head,,30.7,,47° 52.694' N,124° 44.139' W,,09:48,9:56,16:48,16:56,1000,8.2,,33.3,4.0 mg/l,,,,Emily Norton and Shannon Brown,,FALSE,100,OCNMS_ExtractionSheet,,Lab -20˚C,FALSE,FALSE,
+E1042.OC0821,1042,,,FALSE,OC0821,OCNMS Aug 2021,,08/25/21,CE042-01,CE042,1,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Cape Elizabeth,,36.1,,47° 21.009' N,124° 29.126' W,,15:05,15:14,22:05,22:14,1000,7.5,,33.8,0.60 mg/l,,,,Emily Norton and Shannon Brown,,FALSE,100,OCNMS_ExtractionSheet,,Lab -20˚C,FALSE,FALSE,
+E1043.OC0821,1043,,,FALSE,OC0821,OCNMS Aug 2021,,08/25/21,CE042-02,CE042,2,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Cape Elizabeth,,35.8,,47° 21.009' N,124° 29.126' W,,15:05,15:14,22:05,22:14,1000,7.5,,33.8,0.61 mg/l,,,,Emily Norton and Shannon Brown,,FALSE,100,OCNMS_ExtractionSheet,,Lab -20˚C,FALSE,FALSE,
+E1044.OC0821,1044,,,FALSE,OC0821,OCNMS Aug 2021,,08/25/21,CE042-03,CE042,3,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Cape Elizabeth,,35.4,,47° 21.009' N,124° 29.126' W,,15:05,15:14,22:05,22:14,1000,7.5,,33.8,0.62 mg/l,,,,Emily Norton and Shannon Brown,,FALSE,100,OCNMS_ExtractionSheet,,Lab -20˚C,FALSE,FALSE,
+E1045.OC0821,1045,,,FALSE,OC0821,OCNMS Aug 2021,,08/25/21,CE042-04,CE042,4,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Cape Elizabeth,,35.2,,47° 21.009' N,124° 29.126' W,,15:05,15:14,22:05,22:14,1000,7.5,,33.8,0.62 mg/l,,,,Emily Norton and Shannon Brown,,FALSE,100,OCNMS_ExtractionSheet,,Lab -20˚C,FALSE,FALSE,
+E1046.OC0821,1046,,,FALSE,OC0821,OCNMS Aug 2021,,08/25/21,CE042-05,CE042,5,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Cape Elizabeth,,34.6,,47° 21.009' N,124° 29.126' W,,15:05,15:14,22:05,22:14,1000,7.5,,33.8,0.61 mg/l,,,,Emily Norton and Shannon Brown,,FALSE,100,OCNMS_ExtractionSheet,,Lab -20˚C,FALSE,FALSE,
+E1047.OC0821,1047,,,FALSE,OC0821,OCNMS Aug 2021,,08/25/21,CE042-06,CE042,7,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Cape Elizabeth,,34.4,,47° 21.009' N,124° 29.126' W,,15:05,15:14,22:05,22:14,1000,7.5,,33.8,0.60 mg/l,,,,Emily Norton and Shannon Brown,Niskin failed leak test,FALSE,100,OCNMS_ExtractionSheet,,Lab -20˚C,FALSE,FALSE,
+E1048.OC0821,1048,,,FALSE,OC0821,OCNMS Aug 2021,,08/25/21,CE042-07,CE042,9,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Cape Elizabeth,,33.7,,47° 21.009' N,124° 29.126' W,,15:05,15:14,22:05,22:14,1000,7.5,,33.8,0.62 mg/l,,,,Emily Norton and Shannon Brown,,FALSE,100,OCNMS_ExtractionSheet,,Lab -20˚C,FALSE,FALSE,
+E1049.OC0821,1049,,,FALSE,OC0821,OCNMS Aug 2021,,08/25/21,CE042-08,CE042,10,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Cape Elizabeth,,33.3,,47° 21.009' N,124° 29.126' W,,15:05,15:14,22:05,22:14,1000,7.5,,33.8,0.62 mg/l,,,,Emily Norton and Shannon Brown,,FALSE,100,OCNMS_ExtractionSheet,,Lab -20˚C,FALSE,FALSE,
+E1050.OC0821,1050,,,FALSE,OC0821,OCNMS Aug 2021,,08/25/21,CE042-09,CE042,11,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Cape Elizabeth,,32.8,,47° 21.009' N,124° 29.126' W,,15:05,15:14,22:05,22:14,1000,7.5,,33.8,0.63 mg/l,,,,Emily Norton and Shannon Brown,Bottom of Niskin not secure; leaked,FALSE,100,OCNMS_ExtractionSheet,,Lab -20˚C,FALSE,FALSE,
+E1051.OC0821,1051,,,FALSE,OC0821,OCNMS Aug 2021,,08/25/21,CE042-10,CE042,12,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Cape Elizabeth,,32.4,,47° 21.009' N,124° 29.126' W,,15:05,15:14,22:05,22:14,1000,7.6,,33.7,0.72 mg/l,,,,Emily Norton and Shannon Brown,,FALSE,100,OCNMS_ExtractionSheet,,Lab -20˚C,FALSE,FALSE,
+E1052.NC.OC0821,1052,,,TRUE,OC0821,OCNMS Aug 2021,,08/25/21,NC End,-,,Sterivex 0.22µm filter,95% EtOH,,,,-,-,-,-,-,-,-,-,-,1000,-,,-,-,,,,Emily Norton and Shannon Brown,Sterivex sealed with parafilm; caps added in the lab,FALSE,100,OCNMS_ExtractionSheet,,Lab -20˚C,FALSE,FALSE,
+E1171.NC.OC0622,1171,,,TRUE,OC0622,OCNMS June 2022,,06/21/22,,-,,Sterivex 0.22µm filter,95% EtOH,,,,-,-,-,-,,-,-,,,1000,,,,,,,,Shannon Brown,,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1172.OC0622,1172,,,FALSE,OC0622,OCNMS June 2022,,06/21/22,,TH042,1,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,32.4,,47˚ 52.699' N,124˚ 44.187' W,,13:28,13:43,,,1000,8.6,,32.4,5.57 mg/L,,,,Shannon Brown,,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1173.OC0622,1173,,,FALSE,OC0622,OCNMS June 2022,,06/21/22,,TH042,2,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,32.2,,47˚ 52.699' N,124˚ 44.187' W,,13:28,13:43,,,1000,8.6,,32.4,5.9 mg/L,,,,Shannon Brown,Niskin failed leak test,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1174.OC0622,1174,,,FALSE,OC0622,OCNMS June 2022,,06/21/22,,TH042,4,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,32.5,,47˚ 52.699' N,124˚ 44.187' W,,13:28,13:43,,,1000,8.6,,32.4,5.93 mg/L,,,,Shannon Brown,,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1175.OC0622,1175,,,FALSE,OC0622,OCNMS June 2022,,06/21/22,,TH042,5,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,32.3,,47˚ 52.699' N,124˚ 44.187' W,,13:28,13:43,,,1000,8.6,,32.4,5.93 mg/L,,,,Shannon Brown,,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1176.OC0622,1176,,,FALSE,OC0622,OCNMS June 2022,,06/21/22,,TH042,6,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,32.1,,47˚ 52.699' N,124˚ 44.187' W,,13:28,13:43,,,1000,8.6,,32.4,5.97 mg/L,,,,Shannon Brown,,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1177.OC0622,1177,,,FALSE,OC0622,OCNMS June 2022,,06/21/22,,TH042,8,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,32.6,,47˚ 52.699' N,124˚ 44.187' W,,13:28,13:43,,,1000,8.6,,32.4,5.92 mg/L,,,,Shannon Brown,,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1178.OC0622,1178,,,FALSE,OC0622,OCNMS June 2022,,06/21/22,,TH042,9,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,32.4,,47˚ 52.699' N,124˚ 44.187' W,,13:28,13:43,,,1000,8.6,,32.4,5.88 mg/L,,,,Shannon Brown,,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1179.OC0622,1179,,,FALSE,OC0622,OCNMS June 2022,,06/21/22,,TH042,10,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,32.1,,47˚ 52.699' N,124˚ 44.187' W,,13:28,13:43,,,1000,8.6,,32.4,5.96 mg/L,,,,Shannon Brown,Niskin leaked from bottom,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1180.OC0622,1180,,,FALSE,OC0622,OCNMS June 2022,,06/21/22,,TH042,11,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,32.2,,47˚ 52.699' N,124˚ 44.187' W,,13:28,13:43,,,1000,8.6,,32.4,5.98 mg/L,,,,Shannon Brown,Niskin leaked from bottom,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1181.OC0622,1181,,,FALSE,OC0622,OCNMS June 2022,,06/21/22,,TH042,12,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,32.7,,47˚ 52.699' N,124˚ 44.187' W,,13:28,13:43,,,1000,8.6,,32.4,5.93 mg/L,,,,Shannon Brown,Niskin leaked from bottom,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1182.OC0622,1182,,,FALSE,OC0622,OCNMS June 2022,,06/23/22,,CE042,1,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Cape Elizabeth,,32.0,,47˚ 21.009' N,124˚ 29.134' W,,11:35,11:50,,,1000,7.6,,33.6,2.97 mg/L,,,,Shannon Brown,,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1183.OC0622,1183,,,FALSE,OC0622,OCNMS June 2022,,06/23/22,,CE042,2,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Cape Elizabeth,,30.6,,47˚ 21.009' N,124˚ 29.134' W,,11:35,11:50,,,1000,7.6,,33.6,2.97  mg/L,,,,Shannon Brown,,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1184.OC0622,1184,,,FALSE,OC0622,OCNMS June 2022,,06/23/22,,CE042,3,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Cape Elizabeth,,29.9,,47˚ 21.009' N,124˚ 29.134' W,,11:35,11:50,,,1000,7.7,,33.4,2.98  mg/L,,,,Shannon Brown,Niskin partially failed leak test,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1185.OC0622,1185,,,FALSE,OC0622,OCNMS June 2022,,06/23/22,,CE042,4,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Cape Elizabeth,,29.6,,47˚ 21.009' N,124˚ 29.134' W,,11:35,11:50,,,1000,8.0,,33.0,3.12 mg/L,,,,Shannon Brown,,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1186.OC0622,1186,,,FALSE,OC0622,OCNMS June 2022,,06/23/22,,CE042,5,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Cape Elizabeth,,29.2,,47˚ 21.009' N,124˚ 29.134' W,,11:35,11:50,,,1000,8.2,,32.9,3.79 mg/L,,,,Shannon Brown,,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1187.OC0622,1187,,,FALSE,OC0622,OCNMS June 2022,,06/23/22,,CE042,6,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Cape Elizabeth,,28.5,,47˚ 21.009' N,124˚ 29.134' W,,11:35,11:50,,,1000,8.4,,32.6,4.08 mg/L,,,,Shannon Brown,,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1188.OC0622,1188,,,FALSE,OC0622,OCNMS June 2022,,06/23/22,,CE042,8,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Cape Elizabeth,,28.1,,47˚ 21.009' N,124˚ 29.134' W,,11:35,11:50,,,1000,8.6,,32.4,5.27 mg/L,,,,Shannon Brown,,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1189.OC0622,1189,,,FALSE,OC0622,OCNMS June 2022,,06/23/22,,CE042,9,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Cape Elizabeth,,27.7,,47˚ 21.009' N,124˚ 29.134' W,,11:35,11:50,,,1000,8.6,,32.4,6.1 mg/L,,,,Shannon Brown,Niskin leaked from bottom after sampling,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1190.OC0622,1190,,,FALSE,OC0622,OCNMS June 2022,,06/23/22,,CE042,10,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Cape Elizabeth,,28.1,,47˚ 21.009' N,124˚ 29.134' W,,11:35,11:50,,,1000,8.6,,32.4,6.24 mg/L,,,,Shannon Brown,,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1191.OC0622,1191,,,FALSE,OC0622,OCNMS June 2022,,06/23/22,,CE042,12,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Cape Elizabeth,,27.8,,47˚ 21.009' N,124˚ 29.134' W,,11:35,11:50,,,1000,8.6,,32.4,6.27 mg/L,,,,Shannon Brown,,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1192.NC.OC0622,1192,,,TRUE,OC0622,OCNMS June 2022,,06/23/22,,-,,Sterivex 0.22µm filter,95% EtOH,,,,-,-,-,-,,-,-,,,1000,,,,,,,,Shannon Brown,,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1229.OC0822,1229,,,FALSE,OC0822,OCNMS August 2022,,08/22/22,,,2,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,32.8,,47°52.532' N,124°43.992' W,,10:59,,,,1000,7.7,,33.3,4.14 mg/L,,,,Sean McAllister ,,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1230.OC0822,1230,,,FALSE,OC0822,OCNMS August 2022,,08/22/22,,,3,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,32.9,,47°52.532' N,124°43.992' W,,10:59,,,,1000,7.7,,33.3,4.21 mg/L,,,,Sean McAllister ,,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1231.OC0822,1231,,,FALSE,OC0822,OCNMS August 2022,,08/22/22,,,4,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,33.0,,47°52.532' N,124°43.992' W,,10:59,,,,1000,7.7,,33.3,4.34 mg/L,,,,Sean McAllister ,,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1232.OC0822,1232,,,FALSE,OC0822,OCNMS August 2022,,08/22/22,,,5,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,32.4,,47°52.532' N,124°43.992' W,,10:59,,,,1000,7.7,,33.2,4.33 mg/L,,,,Sean McAllister ,,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1233.OC0822,1233,,,FALSE,OC0822,OCNMS August 2022,,08/22/22,,,6,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,33.2,,47°52.532' N,124°43.992' W,,10:59,,,,1000,7.7,,33.3,4.41 mg/L,,,,Sean McAllister ,,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1234.OC0822,1234,,,FALSE,OC0822,OCNMS August 2022,,08/22/22,,,8,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,33.0,,47°52.532' N,124°43.992' W,,10:59,,,,1000,7.7,,33.2,4.39 mg/L,,,,Sean McAllister ,,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1235.OC0822,1235,,,FALSE,OC0822,OCNMS August 2022,,08/22/22,,,9,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,32.7,,47°52.532' N,124°43.992' W,,10:59,,,,1000,7.7,,33.2,4.48 mg/L,,,,Sean McAllister ,,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1236.OC0822,1236,,,FALSE,OC0822,OCNMS August 2022,,08/22/22,,,10,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,32.9,,47°52.532' N,124°43.992' W,,10:59,,,,1000,7.7,,33.2,4.58 mg/L,,,,Sean McAllister ,,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1237.OC0822,1237,,,FALSE,OC0822,OCNMS August 2022,,08/22/22,,,11,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,33.0,,47°52.532' N,124°43.992' W,,10:59,,,,1000,7.7,,33.2,4.54 mg/L,,,,Sean McAllister ,,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1238.OC0822,1238,,,FALSE,OC0822,OCNMS August 2022,,08/22/22,,,12,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,32.8,,47°52.532' N,124°43.992' W,,10:59,,,,1000,7.7,,33.2,4.52 mg/L,,,,Sean McAllister ,,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1239.NC.OC0822,1239,,,TRUE,OC0822,OCNMS August 2022,,08/22/22,,,-,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,,,47°52.532' N,124°43.992' W,,10:59,,,,1000,,,,,,,,Sean McAllister ,,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1240.OC0922,1240,,,FALSE,OC0922,OCNMS Sept 2022,,8/23/2022,,Port 1,,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,34.0,8,47°52.467' N,124°44.070 W,,0:00,00:17,,,1000,,,,,,,,Matt Galaska,"Note that this tube was found at the bottom of cooler on 10/4/22, so was sitting at RT since return from cruise. Placed in -20 freezer after that date.",TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1241.OC0922,1241,,,FALSE,OC0922,OCNMS Sept 2022,,8/23/2022,,Port 2,,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,34.0,8,47°52.467' N,124°44.070 W,,12:00,12:17,,,1000,,,,,,,,Matt Galaska,,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1242.OC0922,1242,,,FALSE,OC0922,OCNMS Sept 2022,,8/24/2022,,Port 3,,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,34.0,8,47°52.467' N,124°44.070 W,,0:00,00:17,,,1000,,,,,,,,Matt Galaska,,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1243.OC0922,1243,,,FALSE,OC0922,OCNMS Sept 2022,,8/24/2022,,Port 4,,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,34.0,8,47°52.467' N,124°44.070 W,,12:00,12:17,,,1000,,,,,,,,Matt Galaska,,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1244.OC0922,1244,,,FALSE,OC0922,OCNMS Sept 2022,,8/25/2022,,Port 5,,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,34.0,8,47°52.467' N,124°44.070 W,,0:00,00:17,,,1000,,,,,,,,Matt Galaska,,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1245.OC0922,1245,,,FALSE,OC0922,OCNMS Sept 2022,,8/26/2022,,Port 6,,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,34.0,8,47°52.467' N,124°44.070 W,,12:00,12:17,,,1000,,,,,,,,Matt Galaska,,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1246.OC0922,1246,,,FALSE,OC0922,OCNMS Sept 2022,,8/28/2022,,Port 7,,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,34.0,8,47°52.467' N,124°44.070 W,,0:00,00:17,,,1000,,,,,,,,Matt Galaska,,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1247.OC0922,1247,,,FALSE,OC0922,OCNMS Sept 2022,,8/29/2022,,Port 8,,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,34.0,8,47°52.467' N,124°44.070 W,,12:00,12:17,,,1000,,,,,,,,Matt Galaska,,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1248.OC0922,1248,,,FALSE,OC0922,OCNMS Sept 2022,,8/31/2022,,Port 9,,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,34.0,8,47°52.467' N,124°44.070 W,,0:00,00:17,,,1000,,,,,,,,Matt Galaska,,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1249.OC0922,1249,,,FALSE,OC0922,OCNMS Sept 2022,,9/1/2022,,Port 10,,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,34.0,8,47°52.467' N,124°44.070 W,,12:00,12:17,,,1000,,,,,,,,Matt Galaska,,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1250.OC0922,1250,,,FALSE,OC0922,OCNMS Sept 2022,,9/3/2022,,Port 11,,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,34.0,8,47°52.467' N,124°44.070 W,,0:00,00:17,,,1000,,,,,,,,Matt Galaska,,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1251.OC0922,1251,,,FALSE,OC0922,OCNMS Sept 2022,,9/4/2022,,Port 12,,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,34.0,8,47°52.467' N,124°44.070 W,,12:00,12:17,,,1000,,,,,,,,Matt Galaska,,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1252.OC0922,1252,,,FALSE,OC0922,OCNMS Sept 2022,,9/6/2022,,Port 13,,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,34.0,8,47°52.467' N,124°44.070 W,,0:00,00:17,,,1000,,,,,,,,Matt Galaska,,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1253.OC0922,1253,,,FALSE,OC0922,OCNMS Sept 2022,,9/7/2022,,Port 14,,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,34.0,8,47°52.467' N,124°44.070 W,,12:00,12:17,,,1000,,,,,,,,Matt Galaska,,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1254.OC0922,1254,,,FALSE,OC0922,OCNMS Sept 2022,,9/9/2022,,Port 15,,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,34.0,8,47°52.467' N,124°44.070 W,,0:00,00:17,,,1000,,,,,,,,Matt Galaska,,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1255.OC0922,1255,,,FALSE,OC0922,OCNMS Sept 2022,,9/10/2022,,Port 16,,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,34.0,8,47°52.467' N,124°44.070 W,,12:00,12:17,,,1000,,,,,,,,Matt Galaska,,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1256.OC0922,1256,,,FALSE,OC0922,OCNMS Sept 2022,,9/12/2022,,Port 17,,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,34.0,8,47°52.467' N,124°44.070 W,,0:00,00:17,,,1000,,,,,,,,Matt Galaska,,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1257.OC0922,1257,,,FALSE,OC0922,OCNMS Sept 2022,,9/13/2022,,Port 18,,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,34.0,8,47°52.467' N,124°44.070 W,,12:00,12:17,,,1000,,,,,,,,Matt Galaska,,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1258.OC0922,1258,,,FALSE,OC0922,OCNMS Sept 2022,,9/15/2022,,Port 19,,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,34.0,8,47°52.467' N,124°44.070 W,,0:00,00:17,,,1000,,,,,,,,Matt Galaska,,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1259.OC0922,1259,,,FALSE,OC0922,OCNMS Sept 2022,,9/16/2022,,Port 20,,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,34.0,8,47°52.467' N,124°44.070 W,,12:00,12:17,,,1000,,,,,,,,Matt Galaska,,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1260.OC0922,1260,,,FALSE,OC0922,OCNMS Sept 2022,,9/17/2022,,Port 21,,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,34.0,8,47°52.467' N,124°44.070 W,,0:00,00:17,,,1000,,,,,,,,Matt Galaska,,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1261.OC0922,1261,,,FALSE,OC0922,OCNMS Sept 2022,,9/17/2022,,Port 22,,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,34.0,8,47°52.467' N,124°44.070 W,,12:00,12:17,,,1000,,,,,,,,Matt Galaska,,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1262.OC0922,1262,,,FALSE,OC0922,OCNMS Sept 2022,,9/18/2022,,Port 23,,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,34.0,8,47°52.467' N,124°44.070 W,,0:00,00:17,,,1000,,,,,,,,Matt Galaska,,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1263.OC0922,1263,,,FALSE,OC0922,OCNMS Sept 2022,,9/18/2022,,Port 24,,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,34.0,8,47°52.467' N,124°44.070 W,,12:00,12:17,,,1000,,,,,,,,Matt Galaska,,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1264.OC0922,1264,,,FALSE,OC0922,OCNMS Sept 2022,,09/20/22,,TH042,12,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,33.5,,47°52.467' N,124°44.070 W,,11:00,,,,1000,7.9,,33.5,1.62 mg/L,,,,Matt Galaska,,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1265.OC0922,1265,,,FALSE,OC0922,OCNMS Sept 2022,,09/20/22,,TH042,10,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,33.2,,47°52.467' N,124°44.070 W,,11:00,,,,1000,7.9,,33.4,1.69 mg/L,,,,Matt Galaska,,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1266.OC0922,1266,,,FALSE,OC0922,OCNMS Sept 2022,,09/20/22,,TH042,9,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,32.7,,47°52.467' N,124°44.070 W,,11:00,,,,1000,7.9,,33.4,1.58 mg/L,,,,Matt Galaska,,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1267.OC0922,1267,,,FALSE,OC0922,OCNMS Sept 2022,,09/20/22,,TH042,8,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,33.1,,47°52.467' N,124°44.070 W,,11:00,,,,1000,7.9,,33.4,1.68 mg/L,,,,Matt Galaska,,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1268.OC0922,1268,,,FALSE,OC0922,OCNMS Sept 2022,,09/20/22,,TH042,6,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,33.2,,47°52.467' N,124°44.070 W,,11:00,,,,1000,7.9,,33.5,1.62 mg/L,,,,Matt Galaska,,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1269.OC0922,1269,,,FALSE,OC0922,OCNMS Sept 2022,,09/20/22,,TH042,5,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,33.2,,47°52.467' N,124°44.070 W,,11:00,,,,1000,7.9,,33.5,1.65 mg/L,,,,Matt Galaska,,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1270.OC0922,1270,,,FALSE,OC0922,OCNMS Sept 2022,,09/20/22,,TH042,4,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,33.3,,47°52.467' N,124°44.070 W,,11:00,,,,1000,7.9,,33.5,1.68 mg/L,,,,Matt Galaska,,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1271.OC0922,1271,,,FALSE,OC0922,OCNMS Sept 2022,,09/20/22,,TH042,3,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,33.4,,47°52.467' N,124°44.070 W,,11:00,,,,1000,8.0,,33.4,1.7 mg/L,,,,Matt Galaska,,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1272.OC0922,1272,,,FALSE,OC0922,OCNMS Sept 2022,,09/20/22,,TH042,2,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,33.5,,47°52.467' N,124°44.070 W,,11:00,,,,1000,7.9,,33.5,1.58 mg/L,,,,Matt Galaska,,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1273.OC0922,1273,,,FALSE,OC0922,OCNMS Sept 2022,,09/20/22,,TH042,11,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,33.1,,47°52.467' N,124°44.070 W,,11:00,,,,1000,7.9,,33.5,1.7 mg/L,,,,Matt Galaska,,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1274.NC.OC0922,1274,,,TRUE,OC0922,OCNMS Sept 2022,,09/20/22,,TH042,,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,,,47°52.467' N,124°44.070 W,,11:00,,,,1000,,,,,,,,Matt Galaska,,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1275.OC1021,1275,,,FALSE,OC1021,OCNMS Oct 2021,,08/26/21,PPS Port 1 - TH042,,,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,34.0,8,47° 52.673' N,124° 44.340' W,,00:01,00:17,7:01,07:17,1000,,,,,,,,Sean McAllister and Emily Norton,,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1276.OC1021,1276,,,FALSE,OC1021,OCNMS Oct 2021,,08/27/21,PPS Port 2 - TH042,,,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,34.0,8,47° 52.673' N,124° 44.340' W,,12:01,12:24,19:01,19:24,1000,,,,,,,,Sean McAllister and Emily Norton,,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1277.OC1021,1277,,,FALSE,OC1021,OCNMS Oct 2021,,08/29/21,PPS Port 3 - TH042,,,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,34.0,8,47° 52.673' N,124° 44.340' W,,00:01,00:27,7:01,07:27,1000,,,,,,,,Sean McAllister and Emily Norton,,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1278.OC1021,1278,,,FALSE,OC1021,OCNMS Oct 2021,,08/30/21,PPS Port 4 - TH042,,,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,34.0,8,47° 52.673' N,124° 44.340' W,,12:01,12:25,19:01,19:25,1000,,,,,,,,Sean McAllister and Emily Norton,,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1279.OC1021,1279,,,FALSE,OC1021,OCNMS Oct 2021,,09/01/21,PPS Port 5 - TH042,,,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,34.0,8,47° 52.673' N,124° 44.340' W,,00:01,00:22,7:01,07:22,1000,,,,,,,,Sean McAllister and Emily Norton,,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1280.OC1021,1280,,,FALSE,OC1021,OCNMS Oct 2021,,09/02/21,PPS Port 6 - TH042,,,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,34.0,8,47° 52.673' N,124° 44.340' W,,12:02,12:29,19:02,19:29,1000,,,,,,,,Sean McAllister and Emily Norton,,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1281.OC1021,1281,,,FALSE,OC1021,OCNMS Oct 2021,,09/04/21,PPS Port 7 - TH042,,,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,34.0,8,47° 52.673' N,124° 44.340' W,,00:02,00:27,7:02,07:27,1000,,,,,,,,Sean McAllister and Emily Norton,,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1282.OC1021,1282,,,FALSE,OC1021,OCNMS Oct 2021,,09/05/21,PPS Port 8 - TH042,,,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,34.0,8,47° 52.673' N,124° 44.340' W,,12:01,12:27,19:01,19:27,1000,,,,,,,,Sean McAllister and Emily Norton,,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1283.OC1021,1283,,,FALSE,OC1021,OCNMS Oct 2021,,09/07/21,PPS Port 9 - TH042,,,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,34.0,8,47° 52.673' N,124° 44.340' W,,00:02,00:24,7:02,07:24,1000,,,,,,,,Sean McAllister and Emily Norton,,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1284.OC1021,1284,,,FALSE,OC1021,OCNMS Oct 2021,,09/08/21,PPS Port 10 - TH042,,,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,34.0,8,47° 52.673' N,124° 44.340' W,,12:02,12:23,19:02,19:23,1000,,,,,,,,Sean McAllister and Emily Norton,,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1285.OC1021,1285,,,FALSE,OC1021,OCNMS Oct 2021,,09/10/21,PPS Port 11 - TH042,,,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,34.0,8,47° 52.673' N,124° 44.340' W,,00:02,00:29,7:02,07:29,1000,,,,,,,,Sean McAllister and Emily Norton,,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1286.OC1021,1286,,,FALSE,OC1021,OCNMS Oct 2021,,09/11/21,PPS Port 12 - TH042,,,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,34.0,8,47° 52.673' N,124° 44.340' W,,12:02,12:31,19:02,19:31,1000,,,,,,,,Sean McAllister and Emily Norton,,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1287.OC1021,1287,,,FALSE,OC1021,OCNMS Oct 2021,,09/13/21,PPS Port 13 - TH042,,,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,34.0,8,47° 52.673' N,124° 44.340' W,,00:02,00:24,7:02,07:24,1000,,,,,,,,Sean McAllister and Emily Norton,,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1288.OC1021,1288,,,FALSE,OC1021,OCNMS Oct 2021,,09/14/21,PPS Port 14 - TH042,,,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,34.0,8,47° 52.673' N,124° 44.340' W,,12:02,12:30,19:02,19:30,1000,,,,,,,,Sean McAllister and Emily Norton,,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1289.OC1021,1289,,,FALSE,OC1021,OCNMS Oct 2021,,09/16/21,PPS Port 15 - TH042,,,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,34.0,8,47° 52.673' N,124° 44.340' W,,00:02,00:25,7:02,07:25,1000,,,,,,,,Sean McAllister and Emily Norton,,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1290.OC1021,1290,,,FALSE,OC1021,OCNMS Oct 2021,,09/17/21,PPS Port 16 - TH042,,,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,34.0,8,47° 52.673' N,124° 44.340' W,,12:02,12:28,19:02,19:28,1000,,,,,,,,Sean McAllister and Emily Norton,,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1291.OC1021,1291,,,FALSE,OC1021,OCNMS Oct 2021,,09/19/21,PPS Port 17 - TH042,,,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,34.0,8,47° 52.673' N,124° 44.340' W,,00:02,00:29,7:02,07:29,1000,,,,,,,,Sean McAllister and Emily Norton,,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1292.OC1021,1292,,,FALSE,OC1021,OCNMS Oct 2021,,09/20/21,PPS Port 18 - TH042,,,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,34.0,8,47° 52.673' N,124° 44.340' W,,12:01,12:26,19:01,19:26,1000,,,,,,,,Sean McAllister and Emily Norton,,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1293.OC1021,1293,,,FALSE,OC1021,OCNMS Oct 2021,,09/22/21,PPS Port 19 - TH042,,,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,34.0,8,47° 52.673' N,124° 44.340' W,,00:01,00:20,7:01,07:20,1000,,,,,,,,Sean McAllister and Emily Norton,,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1294.OC1021,1294,,,FALSE,OC1021,OCNMS Oct 2021,,09/23/21,PPS Port 20 - TH042,,,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,34.0,8,47° 52.673' N,124° 44.340' W,,12:01,12:23,19:01,19:23,1000,,,,,,,,Sean McAllister and Emily Norton,,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1295.OC1021,1295,,,FALSE,OC1021,OCNMS Oct 2021,,09/25/21,PPS Port 21 - TH042,,,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,34.0,8,47° 52.673' N,124° 44.340' W,,00:01,00:24,7:01,07:24,1000,,,,,,,,Sean McAllister and Emily Norton,,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1296.OC1021,1296,,,FALSE,OC1021,OCNMS Oct 2021,,09/26/21,PPS Port 22 - TH042,,,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,34.0,8,47° 52.673' N,124° 44.340' W,,12:01,12:21,19:01,19:21,1000,,,,,,,,Sean McAllister and Emily Norton,,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1297.OC1021,1297,,,FALSE,OC1021,OCNMS Oct 2021,,09/28/21,PPS Port 23 - TH042,,,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,34.0,8,47° 52.673' N,124° 44.340' W,,00:01,00:28,7:01,07:28,1000,,,,,,,,Sean McAllister and Emily Norton,,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1298.OC1021,1298,,,FALSE,OC1021,OCNMS Oct 2021,,09/29/21,PPS Port 24 - TH042,,,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,34.0,8,47° 52.673' N,124° 44.340' W,,12:01,12:26,19:01,19:26,1000,,,,,,,,Sean McAllister and Emily Norton,,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1299.OC1021,1299,,,FALSE,OC1021,OCNMS Oct 2021,,08/26/21,PPS Port 1 - CE042,,,PPS Unit; Programmed Sampling,-,Olympic Coast National Marine Sanctuary,Cape Elizabeth,,34.0,8,47° 21.009' N,124° 29.126' W,,00:01,00:15,7:01,07:15,1000,,,,,,,,Shannon Brown,Likely not preserved in fixative,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1300.OC1021,1300,,,FALSE,OC1021,OCNMS Oct 2021,,08/27/21,PPS Port 2 - CE042,,,PPS Unit; Programmed Sampling,-,Olympic Coast National Marine Sanctuary,Cape Elizabeth,,34.0,8,47° 21.009' N,124° 29.126' W,,12:01,12:16,19:01,19:16,1000,,,,,,,,Shannon Brown,Likely not preserved in fixative,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1301.OC1021,1301,,,FALSE,OC1021,OCNMS Oct 2021,,08/29/21,PPS Port 3 - CE042,,,PPS Unit; Programmed Sampling,-,Olympic Coast National Marine Sanctuary,Cape Elizabeth,,34.0,8,47° 21.009' N,124° 29.126' W,,00:01,00:16,7:01,07:16,1000,,,,,,,,Shannon Brown,Likely not preserved in fixative,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1302.OC1021,1302,,,FALSE,OC1021,OCNMS Oct 2021,,08/30/21,PPS Port 4 - CE042,,,PPS Unit; Programmed Sampling,-,Olympic Coast National Marine Sanctuary,Cape Elizabeth,,34.0,8,47° 21.009' N,124° 29.126' W,,12:01,12:16,19:01,19:16,1000,,,,,,,,Shannon Brown,Likely not preserved in fixative,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1303.OC1021,1303,,,FALSE,OC1021,OCNMS Oct 2021,,09/01/21,PPS Port 5 - CE042,,,PPS Unit; Programmed Sampling,-,Olympic Coast National Marine Sanctuary,Cape Elizabeth,,34.0,8,47° 21.009' N,124° 29.126' W,,00:01,00:16,7:01,07:16,1000,,,,,,,,Shannon Brown,Likely not preserved in fixative,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1304.OC1021,1304,,,FALSE,OC1021,OCNMS Oct 2021,,09/02/21,PPS Port 6 - CE042,,,PPS Unit; Programmed Sampling,-,Olympic Coast National Marine Sanctuary,Cape Elizabeth,,34.0,8,47° 21.009' N,124° 29.126' W,,12:01,12:16,19:01,19:16,1000,,,,,,,,Shannon Brown,Likely not preserved in fixative,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1305.OC1021,1305,,,FALSE,OC1021,OCNMS Oct 2021,,09/04/21,PPS Port 7 - CE042,,,PPS Unit; Programmed Sampling,-,Olympic Coast National Marine Sanctuary,Cape Elizabeth,,34.0,8,47° 21.009' N,124° 29.126' W,,00:02,00:17,7:02,07:17,1000,,,,,,,,Shannon Brown,Likely not preserved in fixative,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1306.OC1021,1306,,,FALSE,OC1021,OCNMS Oct 2021,,09/05/21,PPS Port 8 - CE042,,,PPS Unit; Programmed Sampling,-,Olympic Coast National Marine Sanctuary,Cape Elizabeth,,34.0,8,47° 21.009' N,124° 29.126' W,,12:02,12:16,19:02,19:16,1000,,,,,,,,Shannon Brown,Likely not preserved in fixative,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1307.OC1021,1307,,,FALSE,OC1021,OCNMS Oct 2021,,09/07/21,PPS Port 9 - CE042,,,PPS Unit; Programmed Sampling,-,Olympic Coast National Marine Sanctuary,Cape Elizabeth,,34.0,8,47° 21.009' N,124° 29.126' W,,00:02,00:16,7:02,07:16,1000,,,,,,,,Shannon Brown,Likely not preserved in fixative,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1308.OC1021,1308,,,FALSE,OC1021,OCNMS Oct 2021,,09/08/21,PPS Port 10 - CE042,,,PPS Unit; Programmed Sampling,-,Olympic Coast National Marine Sanctuary,Cape Elizabeth,,34.0,8,47° 21.009' N,124° 29.126' W,,12:02,12:17,19:02,19:17,1000,,,,,,,,Shannon Brown,Likely not preserved in fixative,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1309.OC1021,1309,,,FALSE,OC1021,OCNMS Oct 2021,,09/10/21,PPS Port 11 - CE042,,,PPS Unit; Programmed Sampling,-,Olympic Coast National Marine Sanctuary,Cape Elizabeth,,34.0,8,47° 21.009' N,124° 29.126' W,,00:02,00:17,7:02,07:17,1000,,,,,,,,Shannon Brown,Likely not preserved in fixative,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1310.OC1021,1310,,,FALSE,OC1021,OCNMS Oct 2021,,09/11/21,PPS Port 12 - CE042,,,PPS Unit; Programmed Sampling,-,Olympic Coast National Marine Sanctuary,Cape Elizabeth,,34.0,8,47° 21.009' N,124° 29.126' W,,12:02,12:17,19:02,19:17,1000,,,,,,,,Shannon Brown,Likely not preserved in fixative,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1312.OC1021,1312,,,FALSE,OC1021,OCNMS Oct 2021,,09/14/21,PPS Port 14 - CE042,,,PPS Unit; Programmed Sampling,-,Olympic Coast National Marine Sanctuary,Cape Elizabeth,,34.0,8,47° 21.009' N,124° 29.126' W,,12:02,12:17,19:02,19:17,1000,,,,,,,,Shannon Brown,Likely not preserved in fixative,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1313.OC1021,1313,,,FALSE,OC1021,OCNMS Oct 2021,,09/16/21,PPS Port 15 - CE042,,,PPS Unit; Programmed Sampling,-,Olympic Coast National Marine Sanctuary,Cape Elizabeth,,34.0,8,47° 21.009' N,124° 29.126' W,,00:02,00:17,7:02,07:17,1000,,,,,,,,Shannon Brown,Likely not preserved in fixative,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1315.OC1021,1315,,,FALSE,OC1021,OCNMS Oct 2021,,09/19/21,PPS Port 17 - CE042,,,PPS Unit; Programmed Sampling,-,Olympic Coast National Marine Sanctuary,Cape Elizabeth,,34.0,8,47° 21.009' N,124° 29.126' W,,00:02,00:16,7:02,07:16,1000,,,,,,,,Shannon Brown,Likely not preserved in fixative,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1316.OC1021,1316,,,FALSE,OC1021,OCNMS Oct 2021,,09/20/21,PPS Port 18 - CE042,,,PPS Unit; Programmed Sampling,-,Olympic Coast National Marine Sanctuary,Cape Elizabeth,,34.0,8,47° 21.009' N,124° 29.126' W,,12:02,12:16,19:02,19:16,1000,,,,,,,,Shannon Brown,Likely not preserved in fixative,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1317.OC1021,1317,,,FALSE,OC1021,OCNMS Oct 2021,,09/22/21,PPS Port 19 - CE042,,,PPS Unit; Programmed Sampling,-,Olympic Coast National Marine Sanctuary,Cape Elizabeth,,34.0,8,47° 21.009' N,124° 29.126' W,,00:02,00:18,7:02,07:18,1000,,,,,,,,Shannon Brown,Likely not preserved in fixative,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1318.OC1021,1318,,,FALSE,OC1021,OCNMS Oct 2021,,09/23/21,PPS Port 20 - CE042,,,PPS Unit; Programmed Sampling,-,Olympic Coast National Marine Sanctuary,Cape Elizabeth,,34.0,8,47° 21.009' N,124° 29.126' W,,12:01,12:17,19:01,19:17,1000,,,,,,,,Shannon Brown,Likely not preserved in fixative,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1319.OC1021,1319,,,FALSE,OC1021,OCNMS Oct 2021,,09/25/21,PPS Port 21 - CE042,,,PPS Unit; Programmed Sampling,-,Olympic Coast National Marine Sanctuary,Cape Elizabeth,,34.0,8,47° 21.009' N,124° 29.126' W,,00:01,00:17,7:01,07:17,1000,,,,,,,,Shannon Brown,Likely not preserved in fixative,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1320.OC1021,1320,,,FALSE,OC1021,OCNMS Oct 2021,,09/26/21,PPS Port 22 - CE042,,,PPS Unit; Programmed Sampling,-,Olympic Coast National Marine Sanctuary,Cape Elizabeth,,34.0,8,47° 21.009' N,124° 29.126' W,,12:01,12:16,19:01,19:16,1000,,,,,,,,Shannon Brown,Likely not preserved in fixative,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1321.OC1021,1321,,,FALSE,OC1021,OCNMS Oct 2021,,09/28/21,PPS Port 23 - CE042,,,PPS Unit; Programmed Sampling,-,Olympic Coast National Marine Sanctuary,Cape Elizabeth,,34.0,8,47° 21.009' N,124° 29.126' W,,00:01,00:16,7:01,07:16,1000,,,,,,,,Shannon Brown,Likely not preserved in fixative,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1322.OC1021,1322,,,FALSE,OC1021,OCNMS Oct 2021,,09/29/21,PPS Port 24 - CE042,,,PPS Unit; Programmed Sampling,-,Olympic Coast National Marine Sanctuary,Cape Elizabeth,,34.0,8,47° 21.009' N,124° 29.126' W,,12:01,12:16,19:01,19:16,1000,,,,,,,,Shannon Brown,Likely not preserved in fixative,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1323.OC1021,1323,,,FALSE,OC1021,OCNMS Oct 2021,,10/08/21,TH042-01,TH042,1,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,33.0,,47° 52.673' N,124° 44.340' W,,11:15,11:30,,,1000,7.7,,33.5,2.7 mg/l,,,,Sean McAllister and Emily Norton,,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1324.OC1021,1324,,,FALSE,OC1021,OCNMS Oct 2021,,10/08/21,TH042-02,TH042,2,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,33.0,,47° 52.673' N,124° 44.340' W,,11:15,11:30,,,1000,7.7,,33.5,2.7 mg/l,,,,Sean McAllister and Emily Norton,,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1325.OC1021,1325,,,FALSE,OC1021,OCNMS Oct 2021,,10/08/21,TH042-03,TH042,3,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,33.0,,47° 52.673' N,124° 44.340' W,,11:15,11:30,,,1000,7.8,,33.5,2.8 mg/l,,,,Sean McAllister and Emily Norton,,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1326.OC1021,1326,,,FALSE,OC1021,OCNMS Oct 2021,,10/08/21,TH042-04,TH042,4,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,33.0,,47° 52.673' N,124° 44.340' W,,11:15,11:30,,,1000,7.8,,33.5,2.9 mg/l,,,,Sean McAllister and Emily Norton,,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1327.OC1021,1327,,,FALSE,OC1021,OCNMS Oct 2021,,10/08/21,TH042-05,TH042,5,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,33.0,,47° 52.673' N,124° 44.340' W,,11:15,11:30,,,1000,7.8,,33.5,3 mg/l,,,,Sean McAllister and Emily Norton,,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1328.OC1021,1328,,,FALSE,OC1021,OCNMS Oct 2021,,10/08/21,TH042-06,TH042,7,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,33.0,,47° 52.673' N,124° 44.340' W,,11:15,11:30,,,1000,7.9,,33.5,3.1 mg/l,,,,Sean McAllister and Emily Norton,,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1329.OC1021,1329,,,FALSE,OC1021,OCNMS Oct 2021,,10/08/21,TH042-07,TH042,9,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,32.0,,47° 52.673' N,124° 44.340' W,,11:15,11:30,,,1000,8.0,,33.4,3.3 mg/l,,,,Sean McAllister and Emily Norton,,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1330.OC1021,1330,,,FALSE,OC1021,OCNMS Oct 2021,,10/08/21,TH042-08,TH042,10,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,32.0,,47° 52.673' N,124° 44.340' W,,11:15,11:30,,,1000,8.0,,33.4,3.5 mg/l,,,,Sean McAllister and Emily Norton,,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1331.OC1021,1331,,,FALSE,OC1021,OCNMS Oct 2021,,10/08/21,TH042-09,TH042,11,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,31.0,,47° 52.673' N,124° 44.340' W,,11:15,11:30,,,1000,8.1,,33.4,3.6 mg/l,,,,Sean McAllister and Emily Norton,,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1332.OC1021,1332,,,FALSE,OC1021,OCNMS Oct 2021,,10/08/21,TH042-10,TH042,12,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,31.0,,47° 52.673' N,124° 44.340' W,,11:15,11:30,,,1000,8.2,,33.3,4 mg/l,,,,Sean McAllister and Emily Norton,,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1333.NC.OC1021,1333,,,TRUE,OC1021,OCNMS Oct 2021,,10/08/21,NC End,-,-,Sterivex 0.22µm filter,95% EtOH,,,,,,,,,,,,,1000,,,,,,,,Sean McAllister and Emily Norton,,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1334.OC1021,1334,,,FALSE,OC1021,OCNMS Oct 2021,,10/18/21,CE042-01,CE042,1,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Cape Elizabeth,,36.0,,47° 21.009' N,124° 29.126' W,,11:35,11:50,,,1000,7.5,,33.8,0.6 mg/l,,,,Shannon Brown,,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1335.OC1021,1335,,,FALSE,OC1021,OCNMS Oct 2021,,10/18/21,CE042-02,CE042,2,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Cape Elizabeth,,36.0,,47° 21.009' N,124° 29.126' W,,11:35,11:50,,,1000,7.5,,33.8,0.6 mg/l,,,,Shannon Brown,,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1336.OC1021,1336,,,FALSE,OC1021,OCNMS Oct 2021,,10/18/21,CE042-03,CE042,3,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Cape Elizabeth,,35.0,,47° 21.009' N,124° 29.126' W,,11:35,11:50,,,1000,7.5,,33.8,0.6 mg/l,,,,Shannon Brown,,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1337.OC1021,1337,,,FALSE,OC1021,OCNMS Oct 2021,,10/18/21,CE042-04,CE042,4,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Cape Elizabeth,,35.0,,47° 21.009' N,124° 29.126' W,,11:35,11:50,,,1000,7.5,,33.8,0.6 mg/l,,,,Shannon Brown,,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1338.OC1021,1338,,,FALSE,OC1021,OCNMS Oct 2021,,10/18/21,CE042-05,CE042,5,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Cape Elizabeth,,35.0,,47° 21.009' N,124° 29.126' W,,11:35,11:50,,,1000,7.5,,33.8,0.6 mg/l,,,,Shannon Brown,,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1339.OC1021,1339,,,FALSE,OC1021,OCNMS Oct 2021,,10/18/21,CE042-06,CE042,7,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Cape Elizabeth,,34.0,,47° 21.009' N,124° 29.126' W,,11:35,11:50,,,1000,7.5,,33.8,0.6 mg/l,,,,Shannon Brown,,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1340.OC1021,1340,,,FALSE,OC1021,OCNMS Oct 2021,,10/18/21,CE042-07,CE042,9,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Cape Elizabeth,,34.0,,47° 21.009' N,124° 29.126' W,,11:35,11:50,,,1000,7.5,,33.8,0.6 mg/l,,,,Shannon Brown,,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1341.OC1021,1341,,,FALSE,OC1021,OCNMS Oct 2021,,10/18/21,CE042-08,CE042,10,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Cape Elizabeth,,33.0,,47° 21.009' N,124° 29.126' W,,11:35,11:50,,,1000,7.5,,33.8,0.6 mg/l,,,,Shannon Brown,,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1342.OC1021,1342,,,FALSE,OC1021,OCNMS Oct 2021,,10/18/21,CE042-09,CE042,11,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Cape Elizabeth,,33.0,,47° 21.009' N,124° 29.126' W,,11:35,11:50,,,1000,7.5,,33.8,0.6 mg/l,,,,Shannon Brown,Niskin leaking from the bottom,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1343.OC1021,1343,,,FALSE,OC1021,OCNMS Oct 2021,,10/18/21,CE042-10,CE042,12,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Cape Elizabeth,,32.0,,47° 21.009' N,124° 29.126' W,,11:35,11:50,,,1000,7.6,,33.7,0.7 mg/l,,,,Shannon Brown,,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1344.NC.OC1021,1344,,,TRUE,OC1021,OCNMS Oct 2021,,10/18/21,NC End,-,-,Sterivex 0.22µm filter,95% EtOH,,,,,,,,,,,,,1000,,,,,,,,Shannon Brown,,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1381.NC.OC0722,1381,,,TRUE,OC0722,OCNMS July 2022,,07/19/22,,-,-,Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,,,-,,-,-,,-,-,,,1000,,,,,,,,Shannon Brown,,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1382.OC0722,1382,,,FALSE,OC0722,OCNMS July 2022,,07/19/22,,TH042,1,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,32.3,,47˚ 52.699' N,124˚ 44.187' W,,12:58,13:22,,,1000,7.4,,33.8,2.1 mg/L,,,,Shannon Brown,,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1383.OC0722,1383,,,FALSE,OC0722,OCNMS July 2022,,07/19/22,,TH042,2,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,30.2,,47˚ 52.699' N,124˚ 44.187' W,,12:58,13:22,,,1000,7.5,,33.8,2.11 mg/L,,,,Shannon Brown,,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1384.OC0722,1384,,,FALSE,OC0722,OCNMS July 2022,,07/19/22,,TH042,3,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,28.8,,47˚ 52.699' N,124˚ 44.187' W,,12:58,13:22,,,1000,7.5,,33.7,2.13 mg/L,,,,Shannon Brown,,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1385.OC0722,1385,,,FALSE,OC0722,OCNMS July 2022,,07/19/22,,TH042,4,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,28.1,,47˚ 52.699' N,124˚ 44.187' W,,12:58,13:22,,,1000,7.5,,33.7,2.17 mg/L,,,,Shannon Brown,,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1386.OC0722,1386,,,FALSE,OC0722,OCNMS July 2022,,07/19/22,,TH042,5,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,29.3,,47˚ 52.699' N,124˚ 44.187' W,,12:58,13:22,,,1000,7.5,,33.7,2.15 mg/L,,,,Shannon Brown,,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1387.OC0722,1387,,,FALSE,OC0722,OCNMS July 2022,,07/19/22,,TH042,6,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,31.0,,47˚ 52.699' N,124˚ 44.187' W,,12:58,13:22,,,1000,7.5,,33.7,2.18 mg/L,,,,Shannon Brown,,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1388.OC0722,1388,,,FALSE,OC0722,OCNMS July 2022,,07/19/22,,TH042,8,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,32.1,,47˚ 52.699' N,124˚ 44.187' W,,12:58,13:22,,,1000,7.5,,33.7,2.14 mg/L,,,,Shannon Brown,,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1389.OC0722,1389,,,FALSE,OC0722,OCNMS July 2022,,07/19/22,,TH042,9,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,32.9,,47˚ 52.699' N,124˚ 44.187' W,,12:58,13:22,,,1000,7.4,,33.8,2.07 mg/L,,,,Shannon Brown,,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1390.OC0722,1390,,,FALSE,OC0722,OCNMS July 2022,,07/19/22,,TH042,10,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,33.3,,47˚ 52.699' N,124˚ 44.187' W,,12:58,13:22,,,1000,7.4,,33.8,2.08 mg/L,,,,Shannon Brown,,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1391.OC0722,1391,,,FALSE,OC0722,OCNMS July 2022,,07/19/22,,TH042,12,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,33.3,,47˚ 52.699' N,124˚ 44.187' W,,12:58,13:22,,,1000,7.4,,33.7,2.08 mg/L,,,,Shannon Brown,,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1392.OC0722,1392,,,FALSE,OC0722,OCNMS July 2022,,07/20/22,,CE042,1,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Cape Elizabeth,,32.5,,47˚ 21.009' N,124˚ 29.134' W,,10:25,10:40,,,1000,7.7,,33.5,3.78  mg/L,,,,Shannon Brown,,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1393.OC0722,1393,,,FALSE,OC0722,OCNMS July 2022,,07/20/22,,CE042,2,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Cape Elizabeth,,33.4,,47˚ 21.009' N,124˚ 29.134' W,,10:25,10:40,,,1000,7.7,,33.5,3.8 mg/L,,,,Shannon Brown,,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1394.OC0722,1394,,,FALSE,OC0722,OCNMS July 2022,,07/20/22,,CE042,3,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Cape Elizabeth,,33.1,,47˚ 21.009' N,124˚ 29.134' W,,10:25,10:40,,,1000,7.7,,33.5,3.78 mg/L,,,,Shannon Brown,,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1395.OC0722,1395,,,FALSE,OC0722,OCNMS July 2022,,07/20/22,,CE042,5,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Cape Elizabeth,,33.5,,47˚ 21.009' N,124˚ 29.134' W,,10:25,10:40,,,1000,7.7,,33.5,3.78 mg/L,,,,Shannon Brown,,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1396.OC0722,1396,,,FALSE,OC0722,OCNMS July 2022,,07/20/22,,CE042,6,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Cape Elizabeth,,33.2,,47˚ 21.009' N,124˚ 29.134' W,,10:25,10:40,,,1000,7.7,,33.5,3.79 mg/L,,,,Shannon Brown,,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1397.OC0722,1397,,,FALSE,OC0722,OCNMS July 2022,,07/20/22,,CE042,8,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Cape Elizabeth,,33.4,,47˚ 21.009' N,124˚ 29.134' W,,10:25,10:40,,,1000,7.7,,33.5,3.78 mg/L,,,,Shannon Brown,,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1398.OC0722,1398,,,FALSE,OC0722,OCNMS July 2022,,07/20/22,,CE042,9,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Cape Elizabeth,,32.8,,47˚ 21.009' N,124˚ 29.134' W,,10:25,10:40,,,1000,7.7,,33.5,3.77 mg/L,,,,Shannon Brown,,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1399.OC0722,1399,,,FALSE,OC0722,OCNMS July 2022,,07/20/22,,CE042,10,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Cape Elizabeth,,33.1,,47˚ 21.009' N,124˚ 29.134' W,,10:25,10:40,,,1000,7.7,,33.5,3.76 mg/L,,,,Shannon Brown,,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1400.OC0722,1400,,,FALSE,OC0722,OCNMS July 2022,,07/20/22,,CE042,11,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Cape Elizabeth,,33.6,,47˚ 21.009' N,124˚ 29.134' W,,10:25,10:40,,,1000,7.7,,33.5,3.77 mg/L,,,,Shannon Brown,,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1401.OC0722,1401,,,FALSE,OC0722,OCNMS July 2022,,07/20/22,,CE042,12,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Cape Elizabeth,,33.7,,47˚ 21.009' N,124˚ 29.134' W,,10:25,10:40,,,1000,7.7,,33.5,3.76 mg/L,,,,Shannon Brown,,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1402.NC.OC0722,1402,,,TRUE,OC0722,OCNMS July 2022,,07/20/22,,-,-,Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,,,-,,-,-,,-,-,,,1000,,,,,,,,Shannon Brown,,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1403.OC0722,1403,,,FALSE,OC0722,OCNMS July 2022,,06/23/22,,TH042,1,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,33.7,8,47˚ 52.699' N,124˚ 44.187' W,,00:00,00:12,,,1000,,,,,,,,Shannon Brown,,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1404.OC0722,1404,,,FALSE,OC0722,OCNMS July 2022,,06/23/22,,TH042,2,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,33.7,8,47˚ 52.699' N,124˚ 44.187' W,,12:00,12:01,,,87,,,,,,,,Shannon Brown,Sudden pressure release,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1405.OC0722,1405,,,FALSE,OC0722,OCNMS July 2022,,06/24/22,,TH042,3,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,33.7,8,47˚ 52.699' N,124˚ 44.187' W,,00:00,00:00,,,16,,,,,,,,Shannon Brown,Sudden pressure release,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1406.OC0722,1406,,,FALSE,OC0722,OCNMS July 2022,,06/24/22,,TH042,4,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,33.7,8,47˚ 52.699' N,124˚ 44.187' W,,12:00,12:14,,,1000,,,,,,,,Shannon Brown,,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1407.OC0722,1407,,,FALSE,OC0722,OCNMS July 2022,,06/25/22,,TH042,5,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,33.7,8,47˚ 52.699' N,124˚ 44.187' W,,00:00,00:00,,,24,,,,,,,,Shannon Brown,Sudden pressure release,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1408.OC0722,1408,,,FALSE,OC0722,OCNMS July 2022,,06/26/22,,TH042,6,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,33.7,8,47˚ 52.699' N,124˚ 44.187' W,,12:00,12:00,,,28,,,,,,,,Shannon Brown,Sudden pressure release,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,FALSE,FALSE,
+E1409.OC0722,1409,,,FALSE,OC0722,OCNMS July 2022,,06/28/22,,TH042,7,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,33.7,8,47˚ 52.699' N,124˚ 44.187' W,,00:00,00:00,,,21,,,,,,,,Shannon Brown,Sudden pressure release,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1410.OC0722,1410,,,FALSE,OC0722,OCNMS July 2022,,06/29/22,,TH042,8,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,33.7,8,47˚ 52.699' N,124˚ 44.187' W,,12:00,12:14,,,1000,,,,,,,,Shannon Brown,,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1411.OC0722,1411,,,FALSE,OC0722,OCNMS July 2022,,07/01/22,,TH042,9,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,33.7,8,47˚ 52.699' N,124˚ 44.187' W,,00:00,00:00,,,16,,,,,,,,Shannon Brown,Sudden pressure release,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1412.OC0722,1412,,,FALSE,OC0722,OCNMS July 2022,,07/02/22,,TH042,10,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,33.7,8,47˚ 52.699' N,124˚ 44.187' W,,12:00,12:14,,,1000,,,,,,,,Shannon Brown,,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1413.OC0722,1413,,,FALSE,OC0722,OCNMS July 2022,,07/04/22,,TH042,11,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,33.7,8,47˚ 52.699' N,124˚ 44.187' W,,00:00,00:00,,,16,,,,,,,,Shannon Brown,Sudden pressure release,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1414.OC0722,1414,,,FALSE,OC0722,OCNMS July 2022,,07/05/22,,TH042,12,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,33.7,8,47˚ 52.699' N,124˚ 44.187' W,,12:00,12:14,,,812,,,,,,,,Shannon Brown,Minimum flow reached,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1415.OC0722,1415,,,FALSE,OC0722,OCNMS July 2022,,07/07/22,,TH042,13,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,33.7,8,47˚ 52.699' N,124˚ 44.187' W,,00:00,00:00,,,16,,,,,,,,Shannon Brown,Sudden pressure release,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1416.OC0722,1416,,,FALSE,OC0722,OCNMS July 2022,,07/08/22,,TH042,14,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,33.7,8,47˚ 52.699' N,124˚ 44.187' W,,12:00,12:04,,,216,,,,,,,,Shannon Brown,Minimum flow reached,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1417.OC0722,1417,,,FALSE,OC0722,OCNMS July 2022,,07/10/22,,TH042,15,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,33.7,8,47˚ 52.699' N,124˚ 44.187' W,,00:00,00:00,,,19,,,,,,,,Shannon Brown,Sudden pressure release,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1418.OC0722,1418,,,FALSE,OC0722,OCNMS July 2022,,07/11/22,,TH042,16,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,33.7,8,47˚ 52.699' N,124˚ 44.187' W,,12:00,12:16,,,1000,,,,,,,,Shannon Brown,,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1419.OC0722,1419,,,FALSE,OC0722,OCNMS July 2022,,07/13/22,,TH042,17,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,33.7,8,47˚ 52.699' N,124˚ 44.187' W,,00:00,00:00,,,21,,,,,,,,Shannon Brown,Sudden pressure release,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1420.OC0722,1420,,,FALSE,OC0722,OCNMS July 2022,,07/14/22,,TH042,18,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,33.7,8,47˚ 52.699' N,124˚ 44.187' W,,12:00,12:13,,,1000,,,,,,,,Shannon Brown,,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1421.OC0722,1421,,,FALSE,OC0722,OCNMS July 2022,,07/16/22,,TH042,19,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,33.7,8,47˚ 52.699' N,124˚ 44.187' W,,00:00,00:00,,,17,,,,,,,,Shannon Brown,Sudden pressure release,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1422.OC0722,1422,,,FALSE,OC0722,OCNMS July 2022,,07/17/22,,TH042,20,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,33.7,8,47˚ 52.699' N,124˚ 44.187' W,,12:00,12:08,,,479,,,,,,,,Shannon Brown,Minimum flow reached,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1423.OC0722,1423,,,FALSE,OC0722,OCNMS July 2022,,07/18/22,,TH042,21,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,33.7,8,47˚ 52.699' N,124˚ 44.187' W,,00:00,00:00,,,19,,,,,,,,Shannon Brown,Sudden pressure release,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1424.OC0722,1424,,,FALSE,OC0722,OCNMS July 2022,,07/18/22,,TH042,22,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,33.7,8,47˚ 52.699' N,124˚ 44.187' W,,12:00,12:01,,,87,,,,,,,,Shannon Brown,Minimum flow reached,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1425.OC0722,1425,,,FALSE,OC0722,OCNMS July 2022,,07/19/22,,TH042,23,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,33.7,8,47˚ 52.699' N,124˚ 44.187' W,,00:00,00:00,,,18,,,,,,,,Shannon Brown,Sudden pressure release,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1426.OC0722,1426,,,FALSE,OC0722,OCNMS July 2022,,07/19/22,,TH042,24,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,33.7,8,47˚ 52.699' N,124˚ 44.187' W,,12:00,12:15,,,1000,,,,,,,,Shannon Brown,,TRUE,100,OCNMS_ExtractionSheet,,Lab -20˚C,TRUE,FALSE,At Sequencing Center (R2)
+E1427.OC0722,1427,,,FALSE,OC0722,OCNMS July 2022,,06/24/22,,CE042,1,PPS Unit; Programmed Sampling,-,Olympic Coast National Marine Sanctuary,Cape Elizabeth,,33.7,8,47˚ 21.009' N,124˚ 29.134' W,,00:00,00:11,,,1000,,,,,,,,Shannon Brown,Fixation failure,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1428.OC0722,1428,,,FALSE,OC0722,OCNMS July 2022,,06/24/22,,CE042,2,PPS Unit; Programmed Sampling,-,Olympic Coast National Marine Sanctuary,Cape Elizabeth,,33.7,8,47˚ 21.009' N,124˚ 29.134' W,,12:00,12:13,,,1000,,,,,,,,Shannon Brown,Fixation failure,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1429.OC0722,1429,,,FALSE,OC0722,OCNMS July 2022,,06/25/22,,CE042,3,PPS Unit; Programmed Sampling,-,Olympic Coast National Marine Sanctuary,Cape Elizabeth,,33.7,8,47˚ 21.009' N,124˚ 29.134' W,,00:00,00:14,,,1000,,,,,,,,Shannon Brown,Fixation failure,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1430.OC0722,1430,,,FALSE,OC0722,OCNMS July 2022,,06/26/22,,CE042,4,PPS Unit; Programmed Sampling,-,Olympic Coast National Marine Sanctuary,Cape Elizabeth,,33.7,8,47˚ 21.009' N,124˚ 29.134' W,,12:00,12:14,,,1000,,,,,,,,Shannon Brown,Fixation failure,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1431.OC0722,1431,,,FALSE,OC0722,OCNMS July 2022,,06/28/22,,CE042,5,PPS Unit; Programmed Sampling,-,Olympic Coast National Marine Sanctuary,Cape Elizabeth,,33.7,8,47˚ 21.009' N,124˚ 29.134' W,,00:00,00:15,,,1000,,,,,,,,Shannon Brown,Fixation failure,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1432.OC0722,1432,,,FALSE,OC0722,OCNMS July 2022,,06/29/22,,CE042,6,PPS Unit; Programmed Sampling,-,Olympic Coast National Marine Sanctuary,Cape Elizabeth,,33.7,8,47˚ 21.009' N,124˚ 29.134' W,,12:00,12:14,,,1000,,,,,,,,Shannon Brown,Fixation failure,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1433.OC0722,1433,,,FALSE,OC0722,OCNMS July 2022,,07/01/22,,CE042,7,PPS Unit; Programmed Sampling,-,Olympic Coast National Marine Sanctuary,Cape Elizabeth,,33.7,8,47˚ 21.009' N,124˚ 29.134' W,,00:00,00:14,,,1000,,,,,,,,Shannon Brown,Fixation failure,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1434.OC0722,1434,,,FALSE,OC0722,OCNMS July 2022,,07/02/22,,CE042,8,PPS Unit; Programmed Sampling,-,Olympic Coast National Marine Sanctuary,Cape Elizabeth,,33.7,8,47˚ 21.009' N,124˚ 29.134' W,,12:00,12:15,,,1000,,,,,,,,Shannon Brown,Fixation failure,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1435.OC0722,1435,,,FALSE,OC0722,OCNMS July 2022,,07/04/22,,CE042,9,PPS Unit; Programmed Sampling,-,Olympic Coast National Marine Sanctuary,Cape Elizabeth,,33.7,8,47˚ 21.009' N,124˚ 29.134' W,,00:00,00:13,,,1000,,,,,,,,Shannon Brown,Fixation failure,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1436.OC0722,1436,,,FALSE,OC0722,OCNMS July 2022,,07/04/22,,CE042,10,PPS Unit; Programmed Sampling,-,Olympic Coast National Marine Sanctuary,Cape Elizabeth,,33.7,8,47˚ 21.009' N,124˚ 29.134' W,,00:45,01:01,,,1000,,,,,,,,Shannon Brown,Fixation failure,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1437.OC0722,1437,,,FALSE,OC0722,OCNMS July 2022,,07/05/22,,CE042,11,PPS Unit; Programmed Sampling,-,Olympic Coast National Marine Sanctuary,Cape Elizabeth,,33.7,8,47˚ 21.009' N,124˚ 29.134' W,,12:00,12:12,,,1000,,,,,,,,Shannon Brown,Fixation failure,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1438.OC0722,1438,,,FALSE,OC0722,OCNMS July 2022,,07/07/22,,CE042,12,PPS Unit; Programmed Sampling,-,Olympic Coast National Marine Sanctuary,Cape Elizabeth,,33.7,8,47˚ 21.009' N,124˚ 29.134' W,,00:00,00:16,,,1000,,,,,,,,Shannon Brown,Fixation failure,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1439.OC0722,1439,,,FALSE,OC0722,OCNMS July 2022,,07/08/22,,CE042,13,PPS Unit; Programmed Sampling,-,Olympic Coast National Marine Sanctuary,Cape Elizabeth,,33.7,8,47˚ 21.009' N,124˚ 29.134' W,,12:00,12:16,,,1000,,,,,,,,Shannon Brown,Fixation failure,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1440.OC0722,1440,,,FALSE,OC0722,OCNMS July 2022,,07/10/22,,CE042,14,PPS Unit; Programmed Sampling,-,Olympic Coast National Marine Sanctuary,Cape Elizabeth,,33.7,8,47˚ 21.009' N,124˚ 29.134' W,,00:00,00:17,,,1000,,,,,,,,Shannon Brown,Fixation failure,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1441.OC0722,1441,,,FALSE,OC0722,OCNMS July 2022,,07/11/22,,CE042,15,PPS Unit; Programmed Sampling,-,Olympic Coast National Marine Sanctuary,Cape Elizabeth,,33.7,8,47˚ 21.009' N,124˚ 29.134' W,,12:00,12:17,,,1000,,,,,,,,Shannon Brown,Fixation failure,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1442.OC0722,1442,,,FALSE,OC0722,OCNMS July 2022,,07/11/22,,CE042,16,PPS Unit; Programmed Sampling,-,Olympic Coast National Marine Sanctuary,Cape Elizabeth,,33.7,8,47˚ 21.009' N,124˚ 29.134' W,,12:45,13:03,,,1000,,,,,,,,Shannon Brown,Fixation failure,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1443.OC0722,1443,,,FALSE,OC0722,OCNMS July 2022,,07/13/22,,CE042,17,PPS Unit; Programmed Sampling,-,Olympic Coast National Marine Sanctuary,Cape Elizabeth,,33.7,8,47˚ 21.009' N,124˚ 29.134' W,,00:00,00:15,,,1000,,,,,,,,Shannon Brown,Fixation failure,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1444.OC0722,1444,,,FALSE,OC0722,OCNMS July 2022,,07/14/22,,CE042,18,PPS Unit; Programmed Sampling,-,Olympic Coast National Marine Sanctuary,Cape Elizabeth,,33.7,8,47˚ 21.009' N,124˚ 29.134' W,,12:00,12:01,,,90,,,,,,,,Shannon Brown,Fixation failure; minimum flow reached (sample failure),FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1445.OC0722,1445,,,FALSE,OC0722,OCNMS July 2022,,07/16/22,,CE042,19,PPS Unit; Programmed Sampling,-,Olympic Coast National Marine Sanctuary,Cape Elizabeth,,33.7,8,47˚ 21.009' N,124˚ 29.134' W,,00:00,00:01,,,89,,,,,,,,Shannon Brown,Fixation failure; minimum flow reached (sample failure),FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1446.OC0722,1446,,,FALSE,OC0722,OCNMS July 2022,,07/17/22,,CE042,20,PPS Unit; Programmed Sampling,-,Olympic Coast National Marine Sanctuary,Cape Elizabeth,,33.7,8,47˚ 21.009' N,124˚ 29.134' W,,12:00,12:02,,,131,,,,,,,,Shannon Brown,Fixation failure; minimum flow reached (sample failure),FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1447.OC0722,1447,,,FALSE,OC0722,OCNMS July 2022,,07/18/22,,CE042,21,PPS Unit; Programmed Sampling,-,Olympic Coast National Marine Sanctuary,Cape Elizabeth,,33.7,8,47˚ 21.009' N,124˚ 29.134' W,,00:00,00:01,,,89,,,,,,,,Shannon Brown,Fixation failure; minimum flow reached (sample failure),FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1448.OC0722,1448,,,FALSE,OC0722,OCNMS July 2022,,07/18/22,,CE042,22,PPS Unit; Programmed Sampling,-,Olympic Coast National Marine Sanctuary,Cape Elizabeth,,33.7,8,47˚ 21.009' N,124˚ 29.134' W,,12:00,12:16,,,1000,,,,,,,,Shannon Brown,Fixation failure,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1449.OC0722,1449,,,FALSE,OC0722,OCNMS July 2022,,07/19/22,,CE042,23,PPS Unit; Programmed Sampling,-,Olympic Coast National Marine Sanctuary,Cape Elizabeth,,33.7,8,47˚ 21.009' N,124˚ 29.134' W,,00:00,00:16,,,1000,,,,,,,,Shannon Brown,Fixation failure,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1450.OC0722,1450,,,FALSE,OC0722,OCNMS July 2022,,07/19/22,,CE042,24,PPS Unit; Programmed Sampling,-,Olympic Coast National Marine Sanctuary,Cape Elizabeth,,33.7,8,47˚ 21.009' N,124˚ 29.134' W,,12:00,12:16,,,1000,,,,,,,,Shannon Brown,Fixation failure,FALSE,,,,Lab -20˚C,FALSE,FALSE,
+E1843.,1843,,,FALSE,,Kotzebue Demo,,,,,,Niskin; Sterivex 0.22µm filter,95% EtOH,Kotzebue,,,,,,,,,,,,,,,,,,,,Matt Galaska,,FALSE,,,,,FALSE,FALSE,
+E1844.,1844,,,FALSE,,Kotzebue Demo,,,,,,Niskin; Sterivex 0.22µm filter,95% EtOH,Kotzebue,,,,,,,,,,,,,,,,,,,,Matt Galaska,,FALSE,,,,,FALSE,FALSE,
+E1845.OC0623,1845,,,FALSE,OC0623,OCNMS June 2023,,6/15/2023,Sample 11,,11,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,33.5,,47˚ 52.699' N,124˚ 44.187' W,,14:30,,,,1000,8.0,,33.6,3.67 mg/L,,,,Matt Galaska,,TRUE,100,OCNMS_ExtractionSheet,,,TRUE,FALSE,At Sequencing Center (R2)
+E1846.OC0623,1846,,,FALSE,OC0623,OCNMS June 2023,,6/15/2023,Sample 9,,9,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,34.2,,47˚ 52.699' N,124˚ 44.187' W,,14:30,,,,1000,7.9,,33.6,3.68 mg/L,,,,Matt Galaska,,TRUE,100,OCNMS_ExtractionSheet,,,TRUE,FALSE,At Sequencing Center (R2)
+E1847.OC0623,1847,,,FALSE,OC0623,OCNMS June 2023,,6/15/2023,Sample 5,,5,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,34.2,,47˚ 52.699' N,124˚ 44.187' W,,14:30,,,,1000,7.9,,33.6,3.69 mg/L,,,,Matt Galaska,,TRUE,100,OCNMS_ExtractionSheet,,,TRUE,FALSE,At Sequencing Center (R2)
+E1848.NC.OC0723,1848,,,TRUE,OC0723,OCNMS June 2023,,,,-,-,Sterivex 0.22µm filter,95% EtOH,,,,,,,,,,,,,1000,,,,,,,,,,TRUE,100,OCNMS_ExtractionSheet,,,TRUE,FALSE,At Sequencing Center (R2)
+E1849.OC0723,1849,,,FALSE,OC0723,OCNMS July 2023,,6/16/2023,PPS Port 1,,,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,34.0,,47˚ 52.699' N,124˚ 44.187' W,,00:01,00:18,,,1000,,,,,,,,,,TRUE,100,OCNMS_ExtractionSheet,,,TRUE,FALSE,At Sequencing Center (R2)
+E1850.OC0723,1850,,,FALSE,OC0723,OCNMS July 2023,,6/17/2023,PPS Port 2,,,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,34.0,,47˚ 52.699' N,124˚ 44.187' W,,12:01,12:18,,,1001,,,,,,,,,,TRUE,100,OCNMS_ExtractionSheet,,,TRUE,FALSE,At Sequencing Center (R2)
+E1851.OC0723,1851,,,FALSE,OC0723,OCNMS July 2023,,6/19/2023,PPS Port 3,,,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,34.0,,47˚ 52.699' N,124˚ 44.187' W,,00:01,00:18,,,1001,,,,,,,,,,TRUE,100,OCNMS_ExtractionSheet,,,TRUE,FALSE,At Sequencing Center (R2)
+E1852.OC0723,1852,,,FALSE,OC0723,OCNMS July 2023,,6/20/2023,PPS Port 4,,,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,34.0,,47˚ 52.699' N,124˚ 44.187' W,,12:01,12:18,,,1001,,,,,,,,,,TRUE,100,OCNMS_ExtractionSheet,,,TRUE,FALSE,At Sequencing Center (R2)
+E1853.OC0723,1853,,,FALSE,OC0723,OCNMS July 2023,,6/22/2023,PPS Port 5,,,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,34.0,,47˚ 52.699' N,124˚ 44.187' W,,00:01,00:18,,,1001,,,,,,,,,,TRUE,100,OCNMS_ExtractionSheet,,,TRUE,FALSE,At Sequencing Center (R2)
+E1854.OC0723,1854,,,FALSE,OC0723,OCNMS July 2023,,6/23/2023,PPS Port 6,,,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,34.0,,47˚ 52.699' N,124˚ 44.187' W,,12:01,12:19,,,1001,,,,,,,,,,TRUE,100,OCNMS_ExtractionSheet,,,TRUE,FALSE,At Sequencing Center (R2)
+E1855.OC0723,1855,,,FALSE,OC0723,OCNMS July 2023,,6/25/2023,PPS Port 7,,,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,34.0,,47˚ 52.699' N,124˚ 44.187' W,,00:01,00:19,,,1001,,,,,,,,,,TRUE,100,OCNMS_ExtractionSheet,,,TRUE,FALSE,At Sequencing Center (R2)
+E1856.OC0723,1856,,,FALSE,OC0723,OCNMS July 2023,,6/26/2023,PPS Port 8,,,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,34.0,,47˚ 52.699' N,124˚ 44.187' W,,12:01,12:19,,,1001,,,,,,,,,,TRUE,100,OCNMS_ExtractionSheet,,,TRUE,FALSE,At Sequencing Center (R2)
+E1857.OC0723,1857,,,FALSE,OC0723,OCNMS July 2023,,6/29/2023,PPS Port 9,,,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,34.0,,47˚ 52.699' N,124˚ 44.187' W,,00:01,00:18,,,1001,,,,,,,,,,TRUE,100,OCNMS_ExtractionSheet,,,TRUE,FALSE,At Sequencing Center (R2)
+E1858.OC0723,1858,,,FALSE,OC0723,OCNMS July 2023,,6/30/2023,PPS Port 10,,,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,34.0,,47˚ 52.699' N,124˚ 44.187' W,,12:01,12:18,,,1001,,,,,,,,,,TRUE,100,OCNMS_ExtractionSheet,,,TRUE,FALSE,At Sequencing Center (R2)
+E1859.OC0723,1859,,,FALSE,OC0723,OCNMS July 2023,,07/01/2023,PPS Port 11,,,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,34.0,,47˚ 52.699' N,124˚ 44.187' W,,00:01,00:18,,,1001,,,,,,,,,,TRUE,100,OCNMS_ExtractionSheet,,,TRUE,FALSE,At Sequencing Center (R2)
+E1860.OC0723,1860,,,FALSE,OC0723,OCNMS July 2023,,07/02/2023,PPS Port 12,,,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,34.0,,47˚ 52.699' N,124˚ 44.187' W,,12:01,12:18,,,1001,,,,,,,,,,TRUE,100,OCNMS_ExtractionSheet,,,TRUE,FALSE,At Sequencing Center (R2)
+E1861.OC0723,1861,,,FALSE,OC0723,OCNMS July 2023,,07/04/2023,PPS Port 13,,,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,34.0,,47˚ 52.699' N,124˚ 44.187' W,,00:01,00:18,,,1001,,,,,,,,,,TRUE,100,OCNMS_ExtractionSheet,,,TRUE,FALSE,At Sequencing Center (R2)
+E1862.OC0723,1862,,,FALSE,OC0723,OCNMS July 2023,,07/05/2023,PPS Port 14,,,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,34.0,,47˚ 52.699' N,124˚ 44.187' W,,12:01,12:18,,,1001,,,,,,,,,,TRUE,100,OCNMS_ExtractionSheet,,,TRUE,FALSE,At Sequencing Center (R2)
+E1863.OC0723,1863,,,FALSE,OC0723,OCNMS July 2023,,07/07/2023,PPS Port 15,,,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,34.0,,47˚ 52.699' N,124˚ 44.187' W,,00:01,00:18,,,1001,,,,,,,,,,TRUE,100,OCNMS_ExtractionSheet,,,TRUE,FALSE,At Sequencing Center (R2)
+E1864.OC0723,1864,,,FALSE,OC0723,OCNMS July 2023,,07/08/2023,PPS Port 16,,,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,34.0,,47˚ 52.699' N,124˚ 44.187' W,,12:01,12:18,,,1001,,,,,,,,,,TRUE,100,OCNMS_ExtractionSheet,,,TRUE,FALSE,At Sequencing Center (R2)
+E1865.OC0723,1865,,,FALSE,OC0723,OCNMS July 2023,,7/10/2023,PPS Port 17,,,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,34.0,,47˚ 52.699' N,124˚ 44.187' W,,00:01,00:18,,,1000,,,,,,,,,,TRUE,100,OCNMS_ExtractionSheet,,,TRUE,FALSE,At Sequencing Center (R2)
+E1866.OC0723,1866,,,FALSE,OC0723,OCNMS July 2023,,7/11/2023,PPS Port 18,,,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,34.0,,47˚ 52.699' N,124˚ 44.187' W,,12:00,12:18,,,1001,,,,,,,,,,TRUE,100,OCNMS_ExtractionSheet,,,TRUE,FALSE,At Sequencing Center (R2)
+E1867.OC0723,1867,,,FALSE,OC0723,OCNMS July 2023,,7/13/2023,PPS Port 19,,,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,34.0,,47˚ 52.699' N,124˚ 44.187' W,,00:00,00:18,,,1001,,,,,,,,,,TRUE,100,OCNMS_ExtractionSheet,,,TRUE,FALSE,At Sequencing Center (R2)
+E1868.OC0723,1868,,,FALSE,OC0723,OCNMS July 2023,,7/14/2023,PPS Port 20,,,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,34.0,,47˚ 52.699' N,124˚ 44.187' W,,12:01,12:19,,,1001,,,,,,,,,,TRUE,100,OCNMS_ExtractionSheet,,,TRUE,FALSE,At Sequencing Center (R2)
+E1869.OC0723,1869,,,FALSE,OC0723,OCNMS July 2023,,7/16/2023,PPS Port 21,,,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,34.0,,47˚ 52.699' N,124˚ 44.187' W,,00:01,00:19,,,1001,,,,,,,,,,TRUE,100,OCNMS_ExtractionSheet,,,TRUE,FALSE,At Sequencing Center (R2)
+E1870.OC0723,1870,,,FALSE,OC0723,OCNMS July 2023,,7/17/2023,PPS Port 22,,,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,34.0,,47˚ 52.699' N,124˚ 44.187' W,,12:01,12:19,,,1001,,,,,,,,,,TRUE,100,OCNMS_ExtractionSheet,,,TRUE,FALSE,At Sequencing Center (R2)
+E1871.OC0723,1871,,,FALSE,OC0723,OCNMS July 2023,,7/19/2023,PPS Port 23,,,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,34.0,,47˚ 52.699' N,124˚ 44.187' W,,00:01,00:18,,,1001,,,,,,,,,,TRUE,100,OCNMS_ExtractionSheet,,,TRUE,FALSE,At Sequencing Center (R2)
+E1872.OC0723,1872,,,FALSE,OC0723,OCNMS July 2023,,7/20/2023,PPS Port 24,,,PPS Unit; Programmed Sampling,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,34.0,,47˚ 52.699' N,124˚ 44.187' W,,12:01,12:18,,,1001,,,,,,,,,,TRUE,100,OCNMS_ExtractionSheet,,,TRUE,FALSE,At Sequencing Center (R2)
+E1873.OC0723,1873,,,FALSE,OC0723,OCNMS July 2023,,7/26/2023,,,3,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,33.6,,47˚ 52.699' N,124˚ 44.187' W,,12:54,13:05,,,1000,8.1,,33.7,3.53 mg/L,,,,Shannon Brown,,TRUE,100,OCNMS_ExtractionSheet,,,TRUE,FALSE,At Sequencing Center (R2)
+E1874.OC0723,1874,,,FALSE,OC0723,OCNMS July 2023,,7/26/2023,,,5,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,33.7,,47˚ 52.699' N,124˚ 44.187' W,,12:54,13:05,,,1000,8.1,,33.7,3.52 mg/L,,,,Shannon Brown,,TRUE,100,OCNMS_ExtractionSheet,,,TRUE,FALSE,At Sequencing Center (R2)
+E1875.OC0723,1875,,,FALSE,OC0723,OCNMS July 2023,,7/26/2023,,,11,Niskin; Sterivex 0.22µm filter,95% EtOH,Olympic Coast National Marine Sanctuary,Teahwhit Head,,33.7,,47˚ 52.699' N,124˚ 44.187' W,,12:54,13:05,,,1000,8.1,,33.7,3.53 mg/L,,,,Shannon Brown,,TRUE,100,OCNMS_ExtractionSheet,,,TRUE,FALSE,At Sequencing Center (R2)
+E1876.NC.OC0723,1876,,,TRUE,OC0723,OCNMS July 2023,,,,-,-,Sterivex 0.22µm filter,95% EtOH,,,,,,,,,,,,,1000,,,,,,,,Shannon Brown,,TRUE,100,OCNMS_ExtractionSheet,,,TRUE,FALSE,At Sequencing Center (R2)
+E2128.1B.OC0919,2128,1,,FALSE,OC0919,,,,CP2,,,Bottle; 0.45µm MCE cup filter,750 µL CTAB,,CANS,,Surface,,48° 09.978',124° 45.410',,,,,,,,,,,,,,Christopher Paight,,TRUE,,OCNMS_ExtractionSheet,Extracted by Chris Paight in 2019; quantified in 2024 by HW/ZG,,TRUE,FALSE,18S/16S done; other markers pending (R3)
+E2128.2B.OC0919,2128,2,,FALSE,OC0919,,,,CP35,,,Bottle; 0.45µm MCE cup filter,750 µL CTAB,,CANS,,Surface,,48° 09.978',124° 45.410',,,,,,,,,,,,,,Christopher Paight,,TRUE,,OCNMS_ExtractionSheet,Extracted by Chris Paight in 2019; quantified in 2024 by HW/ZG,,TRUE,FALSE,18S/16S done; other markers pending (R3)
+E2128.3B.OC0919,2128,3,,FALSE,OC0919,,,,CP24,,,Bottle; 0.45µm MCE cup filter,750 µL CTAB,,CANS,,Surface,,48° 09.978',124° 45.410',,,,,,,,,,,,,,Christopher Paight,,TRUE,,OCNMS_ExtractionSheet,Extracted by Chris Paight in 2019; quantified in 2024 by HW/ZG,,TRUE,FALSE,18S/16S done; other markers pending (R3)
+E2128.4B.OC0919,2128,4,,FALSE,OC0919,,,,CP30,,,Bottle; 0.45µm MCE cup filter,750 µL CTAB,,CANS,,Surface,,48° 09.978',124° 45.410',,,,,,,,,,,,,,Christopher Paight,,TRUE,,OCNMS_ExtractionSheet,Extracted by Chris Paight in 2019; quantified in 2024 by HW/ZG,,TRUE,FALSE,18S/16S done; other markers pending (R3)
+E2129.1B.OC0919,2129,1,,FALSE,OC0919,,,,CP1,,,Bottle; 0.45µm MCE cup filter,750 µL CTAB,,CA42,,Surface,,48° 09.961',124° 49.402,,,,,,,,,,,,,,Christopher Paight,,TRUE,,OCNMS_ExtractionSheet,Extracted by Chris Paight in 2019; quantified in 2024 by HW/ZG,,TRUE,FALSE,18S/16S done; other markers pending (R3)
+E2129.2B.OC0919,2129,2,,FALSE,OC0919,,,,CP13,,,Bottle; 0.45µm MCE cup filter,750 µL CTAB,,CA42,,Surface,,48° 09.961',124° 49.402,,,,,,,,,,,,,,Christopher Paight,,TRUE,,OCNMS_ExtractionSheet,Extracted by Chris Paight in 2019; quantified in 2024 by HW/ZG,,TRUE,FALSE,18S/16S done; other markers pending (R3)
+E2129.3B.OC0919,2129,3,,FALSE,OC0919,,,,CP3,,,Bottle; 0.45µm MCE cup filter,750 µL CTAB,,CA42,,Surface,,48° 09.961',124° 49.402,,,,,,,,,,,,,,Christopher Paight,,TRUE,,OCNMS_ExtractionSheet,Extracted by Chris Paight in 2019; quantified in 2024 by HW/ZG,,TRUE,FALSE,18S/16S done; other markers pending (R3)
+E2129.4B.OC0919,2129,4,,FALSE,OC0919,,,,CP4,,,Bottle; 0.45µm MCE cup filter,750 µL CTAB,,CA42,,Surface,,48° 09.961',124° 49.402,,,,,,,,,,,,,,Christopher Paight,,TRUE,,OCNMS_ExtractionSheet,Extracted by Chris Paight in 2019; quantified in 2024 by HW/ZG,,TRUE,FALSE,18S/16S done; other markers pending (R3)
+E2129.5B.OC0919,2129,5,,FALSE,OC0919,,,,CP25,,,Bottle; 0.45µm MCE cup filter,750 µL CTAB,,CA42,,Surface,,48° 09.961',124° 49.402,,,,,,,,,,,,,,Christopher Paight,,TRUE,,OCNMS_ExtractionSheet,Extracted by Chris Paight in 2019; quantified in 2024 by HW/ZG,,TRUE,FALSE,18S/16S done; other markers pending (R3)
+E2130.1B.OC0919,2130,1,,FALSE,OC0919,,,,CP12,,,Bottle; 0.45µm MCE cup filter,750 µL CTAB,,CENS,,Surface,,47° 21.407',124° 20.888',,,,,,,,,,,,,,Christopher Paight,,TRUE,,OCNMS_ExtractionSheet,Extracted by Chris Paight in 2019; quantified in 2024 by HW/ZG,,TRUE,FALSE,18S/16S done; other markers pending (R3)
+E2130.2B.OC0919,2130,2,,FALSE,OC0919,,,,CP40,,,Bottle; 0.45µm MCE cup filter,750 µL CTAB,,CENS,,Surface,,47° 21.407',124° 20.888',,,,,,,,,,,,,,Christopher Paight,,TRUE,,OCNMS_ExtractionSheet,Extracted by Chris Paight in 2019; quantified in 2024 by HW/ZG,,TRUE,FALSE,18S/16S done; other markers pending (R3)
+E2130.3B.OC0919,2130,3,,FALSE,OC0919,,,,CP41,,,Bottle; 0.45µm MCE cup filter,750 µL CTAB,,CENS,,Surface,,47° 21.407',124° 20.888',,,,,,,,,,,,,,Christopher Paight,,TRUE,,OCNMS_ExtractionSheet,Extracted by Chris Paight in 2019; quantified in 2024 by HW/ZG,,TRUE,FALSE,18S/16S done; other markers pending (R3)
+E2130.4B.OC0919,2130,4,,FALSE,OC0919,,,,CP42,,,Bottle; 0.45µm MCE cup filter,750 µL CTAB,,CENS,,Surface,,47° 21.407',124° 20.888',,,,,,,,,,,,,,Christopher Paight,,TRUE,,OCNMS_ExtractionSheet,Extracted by Chris Paight in 2019; quantified in 2024 by HW/ZG,,TRUE,FALSE,18S/16S done; other markers pending (R3)
+E2130.5B.OC0919,2130,5,,FALSE,OC0919,,,,CP43,,,Bottle; 0.45µm MCE cup filter,750 µL CTAB,,CENS,,Surface,,47° 21.407',124° 20.888',,,,,,,,,,,,,,Christopher Paight,,TRUE,,OCNMS_ExtractionSheet,Extracted by Chris Paight in 2019; quantified in 2024 by HW/ZG,,TRUE,FALSE,18S/16S done; other markers pending (R3)
+E2131.1B.OC0919,2131,1,,FALSE,OC0919,,,,CP11,,,Bottle; 0.45µm MCE cup filter,750 µL CTAB,,CE42,,Surface,,47° 21.188',124° 29.324',,,,,,,,,,,,,,Christopher Paight,,TRUE,,OCNMS_ExtractionSheet,Extracted by Chris Paight in 2019; quantified in 2024 by HW/ZG,,TRUE,FALSE,18S/16S done; other markers pending (R3)
+E2131.2B.OC0919,2131,2,,FALSE,OC0919,,,,CP38,,,Bottle; 0.45µm MCE cup filter,750 µL CTAB,,CE42,,Surface,,47° 21.188',124° 29.324',,,,,,,,,,,,,,Christopher Paight,,TRUE,,OCNMS_ExtractionSheet,Extracted by Chris Paight in 2019; quantified in 2024 by HW/ZG,,TRUE,FALSE,18S/16S done; other markers pending (R3)
+E2131.3B.OC0919,2131,3,,FALSE,OC0919,,,,CP23,,,Bottle; 0.45µm MCE cup filter,750 µL CTAB,,CE42,,Surface,,47° 21.188',124° 29.324',,,,,,,,,,,,,,Christopher Paight,,TRUE,,OCNMS_ExtractionSheet,Extracted by Chris Paight in 2019; quantified in 2024 by HW/ZG,,TRUE,FALSE,18S/16S done; other markers pending (R3)
+E2131.4B.OC0919,2131,4,,FALSE,OC0919,,,,CP39,,,Bottle; 0.45µm MCE cup filter,750 µL CTAB,,CE42,,Surface,,47° 21.188',124° 29.324',,,,,,,,,,,,,,Christopher Paight,,TRUE,,OCNMS_ExtractionSheet,Extracted by Chris Paight in 2019; quantified in 2024 by HW/ZG,,TRUE,FALSE,18S/16S done; other markers pending (R3)
+E2131.5B.OC0919,2131,5,,FALSE,OC0919,,,,CP17,,,Bottle; 0.45µm MCE cup filter,750 µL CTAB,,CE42,,Surface,,47° 21.188',124° 29.324',,,,,,,,,,,,,,Christopher Paight,,TRUE,,OCNMS_ExtractionSheet,Extracted by Chris Paight in 2019; quantified in 2024 by HW/ZG,,TRUE,FALSE,18S/16S done; other markers pending (R3)
+E2132.1B.OC0919,2132,1,,FALSE,OC0919,,,,CP7,,,Bottle; 0.45µm MCE cup filter,750 µL CTAB,,CLNS,,Surface,,47° 36.050',124° 25.704',,,,,,,,,,,,,,Christopher Paight,,TRUE,,OCNMS_ExtractionSheet,Extracted by Chris Paight in 2019; quantified in 2024 by HW/ZG,,TRUE,FALSE,18S/16S done; other markers pending (R3)
+E2132.2B.OC0919,2132,2,,FALSE,OC0919,,,,CP21,,,Bottle; 0.45µm MCE cup filter,750 µL CTAB,,CLNS,,Surface,,47° 36.050',124° 25.704',,,,,,,,,,,,,,Christopher Paight,,TRUE,,OCNMS_ExtractionSheet,Extracted by Chris Paight in 2019; quantified in 2024 by HW/ZG,,TRUE,FALSE,18S/16S done; other markers pending (R3)
+E2132.3B.OC0919,2132,3,,FALSE,OC0919,,,,CP34,,,Bottle; 0.45µm MCE cup filter,750 µL CTAB,,CLNS,,Surface,,47° 36.050',124° 25.704',,,,,,,,,,,,,,Christopher Paight,,TRUE,,OCNMS_ExtractionSheet,Extracted by Chris Paight in 2019; quantified in 2024 by HW/ZG,,TRUE,FALSE,18S/16S done; other markers pending (R3)
+E2132.4B.OC0919,2132,4,,FALSE,OC0919,,,,CP33,,,Bottle; 0.45µm MCE cup filter,750 µL CTAB,,CLNS,,Surface,,47° 36.050',124° 25.704',,,,,,,,,,,,,,Christopher Paight,,TRUE,,OCNMS_ExtractionSheet,Extracted by Chris Paight in 2019; quantified in 2024 by HW/ZG,,TRUE,FALSE,18S/16S done; other markers pending (R3)
+E2132.5B.OC0919,2132,5,,FALSE,OC0919,,,,CP16,,,Bottle; 0.45µm MCE cup filter,750 µL CTAB,,CLNS,,Surface,,47° 36.050',124° 25.704',,,,,,,,,,,,,,Christopher Paight,,TRUE,,OCNMS_ExtractionSheet,Extracted by Chris Paight in 2019; quantified in 2024 by HW/ZG,,TRUE,FALSE,18S/16S done; other markers pending (R3)
+E2133.1B.OC0919,2133,1,,FALSE,OC0919,,,,CP8,,,Bottle; 0.45µm MCE cup filter,750 µL CTAB,,CL42,,Surface,,47° 35.674',124° 29.824',,,,,,,,,,,,,,Christopher Paight,,TRUE,,OCNMS_ExtractionSheet,Extracted by Chris Paight in 2019; quantified in 2024 by HW/ZG,,TRUE,FALSE,18S/16S done; other markers pending (R3)
+E2133.2B.OC0919,2133,2,,FALSE,OC0919,,,,CP19,,,Bottle; 0.45µm MCE cup filter,750 µL CTAB,,CL42,,Surface,,47° 35.674',124° 29.824',,,,,,,,,,,,,,Christopher Paight,,TRUE,,OCNMS_ExtractionSheet,Extracted by Chris Paight in 2019; quantified in 2024 by HW/ZG,,TRUE,FALSE,18S/16S done; other markers pending (R3)
+E2133.3B.OC0919,2133,3,,FALSE,OC0919,,,,CP44,,,Bottle; 0.45µm MCE cup filter,750 µL CTAB,,CL42,,Surface,,47° 35.674',124° 29.824',,,,,,,,,,,,,,Christopher Paight,,TRUE,,OCNMS_ExtractionSheet,Extracted by Chris Paight in 2019; quantified in 2024 by HW/ZG,,TRUE,FALSE,18S/16S done; other markers pending (R3)
+E2133.4B.OC0919,2133,4,,FALSE,OC0919,,,,CP45,,,Bottle; 0.45µm MCE cup filter,750 µL CTAB,,CL42,,Surface,,47° 35.674',124° 29.824',,,,,,,,,,,,,,Christopher Paight,,TRUE,,OCNMS_ExtractionSheet,Extracted by Chris Paight in 2019; quantified in 2024 by HW/ZG,,TRUE,FALSE,18S/16S done; other markers pending (R3)
+E2133.5B.OC0919,2133,5,,FALSE,OC0919,,,,CP46,,,Bottle; 0.45µm MCE cup filter,750 µL CTAB,,CL42,,Surface,,47° 35.674',124° 29.824',,,,,,,,,,,,,,Christopher Paight,,TRUE,,OCNMS_ExtractionSheet,Extracted by Chris Paight in 2019; quantified in 2024 by HW/ZG,,TRUE,FALSE,18S/16S done; other markers pending (R3)
+E2134.1B.OC0919,2134,1,,FALSE,OC0919,,,,CP5,,,Bottle; 0.45µm MCE cup filter,750 µL CTAB,,MB42,,Surface,,48° 19.438',124° 44.123',,,,,,,,,,,,,,Christopher Paight,,TRUE,,OCNMS_ExtractionSheet,Extracted by Chris Paight in 2019; quantified in 2024 by HW/ZG,,TRUE,FALSE,18S/16S done; other markers pending (R3)
+E2134.2B.OC0919,2134,2,,FALSE,OC0919,,,,CP26,,,Bottle; 0.45µm MCE cup filter,750 µL CTAB,,MB42,,Surface,,48° 19.438',124° 44.123',,,,,,,,,,,,,,Christopher Paight,,TRUE,,OCNMS_ExtractionSheet,Extracted by Chris Paight in 2019; quantified in 2024 by HW/ZG,,TRUE,FALSE,18S/16S done; other markers pending (R3)
+E2134.3B.OC0919,2134,3,,FALSE,OC0919,,,,CP22,,,Bottle; 0.45µm MCE cup filter,750 µL CTAB,,MB42,,Surface,,48° 19.438',124° 44.123',,,,,,,,,,,,,,Christopher Paight,,TRUE,,OCNMS_ExtractionSheet,Extracted by Chris Paight in 2019; quantified in 2024 by HW/ZG,,TRUE,FALSE,18S/16S done; other markers pending (R3)
+E2134.4B.OC0919,2134,4,,FALSE,OC0919,,,,CP28,,,Bottle; 0.45µm MCE cup filter,750 µL CTAB,,MB42,,Surface,,48° 19.438',124° 44.123',,,,,,,,,,,,,,Christopher Paight,,TRUE,,OCNMS_ExtractionSheet,Extracted by Chris Paight in 2019; quantified in 2024 by HW/ZG,,TRUE,FALSE,18S/16S done; other markers pending (R3)
+E2134.5B.OC0919,2134,5,,FALSE,OC0919,,,,CP14,,,Bottle; 0.45µm MCE cup filter,750 µL CTAB,,MB42,,Surface,,48° 19.438',124° 44.123',,,,,,,,,,,,,,Christopher Paight,,TRUE,,OCNMS_ExtractionSheet,Extracted by Chris Paight in 2019; quantified in 2024 by HW/ZG,,TRUE,FALSE,18S/16S done; other markers pending (R3)
+E2135.1B.OC0919,2135,1,,FALSE,OC0919,,,,CP9,,,Bottle; 0.45µm MCE cup filter,750 µL CTAB,,THNS,,Surface,,47° 52.567',124° 37.168',,,,,,,,,,,,,,Christopher Paight,,TRUE,,OCNMS_ExtractionSheet,Extracted by Chris Paight in 2019; quantified in 2024 by HW/ZG,,TRUE,FALSE,18S/16S done; other markers pending (R3)
+E2135.2B.OC0919,2135,2,,FALSE,OC0919,,,,CP29,,,Bottle; 0.45µm MCE cup filter,750 µL CTAB,,THNS,,Surface,,47° 52.567',124° 37.168',,,,,,,,,,,,,,Christopher Paight,,TRUE,,OCNMS_ExtractionSheet,Extracted by Chris Paight in 2019; quantified in 2024 by HW/ZG,,TRUE,FALSE,18S/16S done; other markers pending (R3)
+E2135.3B.OC0919,2135,3,,FALSE,OC0919,,,,CP15,,,Bottle; 0.45µm MCE cup filter,750 µL CTAB,,THNS,,Surface,,47° 52.567',124° 37.168',,,,,,,,,,,,,,Christopher Paight,,TRUE,,OCNMS_ExtractionSheet,Extracted by Chris Paight in 2019; quantified in 2024 by HW/ZG,,TRUE,FALSE,18S/16S done; other markers pending (R3)
+E2135.4B.OC0919,2135,4,,FALSE,OC0919,,,,CP31,,,Bottle; 0.45µm MCE cup filter,750 µL CTAB,,THNS,,Surface,,47° 52.567',124° 37.168',,,,,,,,,,,,,,Christopher Paight,,TRUE,,OCNMS_ExtractionSheet,Extracted by Chris Paight in 2019; quantified in 2024 by HW/ZG,,TRUE,FALSE,18S/16S done; other markers pending (R3)
+E2135.5B.OC0919,2135,5,,FALSE,OC0919,,,,CP32,,,Bottle; 0.45µm MCE cup filter,750 µL CTAB,,THNS,,Surface,,47° 52.567',124° 37.168',,,,,,,,,,,,,,Christopher Paight,,TRUE,,OCNMS_ExtractionSheet,Extracted by Chris Paight in 2019; quantified in 2024 by HW/ZG,,TRUE,FALSE,18S/16S done; other markers pending (R3)
+E2136.1B.OC0919,2136,1,,FALSE,OC0919,,,,CP36,,,Bottle; 0.45µm MCE cup filter,750 µL CTAB,,TH42,,Surface,,47° 52.569',124° 44.005',,,,,,,,,,,,,,Christopher Paight,,TRUE,,OCNMS_ExtractionSheet,Extracted by Chris Paight in 2019; quantified in 2024 by HW/ZG,,TRUE,FALSE,18S/16S done; other markers pending (R3)
+E2136.2B.OC0919,2136,2,,FALSE,OC0919,,,,CP37,,,Bottle; 0.45µm MCE cup filter,750 µL CTAB,,TH42,,Surface,,47° 52.569',124° 44.005',,,,,,,,,,,,,,Christopher Paight,,TRUE,,OCNMS_ExtractionSheet,Extracted by Chris Paight in 2019; quantified in 2024 by HW/ZG,,TRUE,FALSE,18S/16S done; other markers pending (R3)
+E2136.3B.OC0919,2136,3,,FALSE,OC0919,,,,CP10,,,Bottle; 0.45µm MCE cup filter,750 µL CTAB,,TH42,,Surface,,47° 52.569',124° 44.005',,,,,,,,,,,,,,Christopher Paight,,TRUE,,OCNMS_ExtractionSheet,Extracted by Chris Paight in 2019; quantified in 2024 by HW/ZG,,TRUE,FALSE,18S/16S done; other markers pending (R3)
+E2136.4B.OC0919,2136,4,,FALSE,OC0919,,,,CP20,,,Bottle; 0.45µm MCE cup filter,750 µL CTAB,,TH42,,Surface,,47° 52.569',124° 44.005',,,,,,,,,,,,,,Christopher Paight,,TRUE,,OCNMS_ExtractionSheet,Extracted by Chris Paight in 2019; quantified in 2024 by HW/ZG,,TRUE,FALSE,18S/16S done; other markers pending (R3)
+E2136.5B.OC0919,2136,5,,FALSE,OC0919,,,,CP27,,,Bottle; 0.45µm MCE cup filter,750 µL CTAB,,TH42,,Surface,,47° 52.569',124° 44.005',,,,,,,,,,,,,,Christopher Paight,,TRUE,,OCNMS_ExtractionSheet,Extracted by Chris Paight in 2019; quantified in 2024 by HW/ZG,,TRUE,FALSE,18S/16S done; other markers pending (R3)
+E2137.1B.OC0919,2137,1,,FALSE,OC0919,,,,CP6,,,Niskin; 0.45µm MCE cup filter,750 µL CTAB,,,,,,,,,,,,,,,,,,,,,Christopher Paight,,TRUE,,OCNMS_ExtractionSheet,Extracted by Chris Paight in 2019; quantified in 2024 by HW/ZG,,TRUE,FALSE,18S/16S done; other markers pending (R3)
+E2137.2B.OC0919,2137,2,,FALSE,OC0919,,,,CP18,,,Niskin; 0.45µm MCE cup filter,750 µL CTAB,,,,,,,,,,,,,,,,,,,,,Christopher Paight,,TRUE,,OCNMS_ExtractionSheet,Extracted by Chris Paight in 2019; quantified in 2024 by HW/ZG,,TRUE,FALSE,18S/16S done; other markers pending (R3)
+E2302.NC.OC0524,2302,,,TRUE,OC0524,,,,PPS NC,-,-,"PPS Unit; Sterlitech 0.4 µm filter, 47 mm",95% EtOH,,Teahwhit Head,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+E2303.OC0524,2303,,,FALSE,OC0524,,,,PPS Port 1,-,-,"PPS Unit; Sterlitech 0.4 µm filter, 47 mm",95% EtOH,,Teahwhit Head,,,,47° 52.55' N,124° 44.32 W',,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+E2304.OC0524,2304,,,FALSE,OC0524,,,,PPS Port 2,-,-,"PPS Unit; Sterlitech 0.4 µm filter, 47 mm",95% EtOH,,Teahwhit Head,,,,47° 52.55' N,124° 44.32 W',,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+E2305.OC0524,2305,,,FALSE,OC0524,,,,PPS Port 3,-,-,"PPS Unit; Sterlitech 0.4 µm filter, 47 mm",95% EtOH,,Teahwhit Head,,,,47° 52.55' N,124° 44.32 W',,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+E2306.OC0524,2306,,,FALSE,OC0524,,,,PPS Port 4,-,-,"PPS Unit; Sterlitech 0.4 µm filter, 47 mm",95% EtOH,,Teahwhit Head,,,,47° 52.55' N,124° 44.32 W',,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+E2307.OC0524,2307,,,FALSE,OC0524,,,,PPS Port 5,-,-,"PPS Unit; Sterlitech 0.4 µm filter, 47 mm",95% EtOH,,Teahwhit Head,,,,47° 52.55' N,124° 44.32 W',,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+E2308.OC0524,2308,,,FALSE,OC0524,,,,PPS Port 6,-,-,"PPS Unit; Sterlitech 0.4 µm filter, 47 mm",95% EtOH,,Teahwhit Head,,,,47° 52.55' N,124° 44.32 W',,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+E2309.OC0524,2309,,,FALSE,OC0524,,,,PPS Port 7,-,-,"PPS Unit; Sterlitech 0.4 µm filter, 47 mm",95% EtOH,,Teahwhit Head,,,,47° 52.55' N,124° 44.32 W',,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+E2310.OC0524,2310,,,FALSE,OC0524,,,,PPS Port 8,-,-,"PPS Unit; Sterlitech 0.4 µm filter, 47 mm",95% EtOH,,Teahwhit Head,,,,47° 52.55' N,124° 44.32 W',,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+E2311.OC0524,2311,,,FALSE,OC0524,,,,PPS Port 9,-,-,"PPS Unit; Sterlitech 0.4 µm filter, 47 mm",95% EtOH,,Teahwhit Head,,,,47° 52.55' N,124° 44.32 W',,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+E2312.OC0524,2312,,,FALSE,OC0524,,,,PPS Port 10,-,-,"PPS Unit; Sterlitech 0.4 µm filter, 47 mm",95% EtOH,,Teahwhit Head,,,,47° 52.55' N,124° 44.32 W',,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+E2313.OC0524,2313,,,FALSE,OC0524,,,,PPS Port 11,-,-,"PPS Unit; Sterlitech 0.4 µm filter, 47 mm",95% EtOH,,Teahwhit Head,,,,47° 52.55' N,124° 44.32 W',,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+E2314.OC0524,2314,,,FALSE,OC0524,,,,PPS Port 12,-,-,"PPS Unit; Sterlitech 0.4 µm filter, 47 mm",95% EtOH,,Teahwhit Head,,,,47° 52.55' N,124° 44.32 W',,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+E2315.OC0524,2315,,,FALSE,OC0524,,,,PPS Port 13,-,-,"PPS Unit; Sterlitech 0.4 µm filter, 47 mm",95% EtOH,,Teahwhit Head,,,,47° 52.55' N,124° 44.32 W',,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+E2316.OC0524,2316,,,FALSE,OC0524,,,,PPS Port 14,-,-,"PPS Unit; Sterlitech 0.4 µm filter, 47 mm",95% EtOH,,Teahwhit Head,,,,47° 52.55' N,124° 44.32 W',,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+E2317.OC0524,2317,,,FALSE,OC0524,,,,PPS Port 15,-,-,"PPS Unit; Sterlitech 0.4 µm filter, 47 mm",95% EtOH,,Teahwhit Head,,,,47° 52.55' N,124° 44.32 W',,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+E2318.OC0524,2318,,,FALSE,OC0524,,,,PPS Port 16,-,-,"PPS Unit; Sterlitech 0.4 µm filter, 47 mm",95% EtOH,,Teahwhit Head,,,,47° 52.55' N,124° 44.32 W',,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+E2319.OC0524,2319,,,FALSE,OC0524,,,,PPS Port 17,-,-,"PPS Unit; Sterlitech 0.4 µm filter, 47 mm",95% EtOH,,Teahwhit Head,,,,47° 52.55' N,124° 44.32 W',,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+E2320.OC0524,2320,,,FALSE,OC0524,,,,PPS Port 18,-,-,"PPS Unit; Sterlitech 0.4 µm filter, 47 mm",95% EtOH,,Teahwhit Head,,,,47° 52.55' N,124° 44.32 W',,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+E2321.OC0524,2321,,,FALSE,OC0524,,,,PPS Port 19,-,-,"PPS Unit; Sterlitech 0.4 µm filter, 47 mm",95% EtOH,,Teahwhit Head,,,,47° 52.55' N,124° 44.32 W',,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+E2322.OC0524,2322,,,FALSE,OC0524,,,,PPS Port 20,-,-,"PPS Unit; Sterlitech 0.4 µm filter, 47 mm",95% EtOH,,Teahwhit Head,,,,47° 52.55' N,124° 44.32 W',,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+E2323.OC0524,2323,,,FALSE,OC0524,,,,PPS Port 21,-,-,"PPS Unit; Sterlitech 0.4 µm filter, 47 mm",95% EtOH,,Teahwhit Head,,,,47° 52.55' N,124° 44.32 W',,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+E2324.OC0524,2324,,,FALSE,OC0524,,,,PPS Port 22,-,-,"PPS Unit; Sterlitech 0.4 µm filter, 47 mm",95% EtOH,,Teahwhit Head,,,,47° 52.55' N,124° 44.32 W',,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+E2325.OC0524,2325,,,FALSE,OC0524,,,,PPS Port 23,-,-,"PPS Unit; Sterlitech 0.4 µm filter, 47 mm",95% EtOH,,Teahwhit Head,,,,47° 52.55' N,124° 44.32 W',,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+E2326.OC0524,2326,,,FALSE,OC0524,,,,PPS Port 24,-,-,"PPS Unit; Sterlitech 0.4 µm filter, 47 mm",95% EtOH,,Teahwhit Head,,,,47° 52.55' N,124° 44.32 W',,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+E2327.1T.OC0524,2327,,1,FALSE,OC0524,May 2024 PPS Deployment,,05/09/24,,1,-,Van Dorn Bottle; Sterivex 0.22µm filter,95% EtOH,,Teahwhit Head,,1.0,,47° 52.54' N,124° 44.24 W',,11:15,,,,1000,,,,,,,,Sam Setta and Shannon Brown,,FALSE,,,,,FALSE,FALSE,
+E2327.2T.OC0524,2327,,2,FALSE,OC0524,May 2024 PPS Deployment,,05/09/24,,1,-,Van Dorn Bottle; Sterivex 0.22µm filter,95% EtOH,,Teahwhit Head,,1.0,,47° 52.54' N,124° 44.24 W',,11:15,,,,1000,,,,,,,,Sam Setta and Shannon Brown,,FALSE,,,,,FALSE,FALSE,
+E2328.1T.OC0524,2328,,1,FALSE,OC0524,May 2024 PPS Deployment,,05/09/24,,2,-,Van Dorn Bottle; Sterivex 0.22µm filter,95% EtOH,,Teahwhit Head,,1.0,,47° 52.54' N,124° 44.24 W',,11:15,,,,1000,,,,,,,,Sam Setta and Shannon Brown,,FALSE,,,,,FALSE,FALSE,
+E2328.2T.OC0524,2328,,2,FALSE,OC0524,May 2024 PPS Deployment,,05/09/24,,2,-,Van Dorn Bottle; Sterivex 0.22µm filter,95% EtOH,,Teahwhit Head,,1.0,,47° 52.54' N,124° 44.24 W',,11:15,,,,1000,,,,,,,,Sam Setta and Shannon Brown,,FALSE,,,,,FALSE,FALSE,
+E2329.1T.OC0524,2329,,1,FALSE,OC0524,May 2024 PPS Deployment,,05/09/24,,3,-,Van Dorn Bottle; Sterivex 0.22µm filter,95% EtOH,,Teahwhit Head,,1.0,,47° 52.54' N,124° 44.24 W',,11:15,,,,1000,,,,,,,,Sam Setta and Shannon Brown,,FALSE,,,,,FALSE,FALSE,
+E2329.2T.OC0524,2329,,2,FALSE,OC0524,May 2024 PPS Deployment,,05/09/24,,3,-,Van Dorn Bottle; Sterivex 0.22µm filter,95% EtOH,,Teahwhit Head,,34.0,,47° 52.54' N,124° 44.24 W',,11:15,,,,1000,,,,,,,,Sam Setta and Shannon Brown,,FALSE,,,,,FALSE,FALSE,
+E2330.1T.OC0524,2330,,1,FALSE,OC0524,May 2024 PPS Deployment,,05/09/24,,4,-,Van Dorn Bottle; Sterivex 0.22µm filter,95% EtOH,,Teahwhit Head,,34.0,,47° 52.54' N,124° 44.24 W',,11:15,,,,1000,,,,,,,,Sam Setta and Shannon Brown,,FALSE,,,,,FALSE,FALSE,
+E2330.2T.OC0524,2330,,2,FALSE,OC0524,May 2024 PPS Deployment,,05/09/24,,4,-,Van Dorn Bottle; Sterivex 0.22µm filter,95% EtOH,,Teahwhit Head,,34.0,,47° 52.54' N,124° 44.24 W',,11:15,,,,1000,,,,,,,,Sam Setta and Shannon Brown,,FALSE,,,,,FALSE,FALSE,
+E2330.3T.OC0524,2330,,3,FALSE,OC0524,May 2024 PPS Deployment,,05/09/24,,4,-,Van Dorn Bottle; Sterivex 0.22µm filter,95% EtOH,,Teahwhit Head,,34.0,,47° 52.54' N,124° 44.24 W',,11:15,,,,1000,,,,,,,,Sam Setta and Shannon Brown,,FALSE,,,,,FALSE,FALSE,
+E2331.NC.OC0524,2331,,,TRUE,OC0524,May 2024 PPS Deployment,,,Field Blank,-,-,Sterivex 0.22µm filter,95% EtOH,,,,,,,,,,,,,1000,,,,,,,,Sam Setta and Shannon Brown,,FALSE,,,,,FALSE,FALSE,
+E2332.NC.OC0524,2332,,,TRUE,OC0524,May 2024 PPS Deployment,,,PPS Blank (from RO Jug),-,-,Sterivex 0.22µm filter,95% EtOH,,,,,,,,,,,,,1000,,,,,,,,Sam Setta and Shannon Brown,,FALSE,,,,,FALSE,FALSE,
+E2333.1T.OC0624,2333,,1,FALSE,OC0624,June 2024 PPS Recovery,,6/10/2024,,,,Van Dorn Bottle; Sterivex 0.22µm filter,95% EtOH,,Teahwhit Head,1.0,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+E2333.2T.OC0624,2333,,2,FALSE,OC0624,June 2024 PPS Recovery,,6/10/2024,,,,Van Dorn Bottle; Sterivex 0.22µm filter,95% EtOH,,Teahwhit Head,1.0,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+E2333.3T.OC0624,2333,,3,FALSE,OC0624,June 2024 PPS Recovery,,6/10/2024,,,,Van Dorn Bottle; Sterivex 0.22µm filter,95% EtOH,,Teahwhit Head,1.0,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+E2334.1T.OC0624,2334,,1,FALSE,OC0624,June 2024 PPS Recovery,,6/10/2024,,,,Van Dorn Bottle; Sterivex 0.22µm filter,95% EtOH,,Teahwhit Head,34.0,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+E2334.2T.OC0624,2334,,2,FALSE,OC0624,June 2024 PPS Recovery,,6/10/2024,,,,Van Dorn Bottle; Sterivex 0.22µm filter,95% EtOH,,Teahwhit Head,34.0,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+E2334.3T.OC0624,2334,,3,FALSE,OC0624,June 2024 PPS Recovery,,6/10/2024,,,,Van Dorn Bottle; Sterivex 0.22µm filter,95% EtOH,,Teahwhit Head,34.0,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+E2335.NC.OC0624,2335,,,TRUE,OC0624,June 2024 PPS Recovery,,6/10/2024,Recovery Blank,,,Sterivex 0.22µm filter,95% EtOH,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+E2336.1T.OC0624,2336,,1,FALSE,OC0624,June 2024 PPS Deployment,,6/12/2024,,,,Van Dorn Bottle; Sterivex 0.22µm filter,95% EtOH,,Teahwhit Head,1.0,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+E2336.2T.OC0624,2336,,2,FALSE,OC0624,June 2024 PPS Deployment,,6/12/2024,,,,Van Dorn Bottle; Sterivex 0.22µm filter,95% EtOH,,Teahwhit Head,1.0,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+E2336.3T.OC0624,2336,,3,FALSE,OC0624,June 2024 PPS Deployment,,6/12/2024,,,,Van Dorn Bottle; Sterivex 0.22µm filter,95% EtOH,,Teahwhit Head,1.0,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+E2337.1T.OC0624,2337,,1,FALSE,OC0624,June 2024 PPS Deployment,,6/12/2024,,,,Van Dorn Bottle; Sterivex 0.22µm filter,95% EtOH,,Teahwhit Head,34.0,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+E2337.2T.OC0624,2337,,2,FALSE,OC0624,June 2024 PPS Deployment,,6/12/2024,,,,Van Dorn Bottle; Sterivex 0.22µm filter,95% EtOH,,Teahwhit Head,34.0,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+E2337.3T.OC0624,2337,,3,FALSE,OC0624,June 2024 PPS Deployment,,6/12/2024,,,,Van Dorn Bottle; Sterivex 0.22µm filter,95% EtOH,,Teahwhit Head,34.0,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+E2338.NC.OC0624,2338,,,TRUE,OC0624,June 2024 PPS Deployment,,6/12/2024,Deployment Blank,,,Sterivex 0.22µm filter,95% EtOH,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+E2339.NC.OC0624,2339,,,TRUE,OC0624,,,6/11/2024,PPS NC - Port 24,,,"PPS Unit; Sterlitech 0.4 µm filter, 47 mm",95% EtOH,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+E2340.OC0624,2340,,,FALSE,OC0624,,,6/13/2024,PPS Port 1,,,"PPS Unit; Sterlitech 0.4 µm filter, 47 mm",95% EtOH,,Teahwhit Head,34.0,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+E2341.OC0624,2341,,,FALSE,OC0624,,,6/13/2024,PPS Port 2,,,"PPS Unit; Sterlitech 0.4 µm filter, 47 mm",95% EtOH,,Teahwhit Head,34.0,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+E2342.OC0624,2342,,,FALSE,OC0624,,,6/14/2024,PPS Port 3,,,"PPS Unit; Sterlitech 0.4 µm filter, 47 mm",95% EtOH,,Teahwhit Head,34.0,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+E2343.OC0624,2343,,,FALSE,OC0624,,,6/14/2024,PPS Port 4,,,"PPS Unit; Sterlitech 0.4 µm filter, 47 mm",95% EtOH,,Teahwhit Head,34.0,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+E2344.OC0624,2344,,,FALSE,OC0624,,,6/15/2024,PPS Port 5,,,"PPS Unit; Sterlitech 0.4 µm filter, 47 mm",95% EtOH,,Teahwhit Head,34.0,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+E2345.OC0624,2345,,,FALSE,OC0624,,,6/15/2024,PPS Port 6,,,"PPS Unit; Sterlitech 0.4 µm filter, 47 mm",95% EtOH,,Teahwhit Head,34.0,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+E2346.OC0624,2346,,,FALSE,OC0624,,,6/16/2024,PPS Port 7,,,"PPS Unit; Sterlitech 0.4 µm filter, 47 mm",95% EtOH,,Teahwhit Head,34.0,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+E2347.OC0624,2347,,,FALSE,OC0624,,,6/16/2024,PPS Port 8,,,"PPS Unit; Sterlitech 0.4 µm filter, 47 mm",95% EtOH,,Teahwhit Head,34.0,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+E2348.OC0624,2348,,,FALSE,OC0624,,,6/17/2024,PPS Port 9,,,"PPS Unit; Sterlitech 0.4 µm filter, 47 mm",95% EtOH,,Teahwhit Head,34.0,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+E2349.OC0624,2349,,,FALSE,OC0624,,,6/17/2024,PPS Port 10,,,"PPS Unit; Sterlitech 0.4 µm filter, 47 mm",95% EtOH,,Teahwhit Head,34.0,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+E2350.OC0624,2350,,,FALSE,OC0624,,,6/19/2024,PPS Port 11,,,"PPS Unit; Sterlitech 0.4 µm filter, 47 mm",95% EtOH,,Teahwhit Head,34.0,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+E2351.OC0624,2351,,,FALSE,OC0624,,,6/20/2024,PPS Port 12,,,"PPS Unit; Sterlitech 0.4 µm filter, 47 mm",95% EtOH,,Teahwhit Head,34.0,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+E2352.OC0624,2352,,,FALSE,OC0624,,,6/22/2024,PPS Port 13,,,"PPS Unit; Sterlitech 0.4 µm filter, 47 mm",95% EtOH,,Teahwhit Head,34.0,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+E2353.OC0624,2353,,,FALSE,OC0624,,,6/23/2024,PPS Port 14,,,"PPS Unit; Sterlitech 0.4 µm filter, 47 mm",95% EtOH,,Teahwhit Head,34.0,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+E2354.OC0624,2354,,,FALSE,OC0624,,,6/25/2024,PPS Port 15,,,"PPS Unit; Sterlitech 0.4 µm filter, 47 mm",95% EtOH,,Teahwhit Head,34.0,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+E2355.OC0624,2355,,,FALSE,OC0624,,,6/26/2024,PPS Port 16,,,"PPS Unit; Sterlitech 0.4 µm filter, 47 mm",95% EtOH,,Teahwhit Head,34.0,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+E2356.OC0624,2356,,,FALSE,OC0624,,,6/28/2024,PPS Port 17,,,"PPS Unit; Sterlitech 0.4 µm filter, 47 mm",95% EtOH,,Teahwhit Head,34.0,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+E2357.OC0624,2357,,,FALSE,OC0624,,,6/29/2024,PPS Port 18,,,"PPS Unit; Sterlitech 0.4 µm filter, 47 mm",95% EtOH,,Teahwhit Head,34.0,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+E2358.OC0624,2358,,,FALSE,OC0624,,,7/1/2024,PPS Port 19,,,"PPS Unit; Sterlitech 0.4 µm filter, 47 mm",95% EtOH,,Teahwhit Head,34.0,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+E2359.OC0624,2359,,,FALSE,OC0624,,,7/2/2024,PPS Port 20,,,"PPS Unit; Sterlitech 0.4 µm filter, 47 mm",95% EtOH,,Teahwhit Head,34.0,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+E2360.OC0624,2360,,,FALSE,OC0624,,,7/4/2024,PPS Port 21,,,"PPS Unit; Sterlitech 0.4 µm filter, 47 mm",95% EtOH,,Teahwhit Head,34.0,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+E2361.OC0624,2361,,,FALSE,OC0624,,,7/5/2024,PPS Port 22,,,"PPS Unit; Sterlitech 0.4 µm filter, 47 mm",95% EtOH,,Teahwhit Head,34.0,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+E2362.OC0624,2362,,,FALSE,OC0624,,,7/7/2024,PPS Port 23,,,"PPS Unit; Sterlitech 0.4 µm filter, 47 mm",95% EtOH,,Teahwhit Head,34.0,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+E2363.OC0624,2363,,,FALSE,OC0624,,,7/8/2024,PPS Port 24,,,"PPS Unit; Sterlitech 0.4 µm filter, 47 mm",95% EtOH,,Teahwhit Head,34.0,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,FALSE,,,,,FALSE,FALSE,
