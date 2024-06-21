@@ -20,6 +20,7 @@ library(scales)
 library(ggrepel)
 library(readxl)
 library(here)
+library(R.matlab)
 ```
 
 **Date Formats Understood by Readr**
@@ -55,6 +56,32 @@ TH042$time <- as.POSIXct(TH042$time, tryFormats = c("%e-%b-%Y %H:%M:%S"), tz = "
 TH042 <- TH042 %>%
   mutate(year = as.factor(year(time)))
 ```
+
+```{r}
+# Check times against .mat files
+MoorMat21 <- readMat(here("OCNMS_Hypoxia", "Data", "2021.mat"))
+# str(MoorMat21) # Data structure
+lst <- MoorMat21$CT.CA042.210610.038 # Extract data structure
+
+lst[[1]][[4]][[4]][[1]] # well there's a julian time SOMEWHERE i guess
+
+# as.POSIXct(86400*10625.15, origin=as.Date("1990-01-01 00:00:00"))
+# 86400 = seconds in a Julian day
+# 10625.15 is the Julian date in the example
+lst[[1]][[2]][[65]]
+lst[[1]][[2]][[66]]
+lst[[1]][[2]][[67]]
+lst[[1]][[2]][[68]]
+
+matdates <- lst[[2]][[4]] # I think this is the Julian date
+#as.POSIXct(86400*matdates, origin=as.Date("1990-01-01 00:00:00"))
+# well THAT didn't fucking work
+# let's try the stupid deprecated datenum thing
+dateref <- as.data.frame(as.POSIXct((matdates - 719529)*86400, origin = "1970-01-01", tz = "UTC")) # subtract to get origin = January 0, 0000 (this is a made up date so as.POSIXct won't handle it natively), need to multiply by seconds in a day to go from datenum (days since made up Matlab epoch) to POSIXct (seconds since Unix epoch). Just kinda hoping they were using UTC here.
+colnames(dateref) <- "Date"
+# Somehow the CSV file has 27 seconds added to everything. I have elected to ignore that for the time being because it is small.
+```
+
 
 # Functions
 

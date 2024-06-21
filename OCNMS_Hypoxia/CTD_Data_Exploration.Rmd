@@ -263,6 +263,10 @@ histogram_fill(OME_CTD, DO, 0.5, fill = year)
 histogram_fill(OME_CTD, DO, 0.5, fill = as.factor(month(date)))
 # Shannon says the OME files are redundant and the OCNMS published data probably just eliminated that because the quality score was low or something. Shannon will check with Sam. Use OCNMS_OME_CTD for now. 
 
+# The CTD DO is in mL/L, but we want it in mg/L so it can be compared to the mooring
+OCNMS_OME_CTD <- OCNMS_OME_CTD %>% 
+  mutate(DO = DO*1.42903)
+
 # Plot OME vs. OCNMS to see if redundant
 ggplot(OCNMS_OME_CTD, aes(x = as.Date(date), y = DO)) +
   geom_point(shape = 1, color = "blue") +

@@ -10,6 +10,18 @@ output:
 urlcolor: blue
 ---
 
+# Setup
+
+```{r Change Depths}
+# So that I can rerun this entire pipeline without locating the bit where I filter - set lower and upper depth bound here
+lowerdepth <- 87
+upperdepth <- 83
+#NEMO_data_filtered <- NEMO_data %>% 
+#  filter(upperdepth < depth) %>% 
+#  filter(depth < lowerdepth)
+```
+
+
 ```{r Package Imports, message = F, warning = F}
 # Warnings and startup messages suppressed
 library(tidyverse)
@@ -35,31 +47,195 @@ NEMO23 <- readMat(here("OCNMS_Hypoxia", "Data", "NEMO_Data", "MPall_nemo23a_sn10
 Date format [datenum](https://www.mathworks.com/help/matlab/ref/datenum.html)
 Date format conversion [datenum to POSIXct](https://stackoverflow.com/questions/30072063/how-to-extract-the-time-using-r-from-a-matlab-serial-date-number)
 
-```{r}
-lst <- NEMO23$MPall
-# datenum
-# dox = dissolved oxygen?
-# t = temperature?
-# id
-# yday
-# doxr?
-# z
-# lat
-# lon
-# year
-# cruise
-# comment
-datenum23 <- c(lst[[1]]) # datenums as vector
-metadata23 <- lst[[38]]
+```
+# This code works but I'm gonna switch to a loop so it's text now
+lst23 <- NEMO23$MPall # I have a Google Doc of all the numnbers + names
+
+datenum23 <- c(lst23[[1]]) # datenums as vector
+metadata23 <- lst23[[38]]
 dates23 <- as.POSIXct((datenum23 - 719529)*86400, origin = "1970-01-01", tz = "UTC") # subtract to get origin = January 0, 0000 (this is a made up date so as.POSIXct won't handle it natively), need to multiply by seconds in a day to go from datenum (days since made up Matlab epoch) to POSIXct (seconds since Unix epoch). Just kinda hoping they were using UTC here.
 print(length(datenum23) == length(dates23))
 
 # These look pretty much correct, starting in May 2023
 
-dox23 <- c(lst[[11]])
+dox23 <- c(lst23[[11]])
+temp23 <- c(lst23[[3]])
+
+example23 <- data.frame(dates23, dox23, temp23) %>% 
+  mutate(dox23 = case_when(dox23 == "NaN" ~ NA, .default = dox23), temp23 = case_when(temp23 == "NaN" ~ NA, .default = temp23)) # Make NA actually show up
+```
+
+# Matlab data processing
+```{r}
+lstdf <- list(NEMO21$MPall, NEMO22$MPall, NEMO23$MPall)
+NEMO_data <- data.frame()
+for (i in lstdf) { # Process and combine dates, DO (mg/L according to ERDDAP server that doesn't have the 2023 data), and temp (C)
+  print(paste("Working on: ", i[[38]][2]))
+  #str(i)
+  datenum <- c(i[[1]])
+  print(datenum[30:40])
+  date <- as.POSIXct((datenum - 719529)*86400, origin = "1970-01-01", tz = "UTC") # subtract to get origin = January 0, 0000 (this is a made up date so as.POSIXct won't handle it natively), need to multiply by seconds in a day to go from datenum (days since made up Matlab epoch) to POSIXct (seconds since Unix epoch). Since it's from an epoch this should be UTC and be fine.
+  print(date[30:40])
+  DO <- c(i[[11]])
+  print(DO[30:40])
+  temperature <- c(i[[3]])
+  print(temperature[30:40])
+  depth <- c(i[[33]]) # depth = z, going to use this for averaging
+
+  df <- data.frame(date, DO, temperature, depth) %>% 
+  mutate(DO = case_when(DO == "NaN" ~ NA, .default = DO), temperature = case_when(temperature == "NaN" ~ NA, .default = temperature), year = as.factor(year(date)))  # Make NA actually show up
+
+  NEMO_data <- rbind(NEMO_data, df)
+}
+```
+
+# Functions
+```{r Histogram Functions}
+# Histogram function
+histogram_fill <- function(df, var, binwidth, fill = "darkgray") {
+  label <- rlang::englue("A histogram of {{var}} in {{df}} with binwidth {binwidth}")
+  
+  df |> 
+    ggplot(aes(x = {{ var }}, fill = {{fill}})) + 
+    geom_histogram(binwidth = binwidth, color = "black") + 
+    labs(title = label) +
+    theme_bw()
+}
+
+
+histogram <- function(df, var, binwidth) {
+  label <- rlang::englue("A histogram of {{var}} in {{df}} with binwidth {binwidth}")
+  
+  df |> 
+    ggplot(aes(x = {{ var }})) + 
+    geom_histogram(binwidth = binwidth, color = "black", fill = "darkgray") + 
+    labs(title = label) +
+    theme_bw()
+}
+```
+
+```{r Scatterplot Functions}
+scatterplt <- function(df, x, y, shape = 16, alpha = 1) {
+  label <- rlang::englue("A scatterplot of {{x}} vs {{y}} in {{df}}")
+  
+  df |> 
+    ggplot(aes(x = {{ x }}, y = {{ y }})) + 
+    geom_point(color = "blue", shape = shape, alpha = alpha) + 
+    labs(title = label) +
+    theme_bw()
+}
+
+scatterplt_fill <- function(df, x, y, color, shape = 16, alpha = 1) {
+  label <- rlang::englue("A scatterplot of {{x}} vs {{y}} in {{df}}")
+  
+  df |> 
+    ggplot(aes(x = {{ x }}, y = {{ y }}, color = {{ color }})) + 
+    geom_point(shape = shape, alpha = alpha) + 
+    labs(title = label) +
+    theme_bw()
+}
+```
+
+# Drop NA
+```{r}
+NEMO_data <- NEMO_data %>% # from 464297 obs
+  filter(!is.na(DO))  %>% # to 312905 obs
+  filter(!is.na(date)) # to 312628 obs
+```
+
+# Histograms
+```{r}
+histogram(NEMO_data, DO, 0.5)
+histogram(NEMO_data, temperature, 0.2)
+
+histogram_fill(NEMO_data, DO, 0.5, fill = year)
+histogram_fill(NEMO_data, temperature, 0.2, fill = year)
+
+histogram(NEMO_data, DO, 0.5) +
+  facet_wrap(facets = vars(year), ncol = 1)
+histogram(NEMO_data, temperature, 0.2) +
+  facet_wrap(facets = vars(year), ncol = 1)
+histogram(NEMO_data, depth, 1) +
+  facet_wrap(facets = vars(year), ncol = 1) +
+  scale_x_continuous(breaks = seq(10, 100, by = 5))
+# Similar DO distribution for all years, 2023 was distinctly warmer though.
+```
+# Scatterplots
+
+```{r}
+scatterplt(NEMO_data, depth, temperature, alpha = 0.1) +
+  geom_smooth(color = "black", alpha = 1) +
+  geom_vline(xintercept = c(30,45))
+scatterplt_fill(NEMO_data, depth, temperature, color = as.factor(month(date)), alpha = 0.01) +
+  facet_wrap(facets = vars(year)) +
+  geom_smooth() +
+  geom_vline(xintercept = c(30,45))
+```
+
+# Depth summary
+
+```{r}
+# For the CTD data, the thermocline was around 30 m and the PPS is around 35 m, so I averaged the temperatures from 30-45m. Based on the depth/temp graph here, I think I can safely do that with the NEMO data as well! It is not as clear of a thermocline, but I do think 30-45 is pretty similar.
+NEMO_data_filtered <- NEMO_data %>% 
+  filter(upperdepth < depth) %>% 
+  filter(depth < lowerdepth)
+NEMO_data_nodepth <- NEMO_data_filtered %>% 
+#  mutate(date = as.Date(date)) %>% # uncomment this to average by day
+  group_by(date) %>% 
+  summarize(temperature = mean(temperature), 
+            DO = mean(DO),
+            year = year(date)) %>% 
+  select(date, temperature, DO, year)
+
+scatterplt(NEMO_data_nodepth, DO, temperature, alpha = 1)  +
+  facet_wrap(facets = vars(year)) # Seems a little smoother at least
+scatterplt(NEMO_data_nodepth, date, temperature)  +
+  facet_wrap(facets = vars(year), scales = "free_x") # maybe avg every few days - the depths are different on different days. or narrower range of depths? it travels about 10 meters a day
+
+scatterplt_fill(NEMO_data_filtered, date, temperature, color = depth, shape = 1)  +
+  facet_wrap(facets = vars(year), scales = "free_x") 
+
+ggplot(NEMO_data_filtered, aes(x = date, y = temperature, color = depth)) +
+  geom_line() +
+  geom_point(shape = 1)   +
+  facet_wrap(facets = vars(year), scales = "free_x") +
+  theme_bw()
+
+# Maybe if I can ID day vs night? 
+
+NEMOfilteredgraph <- NEMO_data_filtered %>% 
+  mutate(hour = hour(date))
+
+ggplot(NEMOfilteredgraph, aes(x = date, y = temperature, color = hour)) +
+  geom_point(shape = 1)   +
+  facet_wrap(facets = vars(year), scales = "free_x") +
+  theme_bw()
+
+# Nope, that doesn't really explain the noise
+# This just seems like a really absurd number of data points given that it seems to only sample each date once a week - what's going on here?
 ```
 
 ```{r}
-data.frame(dates23, dox23)
+# Time for some dplyr shenanigans
+test <- NEMO_data_filtered
+head(test)
+
+test %>% group_by(date) %>% summarize(n = n()) %>% summarize(mean = mean(n)) # There's one per time
+
+test <- test %>% mutate(date2 = as.Date(date))
+head(test)
+
+perday <- test %>% group_by(date2) %>% summarize(n = n()) %>% arrange(date2)
+perday %>% summarize(mean = mean(n)) # So now there's more than one per day - where?
+head(perday)
+
+test %>% filter(date2 == as.Date("2021-06-18")) %>% arrange(date)
+
+NEMO_data %>% arrange(date, depth) # Upon arranging, there seems to be one of each depth (with different DO and oxygen) for each timepoint, which are about 4 hours apart. Does the mooring really do a transect every 4 hours and it's just sorted weird on import?
+```
+
+
+```{r}
+write.csv(NEMO_data_nodepth, file = here("OCNMS_Hypoxia", "Outputs", "NEMO_Data_Clean.csv"))
 ```
 

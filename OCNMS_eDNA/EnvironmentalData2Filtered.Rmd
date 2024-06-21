@@ -21,7 +21,9 @@ library(here)
 library(gghighlight)
 ```
 
-```{r}
+# Manually enter dates of interest (old)
+
+```{r, eval = F, show = F}
 # Define dates of interest (old, manual)
 
 BottleDates_Manual <- as.POSIXct(c("2021-08-25", "2022-06-21", "2022-08-22", "2022-09-20", "2021-10-08", "2022-07-19", "2023-06-15", "2023-07-26")) # Times from these are available
@@ -47,6 +49,8 @@ DatesOfInterest_Manual <- rbind(BottleDatesDF, PPS_DatesDF)
 write.csv(DatesOfInterest_Manual, file = here("OCNMS_Project", "Data", "SamplingDates_Manual.csv"))
 ```
 
+# Import sample dates
+
 ```{r}
 eDNA_Meta <- read.csv(here("OCNMS_eDNA", "Data", "OCNMS_eDNA_SampleData.csv"))
 eDNA_dates <- eDNA_Meta[4] # why does this open the file
@@ -70,13 +74,29 @@ DatesOfInterest2 <- data.frame(eDNA_dates, eDNA_times, eDNA_positions) %>%
 write.csv(DatesOfInterest2, file = here("OCNMS_Project", "Data", "SamplingDates2.csv"))
 ```
 
+# Import environmental data
 
 ```{r}
-MooringCTD_Data <- read.csv(here("OCNMS_Hypoxia", "Outputs", "EnvironmentalDataset1.csv")) # Import mooring and CTD environmental data from 2021-2023 + 30-45 meters deep
-MooringCTD_Data$date <- as.POSIXct(MooringCTD_Data$date, tz = "UTC")
+MooringCTD_Data <- read.csv(here("OCNMS_Hypoxia", "Outputs", "EnvironmentalDataset1.csv")) %>%  # Import mooring and CTD environmental data from 2021-2023 + 30-45 meters deep
+  select(-X)
+MooringCTD_Data$date <- as.POSIXct(MooringCTD_Data$date, tz = "UTC") # time stays the same. good
+
+NEMO_Data <- read.csv(here("OCNMS_Hypoxia", "Outputs", "NEMO_Data_Clean.csv")) %>%  # checked date - it does seem to be the same POSIXct time as before export
+  select(-X)
+NEMO_Data$date <- as.POSIXct(NEMO_Data$date, tz = "UTC") # time stays the same. good
+NEMO_Data$source <- "NEMO" # Prep for combination
+
+# Trying to get more efficient at adding all the NA columns for the combination
+NEMO_Data <- NEMO_Data %>% 
+  mutate(salinity = NA, potential_density = NA, pres = NA, cond = NA, sampleID = NA) %>% 
+  select("source", "date", "year", "temperature", "DO", "salinity", "potential_density", "pres", "cond", "sampleID")
+
+Moor_CTD_NEMO_Data <- rbind(MooringCTD_Data, NEMO_Data)
 ```
 
-```{r}
+# Plot manual sample dates (old)
+
+```{r, eval = F, show = F}
 # Plot sampling (manual) vs mooring data
 
 ggplot(MooringCTD_Data, aes(x = date, y = temperature, color = source)) +
@@ -111,6 +131,8 @@ ggplot(MooringCTD_Data %>% filter(source == "CTD"), aes(x = date, y = DO, color 
 ggsave(here("OCNMS_Hypoxia", "Plots", "OxygenOverDeploymentWindowsCTD.png"))
 # The CTD and Bottle_DNA dots should overlap!
 ```
+
+# Plot imported samples
 
 ```{r}
 # Plot sampling (imported from Shannon's spreadsheet) vs mooring data
@@ -148,7 +170,7 @@ ggsave(here("OCNMS_Hypoxia", "Plots", "OxygenOverDeploymentWindowsCTD2.png"))
 # The CTD and Bottle_DNA dots should overlap!
 ```
 
-# work in progress, trying to make CTD show better
+## work in progress, trying to make CTD show better
 ggplot(DatesOfInterest, aes(xintercept = Date, color = Source)) +
   geom_vline() +
   geom_point(MooringCTD_Data, aes(x = date, y = DO, color = source, alpha = source), inherit.aes = F) +
@@ -160,6 +182,8 @@ ggplot(DatesOfInterest, aes(xintercept = Date, color = Source)) +
   geom_hline(aes(yintercept = 2), color = "black", linetype = "dashed") +
   labs(caption = "Dotted line = hypoxic threshold of 2 mg/L dissolved oxygen")
 ggsave(here("OCNMS_Hypoxia2", "Plots", "OxygenOverDeploymentWindows.png"))
+
+# Troubleshooting
 
 ```{r}
 # Alright, where's the problem
@@ -178,3 +202,32 @@ EndUTC <- as.vector(trs[26])
 trs2 <- data.frame(DateUTC, LocalDate, Position, StartLocal, StartUTC, EndLocal, EndUTC)
 ```
 
+# Plot NEMO + imported samples
+
+```{r}
+# Plot sampling (imported from Shannon's spreadsheet) vs mooring data
+
+ggplot(Moor_CTD_NEMO_Data, aes(x = date, y = temperature, color = source, alpha = source)) +
+  geom_point(shape = 1, size = 0.5) +
+  scale_alpha_manual(values = c(1,0.3,0.5)) +
+  scale_x_datetime(date_breaks = "1 month", date_labels = "%m-%y") +
+  theme_bw() +
+  facet_wrap(facets = vars(year), scales = "free_x", ncol = 1) +
+  #geom_vline(data = DatesOfInterest2, aes(xintercept = Date, color = Source)) +
+  #scale_color_manual(values = c("black", "black", "dodgerblue2", "orange", "purple1"))
+  scale_color_manual(values = c("red", "dodgerblue2", "purple1"))
+ggsave(here("OCNMS_Hypoxia", "Plots", "TempOverDeploymentWindowsNEMO.png"))
+
+ggplot(Moor_CTD_NEMO_Data, aes(x = date, y = DO, color = source, alpha = source)) +
+  geom_point(shape = 1, size = 0.5) +
+  scale_alpha_manual(values = c(1,0.5,0.5)) + 
+  scale_x_datetime(date_breaks = "1 month", date_labels = "%m-%y") +
+  theme_bw() +
+  facet_wrap(facets = vars(year), scales = "free_x", ncol = 1) +
+  # geom_vline(data = DatesOfInterest2, aes(xintercept = Date, color = Source)) +
+  # scale_color_manual(values = c("black", "firebrick2", "dodgerblue2", "orange", "purple1")) +
+  scale_color_manual(values = c("red", "dodgerblue2", "purple1")) +
+  geom_hline(aes(yintercept = 2), color = "black", linetype = "dashed") +
+  labs(caption = "Dotted line = hypoxic threshold of 2 mg/L dissolved oxygen")
+ggsave(here("OCNMS_Hypoxia", "Plots", "OxygenOverDeploymentWindowsNEMO.png"))
+```
