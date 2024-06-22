@@ -1,0 +1,86 @@
+---
+title: "OCNSM Sample Data Merge"
+author: "Zack Gold"
+date: "2024-06-22"
+output: html_document
+---
+
+---
+title: "Sikuliaq Cruise Metadata Fix"
+author: "Zack Gold"
+date: "2024-06-21"
+output: html_document
+---
+
+```{r}
+library(tidyverse)
+library(here)
+library(lubridate)
+library(measurements)
+library(sp)
+library(readr)
+library(readxl)
+
+```
+
+```{r}
+JV_Data <- read.csv(here("JV243.2_sampleData.csv"), header = T)
+
+sample_Data <- read.csv(file = here("20240621_OCNMS_eDNA_sampleData_zjg.csv"), header=T,fileEncoding="UTF-8")
+
+```
+
+```{r}
+
+sample_Data %>% 
+  filter(., !str_detect(Sample_Name,"SKQ")) %>% 
+  mutate(., Combined_date = str_c(Collection_Date_UTC, " ",Collection_Time_UTC),
+         Combined_date_local = str_c(Collection_Date_local, " ",Collection_Time_local)) %>% 
+  mutate(.,  Date_UTC = as.POSIXct(Combined_date, format="%m/%d/%y %H:%M", tz="UTC"),
+         Date_local = as.POSIXct(Combined_date_local, format="%m/%d/%y %H:%M", tz="America/Los_Angeles")) %>%
+  mutate(., Date_local_check= format(Date_UTC,tz="America/Los_Angeles"),
+                  Date_UTC_check= format(Date_local,tz="GMT")) %>% 
+   mutate(.,      Date_local_check= as.POSIXct(Date_local_check, format="%Y-%m-%d %H:%M:%S", tz="America/Los_Angeles"),
+         Date_UTC_check= as.POSIXct(Date_UTC_check, format="%Y-%m-%d %H:%M:%S", tz="UTC")) %>% 
+  mutate(.,Date_UTC = case_when(is.na(Date_UTC) ~ Date_UTC_check,
+                                TRUE ~ Date_UTC),
+           Date_local = case_when(is.na(Date_local) ~ Date_local_check,
+                                TRUE ~ Date_local)) %>% 
+  dplyr::select(-Date_UTC_check,-Date_local_check)-> time_cor_west_coast
+  
+colnames(time_cor_west_coast)
+```
+
+```{r}
+sample_Data %>% 
+    filter(., str_detect(Sample_Name,"SKQ")) %>% 
+  mutate(., Combined_date = str_c(Collection_Date_UTC, " ",Collection_Time_UTC),
+         Combined_date_local = str_c(Collection_Date_local, " ",Collection_Time_local)) %>% 
+  mutate(.,  Date_UTC = as.POSIXct(Combined_date, format="%m/%d/%y %H:%M", tz="UTC"),
+         Date_local_check = as.POSIXct(Combined_date_local, format="%m/%d/%y %H:%M", tz="US/Alaska")) %>%
+  mutate(., Date_local= format(Date_UTC,tz="US/Alaska")) %>% 
+  dplyr::select(-Date_local_check)->  time_cor_ak
+
+```
+
+```{r}
+rbind(time_cor_west_coast, time_cor_ak) %>% 
+  mutate(., Lat_fix =str_remove(Lat, "' N")) %>% 
+    mutate(., Lat_fix =str_replace(Lat_fix, "˚","")) %>% 
+  mutate(., Lat_dec = measurements::conv_unit(Lat_fix,'deg_dec_min','dec_deg')) %>% 
+  mutate(., Lon_fix =str_remove(Lon, "' W")) %>% 
+    mutate(., Lon_fix =str_replace(Lon_fix, "˚","")) %>%
+    mutate(., Lon_dec = measurements::conv_unit(Lon_fix,'deg_dec_min','dec_deg')) %>% 
+  mutate(., Lat_dec=as.double(Lat_dec),
+         Lon_dec=as.double(Lon_dec)) %>% 
+    mutate(., , Lon_dec = Lon_dec*-1) %>% 
+  mutate(., Lat_dec = case_when(is.na(Lat_dec_sean) ~ Lat_dec,
+                                TRUE ~Lat_dec_sean ),
+         Lon_dec = case_when(is.na(Lat_dec_sean) ~ Lon_dec,
+                                TRUE ~Lon_dec_sean )) %>% 
+  left_join(., JV_Data, by=c("Sample_Name"="OwnerSampleId")) -> JV2_sample_metadata
+
+
+```
+
+
