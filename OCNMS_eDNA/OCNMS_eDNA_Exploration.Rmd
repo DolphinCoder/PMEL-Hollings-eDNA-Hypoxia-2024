@@ -58,7 +58,7 @@ for (i in 1:nrow(files)) {
 
 ```{r}
 # Copied basenames and did a bunch of finding and replacing. Also manually deleted some sample data under JV243.2
-eDNA_hits <- list(`16SKelly_hits`, `16SKelly_tab_and_taxa`, `16Sv4v5_hits`, `16Sv4v5_tab_and_taxa`, `18SMachida_hits`, `18SMachida_tab_and_taxa`, `18Sv4_hits`, `18Sv4_tab_and_taxa`, `18Sv9_89_hits`, `18Sv9_89_tab_and_taxa`, `ITS1_diatom_hits`, `ITS1_diatom_tab_and_taxa`, `16SKelly_hits`, `16SKelly_tab_and_taxa`, `16Sv4v5_hits`, `16Sv4v5_tab_and_taxa`, `18SMachida_hits`, `18SMachida_tab_and_taxa`, `18Sv4_hits`, `18Sv4_tab_and_taxa`, `18Sv9_89_hits`, `18Sv9_89_tab_and_taxa`, `dLoop_hits`, `dLoop_tab_and_taxa`, `ITS1_diatom_hits`, `ITS1_diatom_tab_and_taxa`, `MiFishU_F2_hits`, `MiFishU_F2_tab_and_taxa`, `UniCOI_hits`, `UniCOI_tab_and_taxa`)
+eDNA_hits <- list(`16SKelly_tab_and_taxa`, `16Sv4v5_tab_and_taxa`, `18SMachida_tab_and_taxa`, `18Sv4_tab_and_taxa`, `18Sv9_89_tab_and_taxa`, `ITS1_diatom_tab_and_taxa`, `16SKelly_tab_and_taxa`, `16Sv4v5_tab_and_taxa`, `18SMachida_tab_and_taxa`, `18Sv4_tab_and_taxa`, `18Sv9_89_tab_and_taxa`, `dLoop_tab_and_taxa`, `ITS1_diatom_tab_and_taxa`, `MiFishU_F2_tab_and_taxa`, `UniCOI_tab_and_taxa`)
 ```
 
 
@@ -70,7 +70,7 @@ SOI_other_df <- read.csv(here("OCNMS_eDNA", "Data", "OCNMS_OtherOfInterest.csv")
 genera <- c("Pseudo-nitzchia", "Pyrosoma", "Pyrosomella", "Sargassum", "Undaria", "Acrozoanthus", "Isarus", "Zoanthus")
 families <- c("Ammodytidae", "Acipenseridae")
 othernote <- "Pteropods, Northern copepods"
-SpeciesOfInterest <- c(SOI_df$Taxon, "Cancer magister", "Haliotis kamtschatkana kamtschatkana", "Haliotis assimilis")
+SpeciesOfInterest <- c(SOI_df$Taxon, "Cancer magister", "Haliotis kamtschatkana kamtschatkana", "Haliotis assimilis") # Includes some not accepted old names
 
 SOI_fn <- function(df) {
   marker <- df$Marker[1]
@@ -104,7 +104,23 @@ SOI_fn(`UniCOI_hits`)
 
 ```{r}
 # Now to make one giant dataframe of all that
-SOI_hits <- lapply(eDNA_hits, SOI_fn)
-SOI_hits_all <- do.call(rbind,SOI_hits)
+SOI_hits_summarylist <- lapply(eDNA_hits, SOI_fn)
+SOI_hits_summary <- do.call(rbind,SOI_hits_summarylist)
 ```
+
+```{r}
+# Now to make a df of all the detections (not a summary per species & marker)
+SOI_full_fn <- function(df) {
+  marker <- df$Marker[1]
+  s <- df %>% 
+    filter(Species %in% SpeciesOfInterest | Genus %in% genera | Family %in% families) %>% 
+    mutate(Marker = marker) %>% 
+    select(ESV, Kingdom, Phylum, Class, Order, Family, Genus, Species, Marker)
+  s
+}
+
+SOI_hits_list <- lapply(eDNA_hits, SOI_full_fn)
+SOI_hits <- do.call(rbind,SOI_hits_list)
+```
+
 
