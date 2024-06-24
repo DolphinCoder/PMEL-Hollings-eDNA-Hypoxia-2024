@@ -27,7 +27,6 @@ library(readxl)
 JV_Data <- read.csv(here("JV243.2_sampleData.csv"), header = T)
 
 sample_Data <- read.csv(file = here("20240621_OCNMS_eDNA_sampleData_zjg.csv"), header=T,fileEncoding="UTF-8")
-
 ```
 
 ```{r}

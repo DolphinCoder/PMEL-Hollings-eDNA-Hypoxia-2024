@@ -1,0 +1,126 @@
+---
+title: "eDNA Data Exploration"
+author: "Eleanor (Ella) Crotty"
+header-includes:
+  \usepackage{fvextra}
+  \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,commandchars=\\\{\}}
+output:
+  pdf_document:
+    toc: TRUE
+urlcolor: blue
+---
+
+```{r Package Imports, message = F, warning = F}
+# Warnings and startup messages suppressed
+library(tidyverse)
+library(patchwork)
+library(scales)
+library(ggrepel)
+library(readxl)
+library(here)
+```
+
+```{r}
+# Set up where I'm grabbing the eDNA data from + list all the files and directories in there
+dataWD <- "OCNMS_sample_metadata_zjg/OCNMS/JV_bioinformatics"
+print("Here:")
+here()
+print("Data Working Directory:")
+here(dataWD)
+# print("Directories:")
+Directory <- list.dirs(path = here(dataWD), full.names = F, recursive = T)[2:17]
+directories <- data.frame(Directory)
+# print("Files:")
+File <- list.files(path = here(dataWD), full.names = F, recursive = T)
+files <- data.frame(File)
+
+directories
+files
+```
+
+```{r}
+filenames <- files$File
+basenames <- c()
+eDNA_hits <- list()
+
+for (i in 1:nrow(files)) {
+  print(filenames[i])
+  path <- filenames[i]
+  basename <- gsub(".csv", "", gsub(".*\\/", "", gsub("\\+", "_and_", filenames[i]))) # Get the name, delete + signs, everything before the slash (directory), and .csv
+  print(basename)
+  assign(basename, read.csv(here(dataWD, path)) %>% mutate(Marker = basename)) # Import + add a column that identifies each dataframe
+  basenames <- c(basenames, basename) # Add basename to the list of basenames so I can use it later
+}
+
+# test16SKelly <- read.csv(here(dataWD, "16SKelly", "16SKelly_hits.csv"))
+# test16SKelly == `16SKelly_hits` # should print a big array of TRUE if the loop is working
+```
+
+```{r}
+# Copied basenames and did a bunch of finding and replacing. Also manually deleted some sample data under JV243.2
+eDNA_hits <- list(`16SKelly_tab_and_taxa`, `16Sv4v5_tab_and_taxa`, `18SMachida_tab_and_taxa`, `18Sv4_tab_and_taxa`, `18Sv9_89_tab_and_taxa`, `ITS1_diatom_tab_and_taxa`, `16SKelly_tab_and_taxa`, `16Sv4v5_tab_and_taxa`, `18SMachida_tab_and_taxa`, `18Sv4_tab_and_taxa`, `18Sv9_89_tab_and_taxa`, `dLoop_tab_and_taxa`, `ITS1_diatom_tab_and_taxa`, `MiFishU_F2_tab_and_taxa`, `UniCOI_tab_and_taxa`)
+```
+
+
+```{r}
+# Which species are we detecting?
+
+SOI_df <- read.csv(here("OCNMS_eDNA", "Data", "OCNMS_SpeciesOfInterest_Short.csv"))
+SOI_other_df <- read.csv(here("OCNMS_eDNA", "Data", "OCNMS_OtherOfInterest.csv"))
+genera <- c("Pseudo-nitzchia", "Pyrosoma", "Pyrosomella", "Sargassum", "Undaria", "Acrozoanthus", "Isarus", "Zoanthus")
+families <- c("Ammodytidae", "Acipenseridae")
+othernote <- "Pteropods, Northern copepods"
+SpeciesOfInterest <- c(SOI_df$Taxon, "Cancer magister", "Haliotis kamtschatkana kamtschatkana", "Haliotis assimilis") # Includes some not accepted old names
+
+SOI_fn <- function(df) {
+  marker <- df$Marker[1]
+  
+  s <- df %>% 
+    group_by(Species) %>% 
+    summarize(Count = n(), MeanPctMatch = mean(pctMatch), Genus = NA, Family = NA) %>% 
+    filter(Species %in% SpeciesOfInterest) %>% 
+    select(Family, Genus, Species, Count, MeanPctMatch) %>% 
+    mutate(Marker = marker)
+  
+  g <- df %>% 
+    group_by(Genus) %>% 
+    summarize(Count = n(), MeanPctMatch = mean(pctMatch), Species = NA, Family = NA) %>% 
+    filter(Genus %in% genera) %>% 
+    select(Family, Genus, Species, Count, MeanPctMatch) %>% 
+    mutate(Marker = marker)
+  
+  f <- df %>% 
+    group_by(Family) %>% 
+    summarize(Count = n(), MeanPctMatch = mean(pctMatch), Genus = NA, Species = NA) %>% 
+    filter(Family %in% families) %>% 
+    select(Family, Genus, Species, Count, MeanPctMatch) %>% 
+    mutate(Marker = marker)
+  
+  rbind(s,g,f)
+}
+
+SOI_fn(`UniCOI_hits`)
+```
+
+```{r}
+# Now to make one giant dataframe of all that
+SOI_hits_summarylist <- lapply(eDNA_hits, SOI_fn)
+SOI_hits_summary <- do.call(rbind,SOI_hits_summarylist)
+```
+
+```{r}
+# Now to make a df of all the detections (not a summary per species & marker)
+SOI_full_fn <- function(df) {
+  marker <- df$Marker[1]
+  s <- df %>% 
+    filter(Species %in% SpeciesOfInterest | Genus %in% genera | Family %in% families) %>% 
+    mutate(Marker = marker) %>% 
+    select(ESV, Kingdom, Phylum, Class, Order, Family, Genus, Species, Marker)
+  s
+}
+
+SOI_hits_list <- lapply(eDNA_hits, SOI_full_fn)
+SOI_hits <- do.call(rbind,SOI_hits_list)
+```
+
+
