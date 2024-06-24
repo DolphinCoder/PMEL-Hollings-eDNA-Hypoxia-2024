@@ -83,4 +83,51 @@ rbind(time_cor_west_coast, time_cor_ak) %>%
 
 ```
 
+```{r}
+
+mifish_data <- read.csv(here("JV_bioinformatics","JVB3041_export","MiFishU_F2","MiFishU_F2_tab+taxa.csv"), header = T)
+
+mifish_data %>% 
+  pivot_longer(cols=`JV243.2_MiFishU_F2_GoldZachary_S074400.1`:`JV243.2_MiFishU_F2_GoldZachary_S074783.1`, names_to = "JV_Sample_Name", values_to = "nReads") %>% 
+separate(JV_Sample_Name, into=c("JV243.2","Barcode","Barcode_mod","PI","SampleId"), sep="_", remove=F) %>% mutate(., SampleId=str_sub(SampleId,end=-3)) %>% 
+  left_join(JV2_sample_metadata, by="SampleId") -> combined_data
+```
+
+```{r}
+combined_data %>% 
+  filter(., Species =="Engraulis mordax") -> chovies
+
+chovies %>% 
+  ggplot(., aes(x=Date_UTC, y= log10(nReads+1))) + geom_point()
+
+```
+
+```{r}
+
+combined_data %>% 
+  filter(., nReads >0) %>% 
+  group_by(ESV) %>% 
+  count() %>% 
+  arrange(desc(n))
+
+```
+
+```{r}
+
+combined_data %>% 
+filter(., ESV =="ESV_000003")  %>% 
+  ggplot(., aes(x=Date_UTC, y= log10(nReads+1))) + geom_point() +facet_wrap(~Species)
+
+
+```
+
+```{r}
+
+combined_data %>% 
+filter(., ESV =="ESV_008311")  %>% 
+  ggplot(., aes(x=Date_UTC, y= log10(nReads+1))) + geom_point() +facet_wrap(~Species)
+
+
+```
+
 
