@@ -144,6 +144,7 @@ V2_sample_metadata %>%
 holder %>% 
   left_join(co1_JV2_sample_metadata, by="SampleId") -> combined_data_co1
 
+saveRDS(combined_data_co1, file=here("eDNA_merged","combined_data_co1.RDS"))
 
 ```
 
