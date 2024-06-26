@@ -115,8 +115,14 @@ mifish_pivot <- mifish_data %>%
   pivot_longer(cols=`JV243.2_MiFishU_F2_GoldZachary_S074400.1`:`JV243.2_MiFishU_F2_GoldZachary_S074783.1`, names_to = "JV_Sample_Name", values_to = "nReads") # Make sample numbers rows, not columns
 
 mifish_pivot %>% 
-separate(JV_Sample_Name, into=c("JV243.2","Barcode","Barcode_mod","PI","SampleId"), sep="_", remove=F) %>% mutate(., SampleId=str_sub(SampleId,end=-3)) %>% # Extract SampleID from JV_Sample_Name so that it can be matched by E-number
-  left_join(OCNMS_sample_metadata, by="SampleId") -> combined_data_mf # Attach metadata to each row
+separate(JV_Sample_Name, into=c("JV243.2","Barcode","Barcode_mod","PI","SampleId"), sep="_", remove=F) %>% # Extract SampleID from JV_Sample_Name so that it can be matched by E-number
+  mutate(., SampleId=str_sub(SampleId,end=-3)) -> holder # Zack fix
+
+OCNMS_sample_metadata %>% 
+  filter(., Amplicon =="MiFishU_F2") -> OCNMS_sample_metadata_mf
+
+holder %>% # Zack fix
+  left_join(OCNMS_sample_metadata_mf, by="SampleId") -> combined_data_mf # This currently exceeds the memory space allocated to R
 
 combined_data_mf
 ```
@@ -131,6 +137,7 @@ kelly_data <- kelly_data %>% # Cleaning
   select(-c(flagged, numSpp)) %>% 
   filter(Family != "") # If it's not identified to the family level it's not useful to me
 ```
+# Haven't applied the metadata filtering fix here yet! Can't find the Kelly primer in there
 
 ```{r}
 kelly_data %>% 
@@ -152,23 +159,7 @@ coi_data <- coi_data %>% # Cleaning to try to not exhaust vector memory
   filter(Genus %in% genera | Family %in% families | Species != "") # If it's not identified to the species level or in one of these specific families/genera, it's not useful to me.
 
 coi_data <- coi_data %>% 
-  filter(Species != "Homo sapiens")
-
-coi_rare <- coi_data %>% 
-  group_by(ESV) %>% 
-  mutate(nreads = rowSums(pick(`JV243.2_UniCOI_GoldZachary_S074016.1`:`JV243.2_UniCOI_GoldZachary_S074399.1`))) %>% 
-  relocate(nreads, .before = `JV243.2_UniCOI_GoldZachary_S074016.1`)
-
-coi_rare <- coi_rare %>% 
-  filter(nreads < 10)
-coi_rare %>% 
-  filter(Species %in% SpeciesOfInterest) # None. Check with Zack anyway.
-coi_rare %>% 
-  filter(Genus %in% genera) # None. Check with Zack anyway.
-coi_rare %>% 
-  filter(Family %in% families) # None. Check with Zack anyway.
-
-rarespeciescoi <- coi_rare$Species # There's 1436 species that are detected only 8 or 9 reads across the ENTIRE dataset of 378 samples. Gonna delete those.
+  filter(Species != "Homo sapiens") # contamination
 ```
 
 ```{r}
@@ -183,9 +174,22 @@ coi_data %>%
 
 ```{r}
 coi_data %>% 
-  pivot_longer(cols=`JV243.2_UniCOI_GoldZachary_S074016.1`:`JV243.2_UniCOI_GoldZachary_S074399.1`, names_to = "JV_Sample_Name", values_to = "nReads") %>% # All of the bottle columns - this is currently generating a warning saying there are a lot of missing pieces due to a many-to-many relationship between x and y
-separate(JV_Sample_Name, into=c("JV243.2","Barcode","Barcode_mod","PI","SampleId"), sep="_", remove=F) %>% mutate(., SampleId=str_sub(SampleId,end=-3)) %>% 
-  left_join(OCNMS_sample_metadata, by="SampleId") -> combined_data_coi # This currently exceeds the memory space allocated to R
+  pivot_longer(cols=`JV243.2_UniCOI_GoldZachary_S074016.1`:`JV243.2_UniCOI_GoldZachary_S074399.1`, 
+               names_to = "JV_Sample_Name", 
+               values_to = "nReads") %>% # All of the bottle columns - this is currently generating a warning saying there are a lot of missing pieces due to a many-to-many relationship between x and y
+  separate(JV_Sample_Name,
+           into=c("JV243.2","Barcode","Barcode_mod","PI","SampleId"), 
+           sep="_", 
+           remove=F) %>% 
+  mutate(., SampleId=str_sub(SampleId,end=-3)) -> holder # Zack fix
+
+OCNMS_sample_metadata %>% 
+  filter(., Amplicon =="UniCOI") -> OCNMS_sample_metadata_coi
+
+holder %>% # Zack fix
+  left_join(OCNMS_sample_metadata_coi, by="SampleId") -> combined_data_coi # This currently exceeds the memory space allocated to R
+
+saveRDS(combined_data_coi, file=here("eDNA_merged","combined_data_co1.RDS"))
 ```
 
 ```{r}
@@ -204,9 +208,9 @@ here::i_am("OCNMS.Rproj")
 here()
 
 write.csv(OCNMS_sample_metadata, here("OCNMS_eDNA_sampleData_Full2.csv")) # Save to Zack OCNMS outputs
-write.csv(combined_data_mf, here("OCNMS_eDNA_MiFish_Data2.csv")) # Save to Zack OCNMS outputs
-write.csv(combined_data_k, here("OCNMS_eDNA_Kelly_Data2.csv")) # Save to Zack OCNMS outputs
-write.csv(combined_data_coi, here("OCNMS_eDNA_COI_Data2.csv")) # Save to Zack OCNMS outputs
+#write.csv(combined_data_mf, here("OCNMS_eDNA_MiFish_Data2.csv")) # Save to Zack OCNMS outputs
+#write.csv(combined_data_k, here("OCNMS_eDNA_Kelly_Data2.csv")) # Save to Zack OCNMS outputs
+#write.csv(combined_data_coi, here("OCNMS_eDNA_COI_Data2.csv")) # Save to Zack OCNMS outputs
 
 # Export to the eDNA project folder
 here::i_am("PMEL-Hollings-eDNA-Hypoxia-2024.Rproj") # Set working directory to further up in the repo
