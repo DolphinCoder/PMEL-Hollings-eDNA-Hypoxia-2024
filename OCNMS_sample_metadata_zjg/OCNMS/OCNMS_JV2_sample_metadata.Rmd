@@ -131,5 +131,20 @@ filter(., ESV =="ESV_008311")  %>%
 
 
 ```
+```{r}
+COI_data <- read.csv(here("JV_bioinformatics","JVB3041_export","UniCOI","UniCOI_tab+taxa.csv"), header = T)
 
+COI_data %>% 
+  pivot_longer(cols=`JV243.2_UniCOI_GoldZachary_S074016.1`:`JV243.2_UniCOI_GoldZachary_S074399.1`, names_to = "JV_Sample_Name", values_to = "nReads") %>% 
+separate(JV_Sample_Name, into=c("JV243.2","Barcode","Barcode_mod","PI","SampleId"), sep="_", remove=F) %>% mutate(., SampleId=str_sub(SampleId,end=-3)) -> holder
+
+V2_sample_metadata %>% 
+  filter(., Amplicon =="UniCOI") -> co1_JV2_sample_metadata
+
+holder %>% 
+  left_join(co1_JV2_sample_metadata, by="SampleId") -> combined_data_co1
+
+saveRDS(combined_data_co1, file=here("eDNA_merged","combined_data_co1.RDS"))
+
+```
 
