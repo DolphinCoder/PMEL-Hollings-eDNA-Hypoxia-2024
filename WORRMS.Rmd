@@ -1,0 +1,53 @@
+---
+title: "WORRMS Package/Species of Interest Cleaning"
+author: "Eleanor (Ella) Crotty"
+header-includes:
+  \usepackage{fvextra}
+  \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,commandchars=\\\{\}}
+output:
+  pdf_document:
+    toc: TRUE
+urlcolor: blue
+---
+
+```{r Package Imports, message = F, warning = F}
+# Warnings and startup messages suppressed
+library(tidyverse)
+library(patchwork)
+library(scales)
+library(ggrepel)
+library(readxl)
+library(here)
+library(worrms)
+library(taxonomizr)
+```
+
+```{r}
+SOI_df <- read.csv(here("OCNMS_eDNA", "Data", "OCNMS_SpeciesOfInterest_Short.csv"))
+SOI_other_df <- read.csv(here("OCNMS_eDNA", "Data", "OCNMS_OtherOfInterest.csv"))
+genera <- c("Pseudo-nitzchia", "Pyrosoma", "Pyrosomella", "Sargassum", "Undaria", "Acrozoanthus", "Isarus", "Zoanthus")
+families <- c("Ammodytidae", "Acipenseridae")
+othernote <- "Pteropods, Northern copepods"
+SpeciesOfInterest <- c(SOI_df$Taxon, "Cancer magister", "Haliotis kamtschatkana kamtschatkana", "Haliotis assimilis") # Includes some not accepted old names
+```
+
+
+```{r}
+# Pull Aphia ID
+AphiaID <- wm_name2id("Engraulis mordax") # With underscore = list of names, without underscore = one name
+# Get NCBI taxonomy ID
+wm_external(AphiaID, type = "ncbi")
+# Plug that into NCBI and you can pull the taxonomy to see if that name is in the dataset - use taxonKit
+# taxonKit is a command line tool
+# taxonkit lineage 239368.txt
+
+# or do taxonomizr - still requires NCBI database to be downloaded on computer 
+#> prepareDatabase('accessionTaxa.sql')
+getTaxonomy(239368, here("accessionTaxa.sql"))
+```
+
+```{r}
+# write.csv(df, here("OCNMS_eDNA", "Data", "OCNMS_SpeciesOfInterest_Clean.csv"))
+```
+
+

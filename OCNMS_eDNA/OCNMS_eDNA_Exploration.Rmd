@@ -1,5 +1,5 @@
 ---
-title: "eDNA Data Exploration"
+title: "eDNA Exploration (Take 2)"
 author: "Eleanor (Ella) Crotty"
 header-includes:
   \usepackage{fvextra}
@@ -20,57 +20,34 @@ library(readxl)
 library(here)
 ```
 
-```{r}
-# Set up where I'm grabbing the eDNA data from + list all the files and directories in there
-dataWD <- "OCNMS_sample_metadata_zjg/OCNMS/JV_bioinformatics"
-print("Here:")
-here()
-print("Data Working Directory:")
-here(dataWD)
-# print("Directories:")
-Directory <- list.dirs(path = here(dataWD), full.names = F, recursive = T)[2:17]
-directories <- data.frame(Directory)
-# print("Files:")
-File <- list.files(path = here(dataWD), full.names = F, recursive = T)
-files <- data.frame(File)
+# Import eDNA data
 
-directories
-files
+```{r}
+mifishReads <- read.csv(here("OCNMS_eDNA", "Data", "OCNMS_MiFish_Data.csv"))
+mifishReads <- mifishReads %>% 
+  mutate(Marker = "MiFish")
 ```
 
-```{r}
-filenames <- files$File
-basenames <- c()
-eDNA_hits <- list()
-
-for (i in 1:nrow(files)) {
-  print(filenames[i])
-  path <- filenames[i]
-  basename <- gsub(".csv", "", gsub(".*\\/", "", gsub("\\+", "_and_", filenames[i]))) # Get the name, delete + signs, everything before the slash (directory), and .csv
-  print(basename)
-  assign(basename, read.csv(here(dataWD, path)) %>% mutate(Marker = basename)) # Import + add a column that identifies each dataframe
-  basenames <- c(basenames, basename) # Add basename to the list of basenames so I can use it later
-}
-
-# test16SKelly <- read.csv(here(dataWD, "16SKelly", "16SKelly_hits.csv"))
-# test16SKelly == `16SKelly_hits` # should print a big array of TRUE if the loop is working
-```
+# Import species of interest
 
 ```{r}
-# Copied basenames and did a bunch of finding and replacing. Also manually deleted some sample data under JV243.2
-eDNA_hits <- list(`16SKelly_tab_and_taxa`, `16Sv4v5_tab_and_taxa`, `18SMachida_tab_and_taxa`, `18Sv4_tab_and_taxa`, `18Sv9_89_tab_and_taxa`, `ITS1_diatom_tab_and_taxa`, `16SKelly_tab_and_taxa`, `16Sv4v5_tab_and_taxa`, `18SMachida_tab_and_taxa`, `18Sv4_tab_and_taxa`, `18Sv9_89_tab_and_taxa`, `dLoop_tab_and_taxa`, `ITS1_diatom_tab_and_taxa`, `MiFishU_F2_tab_and_taxa`, `UniCOI_tab_and_taxa`)
-```
-
-
-```{r}
-# Which species are we detecting?
-
-SOI_df <- read.csv(here("OCNMS_eDNA", "Data", "OCNMS_SpeciesOfInterest_Short.csv"))
-SOI_other_df <- read.csv(here("OCNMS_eDNA", "Data", "OCNMS_OtherOfInterest.csv"))
+# SOI_df <- read.csv(here("OCNMS_eDNA", "Data", "OCNMS_SpeciesOfInterest_Clean.csv"))
 genera <- c("Pseudo-nitzchia", "Pyrosoma", "Pyrosomella", "Sargassum", "Undaria", "Acrozoanthus", "Isarus", "Zoanthus")
 families <- c("Ammodytidae", "Acipenseridae")
-othernote <- "Pteropods, Northern copepods"
-SpeciesOfInterest <- c(SOI_df$Taxon, "Cancer magister", "Haliotis kamtschatkana kamtschatkana", "Haliotis assimilis") # Includes some not accepted old names
+```
+
+# Clean
+
+```{r}
+# Remove non-TH042 samples
+# Remove Chris Paight samples
+
+```
+
+# Functions
+
+```{r}
+# Summaries
 
 SOI_fn <- function(df) {
   marker <- df$Marker[1]
@@ -99,13 +76,7 @@ SOI_fn <- function(df) {
   rbind(s,g,f)
 }
 
-SOI_fn(`UniCOI_hits`)
-```
-
-```{r}
-# Now to make one giant dataframe of all that
-SOI_hits_summarylist <- lapply(eDNA_hits, SOI_fn)
-SOI_hits_summary <- do.call(rbind,SOI_hits_summarylist)
+MiFish_SOI_id_summary <- SOI_fn(mifishReads)
 ```
 
 ```{r}
@@ -119,8 +90,7 @@ SOI_full_fn <- function(df) {
   s
 }
 
-SOI_hits_list <- lapply(eDNA_hits, SOI_full_fn)
-SOI_hits <- do.call(rbind,SOI_hits_list)
+MiFish_SOI_IDs <- SOI_full_fn(mifishReads)
 ```
 
 
