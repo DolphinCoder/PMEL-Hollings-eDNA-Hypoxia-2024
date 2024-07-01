@@ -1,0 +1,166 @@
+---
+title: "Combining Species Presence/Absence with Environmental Data"
+author: "Eleanor (Ella) Crotty"
+header-includes:
+  \usepackage{fvextra}
+  \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,commandchars=\\\{\}}
+output:
+  pdf_document:
+    toc: TRUE
+urlcolor: blue
+---
+
+```{r Package Imports, message = F, warning = F}
+# Warnings and startup messages suppressed
+library(tidyverse)
+library(patchwork)
+library(scales)
+library(ggrepel)
+library(readxl)
+library(here)
+```
+
+```{r}
+# Import data
+SpeciesDetections <- read_csv(here("OCNMS_Project", "Outputs", "SOI_IDs_Species10Detections.csv")) %>% 
+  filter(year(Date_UTC) != 2023)
+EnvData1 <- read_csv(here("OCNMS_Project", "Data", "EnvironmentalDataset1.csv")) %>%  # Using EnvironmentalDataset1 because the satellite + NEMO data in EnvironmentalDataset2 didn't turn out to be good at gap filling
+  filter(year != 2023) # Ignoring 2023 due to gaps for now
+SamplingDates2 <- read_csv(here("OCNMS_Project", "Data", "SamplingDates2.csv")) %>%  # Exported from EnvironmentalDataxSampleDates.Rmd, simple dataframe of all datetimes of samples
+  filter(year(Date) != 2023) %>% # Ignoring 2023 due to gaps for now
+  mutate(Source = case_when(Source == "Bottle_DNA" ~ "Bottle_DNA_Sampled", Source == "PPS_DNA" ~ "Automated_DNA_Sampler"))
+```
+
+```{r Checking Dates, eval = F}
+# Let's take a quick look at whether the dates match up
+sampdates <- data.frame(Date = SamplingDates2$Date, Source = "Metadata")
+detectdates <- data.frame(Date = SpeciesDetections$Date_UTC, Source = "Detections")
+datescomp <- rbind(sampdates,detectdates)
+
+ggplot() +
+  geom_vline(data = datescomp, mapping = aes(xintercept = Date, color = Source, linetype = Source)) +
+  scale_linetype_manual(values = c(2,1)) +
+  theme_bw() +
+  facet_wrap(facets = vars(year(Date)), scales = "free_x", ncol = 1) #+
+  #scale_x_datetime(date_breaks = "4 days", date_labels = "%y-%b-%d") # This is fucked but tbh I don't need it
+```
+
+```{r Recreate the Sampling x Environmental Data graph}
+ggplot(EnvData1, aes(x = date, y = DO, color = source, alpha = source)) +
+  geom_point() +
+  scale_alpha_manual(values = c(1,0.1)) + # doesn't currently do anything
+  scale_x_datetime(date_breaks = "1 month", date_labels = "%m-%y") +
+  theme_bw() +
+  facet_wrap(facets = vars(year), scales = "free_x", ncol = 1) +
+  geom_vline(data = SamplingDates2, aes(xintercept = Date, color = Source)) +
+  scale_color_manual(values = c("purple1", "black", "firebrick2", "dodgerblue2")) +
+  geom_hline(aes(yintercept = 2), color = "black", linetype = "dashed") +
+  labs(title = "Dissolved Oxygen Data + Sampling Dates", caption = "Dotted line = hypoxic threshold of 2 mg/L dissolved oxygen, vertical lines = DNA sampling times", alpha = "Environmental Data", color = "Source")
+```
+
+```{r Messy Join}
+messyjoin <- full_join(EnvData1, SpeciesDetections, by = join_by(date == Date_UTC)) # did not work, unsurprised
+EnvRd <- EnvData1 %>% 
+  mutate(DateMatch = round_date(date, unit = "10 minutes")) # well at least it didn't immediately explode. However, this still has many datapoints per hour. Maybe round to the nearest 10 minutes? 
+DetectRd <- SpeciesDetections %>% 
+  mutate(DateMatch = round_date(Date_UTC, unit = "10 minutes"), Date_local_hr = round_date(Date_local, unit = "hour")) # Spot check - looks good. 
+
+messyrdjoin <- full_join(EnvRd, DetectRd, by = join_by(DateMatch)) # Many to many is probably expected - There's several detections per time point
+
+# Ok, that was pretty good! To try and avoid many-to-many, perhaps a specific join. Don't care about EnvHr without DetectHr matches, so make DetectHr x and do a left join (A left_join() keeps all observations in x.)
+
+eDNAxEnvData <- left_join(DetectRd, EnvRd, by = join_by(DateMatch)) 
+
+investigate <- eDNAxEnvData %>% select(Species, DateMatch, Date_UTC, Date_local_hr, source, temperature, DO, SampleId, Rosette_position, Amplicon)
+```
+
+```{r}
+ggplot(eDNAxEnvData, aes(x = DateMatch, y = DO, shape = Present, size = Present, color = Present)) +
+  scale_shape_manual(values = c(1, 19)) +
+  scale_size_manual(values = c(1,1)) +
+  geom_point() +
+  theme_bw() +
+  facet_wrap(facets = vars(Species))
+
+ggplot(data = EnvData1, aes(x = date, y = DO)) +
+  geom_line(color = "gray90") +
+  geom_point(data = eDNAxEnvData, aes(x = DateMatch, y = DO, shape = Present, size = Present, color = Present)) +
+  scale_shape_manual(values = c(1, 19)) +
+  scale_size_manual(values = c(1,1)) + 
+  theme_bw() +
+  facet_wrap(facets = vars(Species, year(date)), scales = "free_x", ncol = 2)
+```
+
+# Graph over environmental data
+```{r Preliminary Graphs}
+EnvDataRange <- EnvData1 %>% 
+  filter(date > as.POSIXct("2021-08-15 00:00:00", tz = "UTC"))
+
+ggplot(data = EnvDataRange, aes(x = date, y = DO)) +
+  geom_line(color = "gray90") +
+  geom_point(data = eDNAxEnvData, aes(x = DateMatch, y = DO, shape = Present, size = Present, color = Present)) +
+  scale_shape_manual(values = c(1, 19)) +
+  scale_size_manual(values = c(1,1)) + 
+  theme_bw() +
+  facet_wrap(facets = vars(Species, year(date)), scales = "free_x", ncol = 4) +
+  scale_x_datetime(breaks = "month", date_labels = "%b-%y") +
+  theme(text = element_text(size = 20), axis.text.x = element_text(angle = 45, hjust = 1), strip.text = element_text(size = 8), strip.background = element_rect(fill = "gray95")) +
+  geom_hline(yintercept = 2, linetype = 2) +
+  labs(title = "Species Presence and Absence Over Dissolved Oxygen", x = "Date", y = "Dissolved Oxygen (mg/L) At TH042")
+
+ggsave(filename = here("OCNMS_Project", "Plots", "SpeciesPresence_Oxygen_Preliminary.png"), width = 2500, height = 2000, units = "px")
+
+ggplot(data = EnvDataRange, aes(x = date, y = temperature)) +
+  geom_line(color = "gray90") +
+  geom_point(data = eDNAxEnvData, aes(x = DateMatch, y = temperature, shape = Present, size = Present, color = Present)) +
+  scale_shape_manual(values = c(1, 19)) +
+  scale_size_manual(values = c(1,1)) + 
+  theme_bw() +
+  facet_wrap(facets = vars(Species, year(date)), scales = "free_x", ncol = 4) +
+  scale_x_datetime(breaks = "month", date_labels = "%b-%y") +
+  theme(text = element_text(size = 15), axis.text.x = element_text(angle = 45, hjust = 1), strip.text = element_text(size = 8), strip.background = element_rect(fill = "gray95")) +
+  labs(title = "Species Presence and Absence Over Temperature", x = "Date", y = "Temperature (C) At TH042")
+
+ggsave(filename = here("OCNMS_Project", "Plots", "SpeciesPresence_Temp_Preliminary.png"), width = 2500, height = 2000, units = "px")
+```
+
+```{r}
+ggplot(EnvDataRange, aes(x = temperature, y = DO, shape = source, color = as.factor(year))) +
+  scale_shape_manual(values = c(4,19)) +
+  scale_color_manual(values = c("blue", "black")) +
+  geom_point(shape = 1, alpha = 0.5) +
+  theme_bw() +
+  labs(title = "DO vs Temp during sampling years")
+ggsave(here("OCNMS_eDNA", "Plots", "DO_vs_Temp.png"))
+
+ggplot(EnvDataRange, aes(x = temperature, y = DO, shape = source, color = as.factor(year))) +
+  scale_shape_manual(values = c(4,19)) +
+  scale_color_manual(values = c("blue", "black")) +
+  geom_point(shape = 1, alpha = 0.5) +
+  theme_bw() +
+  facet_wrap(facets = vars(year)) +
+  labs(title = "DO vs Temp during sampling years")
+ggsave(here("OCNMS_eDNA", "Plots", "DO_vs_TempYear.png"))
+
+ggplot(EnvDataRange, aes(x = temperature, y = DO, shape = source, color = as.factor(year))) +
+  scale_shape_manual(values = c(4,19)) +
+  scale_color_manual(values = c("blue", "black")) +
+  geom_point(shape = 1, alpha = 0.5) +
+  scale_x_continuous(limits = c(7, 10)) +
+  scale_y_continuous(limits = c(0,6)) +
+  theme_bw() +
+  labs(title = "DO vs Temp during sampling years (Zoomed in)")
+ggsave(here("OCNMS_eDNA", "Plots", "DO_vs_Temp_Zoomed.png"))
+
+ggplot(EnvDataRange, aes(x = temperature, y = DO, shape = source, color = as.factor(year))) +
+  scale_shape_manual(values = c(4,19)) +
+  scale_color_manual(values = c("blue", "black")) +
+  geom_point(shape = 1, alpha = 0.5) +
+  scale_x_continuous(limits = c(7, 10)) +
+  scale_y_continuous(limits = c(0,6)) +
+  theme_bw() +
+  facet_wrap(facets = vars(year)) +
+  labs(title = "DO vs Temp during sampling years (Zoomed in)")
+ggsave(here("OCNMS_eDNA", "Plots", "DO_vs_Temp_ZoomedYear.png"))
+```
+

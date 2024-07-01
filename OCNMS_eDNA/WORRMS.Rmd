@@ -22,15 +22,33 @@ library(worrms)
 library(taxonomizr)
 ```
 
+# Import species of interest from Shannon
+
 ```{r}
-SOI_df <- read.csv(here("OCNMS_eDNA", "Data", "OCNMS_SpeciesOfInterest_Short.csv"))
-SOI_other_df <- read.csv(here("OCNMS_eDNA", "Data", "OCNMS_OtherOfInterest.csv"))
+SOI_df <- read.csv(here("OCNMS_eDNA", "Data", "OCNMS_SpeciesOfInterest.csv"))
 genera <- c("Pseudo-nitzchia", "Pyrosoma", "Pyrosomella", "Sargassum", "Undaria", "Acrozoanthus", "Isarus", "Zoanthus")
 families <- c("Ammodytidae", "Acipenseridae")
 othernote <- "Pteropods, Northern copepods"
-SpeciesOfInterest <- c(SOI_df$Taxon, "Cancer magister", "Haliotis kamtschatkana kamtschatkana", "Haliotis assimilis") # Includes some not accepted old names
+SpeciesOfInterest <- c(SOI_df$Taxon, "Cancer magister", "Haliotis kamtschatkana kamtschatkana", "Haliotis assimilis") # FUll list of species-specific targest. Includes some not accepted old names.
 ```
 
+# Import eDNA combined data
+
+```{r}
+fishReads <- read.csv(here("OCNMS_eDNA", "Data", "OCNMS_MiFish_Data.csv"))
+fishReads <- fishReads %>% 
+  mutate(Marker = "MiFish")
+
+kelReads <- read.csv(here("OCNMS_eDNA", "Data", "OCNMS_Kelly_Data.csv"))
+kelReads <- kelReads %>% 
+  mutate(Marker = "Kelly16S")
+
+coiReads <- read.csv(here("OCNMS_eDNA", "Data", "OCNMS_COI_Data.csv"))
+coiReads <- coiReads %>% 
+  mutate(Marker = "Uni_CO1")
+```
+
+# Single species example
 
 ```{r}
 # Pull Aphia ID
@@ -45,6 +63,14 @@ wm_external(AphiaID, type = "ncbi")
 #> prepareDatabase('accessionTaxa.sql')
 getTaxonomy(239368, here("accessionTaxa.sql"))
 ```
+
+# All species of interest script
+
+```{r}
+
+```
+
+# Export species of interest
 
 ```{r}
 # write.csv(df, here("OCNMS_eDNA", "Data", "OCNMS_SpeciesOfInterest_Clean.csv"))

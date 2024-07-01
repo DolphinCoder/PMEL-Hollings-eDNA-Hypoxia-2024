@@ -1,5 +1,5 @@
 ---
-title: "Title"
+title: "Adding Satellite Data"
 author: "Eleanor (Ella) Crotty"
 header-includes:
   \usepackage{fvextra}

@@ -20,28 +20,37 @@ library(readxl)
 library(here)
 ```
 
-# Import eDNA data
+# Import eDNA combined data
 
 ```{r}
-mifishReads <- read.csv(here("OCNMS_eDNA", "Data", "OCNMS_MiFish_Data.csv"))
-mifishReads <- mifishReads %>% 
-  mutate(Marker = "MiFish")
+# Remove non-TH042 samples
+# Remove Chris Paight samples
+fishReads <- read.csv(here("OCNMS_eDNA", "Data", "OCNMS_MiFish_Data.csv"))
+fishReads <- fishReads %>% 
+  mutate(Marker = "MiFish") %>% 
+  filter(Cast_No. == "TH042") 
+# No more Chris. yay.
+
+coiReads <- read.csv(here("OCNMS_eDNA", "Data", "OCNMS_COI_Data.csv"))
+coiReads <- coiReads %>% 
+  mutate(Marker = "Uni_CO1", Barcode_mod = NA) %>% # Barcode_mod just needs to be there to match fish.
+  relocate(Barcode_mod, .after = Barcode.x) %>% 
+  filter(Cast_No. == "TH042") 
+```
+
+```{r}
+allReads <- rbind(fishReads, coiReads)
+write_csv(allReads, here("OCNMS_eDNA", "Outputs", "FishPlusCOI_Reads.csv")) # Save all the reads for reference
 ```
 
 # Import species of interest
 
 ```{r}
-# SOI_df <- read.csv(here("OCNMS_eDNA", "Data", "OCNMS_SpeciesOfInterest_Clean.csv"))
+SOI_df <- read.csv(here("OCNMS_eDNA", "Data", "OCNMS_SpeciesOfInterest.csv")) 
+SOI_invert_df <- read.csv(here("OCNMS_eDNA", "Data", "OCNMS_CopepodsAndKrillofInterest.csv")) 
 genera <- c("Pseudo-nitzchia", "Pyrosoma", "Pyrosomella", "Sargassum", "Undaria", "Acrozoanthus", "Isarus", "Zoanthus")
 families <- c("Ammodytidae", "Acipenseridae")
-```
-
-# Clean
-
-```{r}
-# Remove non-TH042 samples
-# Remove Chris Paight samples
-
+SpeciesOfInterest <- c(SOI_df$Taxon, SOI_invert_df$Taxon)
 ```
 
 # Functions
@@ -50,7 +59,7 @@ families <- c("Ammodytidae", "Acipenseridae")
 # Summaries
 
 SOI_fn <- function(df) {
-  marker <- df$Marker[1]
+  marker <- df$Marker[1] # This won't work on allReads
   
   s <- df %>% 
     group_by(Species) %>% 
@@ -76,7 +85,9 @@ SOI_fn <- function(df) {
   rbind(s,g,f)
 }
 
-MiFish_SOI_id_summary <- SOI_fn(mifishReads)
+MiFish_SOI_id_summary <- SOI_fn(fishReads)
+COI_SOI_id_summary <- SOI_fn(coiReads)
+SOI_id_summary <- rbind(MiFish_SOI_id_summary, COI_SOI_id_summary)
 ```
 
 ```{r}
@@ -85,12 +96,50 @@ SOI_full_fn <- function(df) {
   marker <- df$Marker[1]
   s <- df %>% 
     filter(Species %in% SpeciesOfInterest | Genus %in% genera | Family %in% families) %>% 
-    mutate(Marker = marker) %>% 
-    select(ESV, Kingdom, Phylum, Class, Order, Family, Genus, Species, Marker)
+    mutate(Marker = marker)
   s
 }
 
-MiFish_SOI_IDs <- SOI_full_fn(mifishReads)
+MiFish_SOI_IDs <- SOI_full_fn(fishReads)
+COI_SOI_IDs <- SOI_full_fn(coiReads)
+SOI_IDs <- rbind(MiFish_SOI_IDs, COI_SOI_IDs) %>% 
+  group_by(Family, Genus, Species)
 ```
+
+```{r}
+write_csv(MiFish_SOI_IDs, here("OCNMS_eDNA", "Data", "MiFish_SOI_IDs.csv"))
+write_csv(COI_SOI_IDs, here("OCNMS_eDNA", "Data", "COI_SOI_IDs.csv"))
+write_csv(SOI_IDs, here("OCNMS_eDNA", "Data", "All_SOI_IDs.csv"))
+```
+
+
+```{r}
+# Take allReads and start poking at dates and stuff!
+ggplot(SOI_IDs, aes(x = as.POSIXct(Date_UTC, tz = "UTC"), fill = Species)) +
+  geom_histogram() +
+  facet_wrap(facets = vars(year(as.POSIXct(Date_UTC, tz = "UTC"))), scales = "free_x", ncol = 1) +
+  theme_bw()
+```
+
+```{r}
+ggplot(SOI_IDs, aes(x = Species)) +
+  geom_bar() +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+```{r}
+SOI_IDs %>% 
+  group_by(Family, Genus, Species) %>% 
+  summarize(n = n()) %>% 
+  arrange(n)
+
+SOI_IDs %>% 
+  group_by(Family, Genus, Species) %>% 
+  summarize(n = n()) %>% 
+  arrange(n) %>% 
+  filter(n > 10)
+```
+
 
 
