@@ -1,5 +1,5 @@
 # PMEL-Hollings-eDNA-Hypoxia-2024
-Eleanor Crotty's 2024 Hollings Scholarship project. Leveraging environmental DNA approaches to understand impacts of episodic hypoxia events on Olympic Coast National Marine Sanctuary marine ecosystems.
+Eleanor Crotty's 2024 Hollings Scholarship project. Leveraging environmental DNA approaches to understand impacts of episodic hypoxia events on Olympic Coast National Marine Sanctuary marine ecosystems. In addition to this README file, this repository also contains several PDF files called "Hollings Project Workflow *", which are flowcharts explaining how all of these .Rmd files and data sources connect, focused on the inputs and outputs that are critical to follow my workflow and generate the final dataset of species detections with associated environmental data.
 
 ## Directories
 - OCNMS_Hypoxia: Environmental data cleaning and combining. Main sources are OCNMS CTD casts and the Teawhit Head mooring's 42 meter depth sensor (TH042). The folder also includes satellite data and data from the Cha'ba NEMO mooring that I did not end up using.
@@ -15,8 +15,14 @@ Eleanor Crotty's 2024 Hollings Scholarship project. Leveraging environmental DNA
 - HypoxiaTimeSeries.Rmd: Combines CTD and mooring data and makes some graphs to compare them.
 - NEMO_Data_Exploration.Rmd and Satellite_Data_Exploration.Rmd are both attempts at investigating alternate sources of data to fill the gap in data in 2023. These data sources did not agree well with TH042 in 2021-22, so I did not use them for 2023.
 
+[Hollings Project Workflow-EnvData.pdf](https://github.com/user-attachments/files/16059843/Hollings.Project.Workflow-EnvData.pdf)
+
 ### Files in OCNMS_sample_metadata_zjd
 
 ### Files in OCNMS_eDNA
 
+[Hollings Project Workflow-eDNA.pdf](https://github.com/user-attachments/files/16059847/Hollings.Project.Workflow-eDNA.pdf)
+
 ### Files in OCNMS_Project
+
+[Hollings Project Workflow.pdf](https://github.com/user-attachments/files/16059851/Hollings.Project.Workflow.pdf)
