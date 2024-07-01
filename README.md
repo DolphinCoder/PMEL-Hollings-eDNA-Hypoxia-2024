@@ -18,11 +18,21 @@ Eleanor Crotty's 2024 Hollings Scholarship project. Leveraging environmental DNA
 [Hollings Project Workflow-EnvData.pdf](https://github.com/user-attachments/files/16059843/Hollings.Project.Workflow-EnvData.pdf)
 
 ### Files in OCNMS_sample_metadata_zjd
+- JV = Jonah Ventures, the DNA metabarcoding service we use (sic, this is my understanding from lab meetings)
+- /OCNMS/JV_bioinformatics contains the results of DNA metabarcoding from the OCNMS eDNA samples.
+- OCNMS_JV2_sample_metadata.Rmd is an example of how to filter the data, focused on Alaska
+- eDNA_SampleData_Exploration.Rmd: Imports the MiFish and CO1 Universal primer datasets (primer_tab+taxa.csv), the Jonah Ventures metadata, and the Ocean Molecular Ecology group metadata. It cleans the metadata, pivots the species detection metabarcoding data so that each sample + species detection combination is a row, and combines the species detection data with the metadata.
+- Exports cleaned eDNA data to OCNMS_eDNA
 
 ### Files in OCNMS_eDNA
+- EnvironmentalDataxSampleDates.Rmd: Imports Ocean Molecular Ecology group metadata, extracts DNA sampling dates, and plots these over the full environmental data time series to identify data gaps and visualize the full set of data.
+- OCNMS_eDNA_Exploration.Rmd: Imports the cleaned eDNA detections data and the OCNMS species of interest list, filters out only the species detections on the list of interest and exports those.
 
 [Hollings Project Workflow-eDNA.pdf](https://github.com/user-attachments/files/16059847/Hollings.Project.Workflow-eDNA.pdf)
 
 ### Files in OCNMS_Project
+- EnvironmentalData2.Rmd combines satellite data with CTD and mooring data and makes some plots of this. Satellite data is not consistent with data at depth so I did not use it.
+- OCNMS_SpeciesDetections_Cleaning.Rmd: Imports species detections on the OCNMS species of interest list, makes a variable for presence and absence, and then filters for species that are present in at least 10 samples.
+- eDNAxEnvData.Rmd: Cleans eDNA and environmental data so that they are compatible, and joins them by datetime (rounded to the nearest 10 minutes) and plots them on top of each other. This produces eDNAxEnvData.csv, a dataset with each species detection in the 4 species of interest with more than 10 detection dates + the associated environmental data from the TH042 mooring.
 
 [Hollings Project Workflow.pdf](https://github.com/user-attachments/files/16059851/Hollings.Project.Workflow.pdf)
