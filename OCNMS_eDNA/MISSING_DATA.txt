@@ -1,0 +1,8 @@
+There are three files missing from this folder because they are too large. 
+1. OCNMS_COI_Data.csv
+2. OCNMS_MiFish_Data.csv
+3. FishPlusCOI_Reads.csv
+
+They are very important, because they are the source of all the DNA data. 
+If you are only interested in the same species of interest as the Olympic Coast National Marine Sanctuary, you can skip to the OCNMS_Project folder and use All_SOI_IDs.csv, a filtered version of all of the reads. 
+If not, you can access the full dataset by [emailing Zack? emailing Shannon? set up a file hosting thing?]
