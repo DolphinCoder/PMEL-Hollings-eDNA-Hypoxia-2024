@@ -10,6 +10,8 @@ output:
 urlcolor: blue
 ---
 
+# Setup 
+
 ```{r Package Imports, message = F, warning = F}
 # Warnings and startup messages suppressed
 library(tidyverse)
@@ -25,12 +27,14 @@ library(here)
 SpeciesDetections <- read_csv(here("OCNMS_Project", "Outputs", "SOI_IDs_Species10Detections.csv")) %>% 
   filter(year(Date_UTC) != 2023)
 EnvData1 <- read_csv(here("OCNMS_Project", "Data", "EnvironmentalDataset1.csv")) %>%  # Using EnvironmentalDataset1 because the satellite + NEMO data in EnvironmentalDataset2 didn't turn out to be good at gap filling
-  filter(year != 2023) # Ignoring 2023 due to gaps for now
+  filter(year != 2023) %>%  # Ignoring 2023 due to gaps for now
+  mutate(year = as.factor(year))
 SamplingDates2 <- read_csv(here("OCNMS_Project", "Data", "SamplingDates2.csv")) %>%  # Exported from EnvironmentalDataxSampleDates.Rmd, simple dataframe of all datetimes of samples
   filter(year(Date) != 2023) %>% # Ignoring 2023 due to gaps for now
   mutate(Source = case_when(Source == "Bottle_DNA" ~ "Bottle_DNA_Sampled", Source == "PPS_DNA" ~ "Automated_DNA_Sampler"))
 ```
-
+ # Date check
+ 
 ```{r Checking Dates, eval = F}
 # Let's take a quick look at whether the dates match up
 sampdates <- data.frame(Date = SamplingDates2$Date, Source = "Metadata")
@@ -45,6 +49,8 @@ ggplot() +
   #scale_x_datetime(date_breaks = "4 days", date_labels = "%y-%b-%d") # This is fucked but tbh I don't need it
 ```
 
+# Sampling x environmental data graph
+
 ```{r Recreate the Sampling x Environmental Data graph}
 ggplot(EnvData1, aes(x = date, y = DO, color = source, alpha = source)) +
   geom_point() +
@@ -58,7 +64,9 @@ ggplot(EnvData1, aes(x = date, y = DO, color = source, alpha = source)) +
   labs(title = "Dissolved Oxygen Data + Sampling Dates", caption = "Dotted line = hypoxic threshold of 2 mg/L dissolved oxygen, vertical lines = DNA sampling times", alpha = "Environmental Data", color = "Source")
 ```
 
-```{r Messy Join}
+# Data Join
+
+```{r Data Join}
 messyjoin <- full_join(EnvData1, SpeciesDetections, by = join_by(date == Date_UTC)) # did not work, unsurprised
 EnvRd <- EnvData1 %>% 
   mutate(DateMatch = round_date(date, unit = "10 minutes")) # well at least it didn't immediately explode. However, this still has many datapoints per hour. Maybe round to the nearest 10 minutes? 
@@ -74,7 +82,9 @@ eDNAxEnvData <- left_join(DetectRd, EnvRd, by = join_by(DateMatch))
 investigate <- eDNAxEnvData %>% select(Species, DateMatch, Date_UTC, Date_local_hr, source, temperature, DO, SampleId, Rosette_position, Amplicon)
 ```
 
-```{r}
+# Joined data graphs
+
+```{r Graph eDNAxEnvData}
 ggplot(eDNAxEnvData, aes(x = DateMatch, y = DO, shape = Present, size = Present, color = Present)) +
   scale_shape_manual(values = c(1, 19)) +
   scale_size_manual(values = c(1,1)) +
@@ -91,7 +101,6 @@ ggplot(data = EnvData1, aes(x = date, y = DO)) +
   facet_wrap(facets = vars(Species, year(date)), scales = "free_x", ncol = 2)
 ```
 
-# Graph over environmental data
 ```{r Preliminary Graphs}
 EnvDataRange <- EnvData1 %>% 
   filter(date > as.POSIXct("2021-08-15 00:00:00", tz = "UTC"))
@@ -123,6 +132,8 @@ ggplot(data = EnvDataRange, aes(x = date, y = temperature)) +
 
 ggsave(filename = here("OCNMS_Project", "Plots", "SpeciesPresence_Temp_Preliminary.png"), width = 2500, height = 2000, units = "px")
 ```
+
+# DO x Temp graphs
 
 ```{r}
 ggplot(EnvDataRange, aes(x = temperature, y = DO, shape = source, color = as.factor(year))) +
@@ -162,5 +173,64 @@ ggplot(EnvDataRange, aes(x = temperature, y = DO, shape = source, color = as.fac
   facet_wrap(facets = vars(year)) +
   labs(title = "DO vs Temp during sampling years (Zoomed in)")
 ggsave(here("OCNMS_eDNA", "Plots", "DO_vs_Temp_ZoomedYear.png"))
+```
+
+# Binomial Regression
+
+```{r}
+joinSpeciesList <- split(eDNAxEnvData, eDNAxEnvData$Species)
+
+oxmodels <- lapply(joinSpeciesList, glm, formula = Present ~ DO, family = "binomial")
+lapply(oxmodels, summary)
+
+tmodels <- lapply(joinSpeciesList, glm, formula = Present ~ temperature, family = "binomial")
+lapply(tmodels, summary)
+```
+
+## Check for outliers
+
+```{r}
+ggplot(EnvDataRange, aes(x = DO, y = temperature)) +
+  geom_point(color = "gray90", alpha = 0.5) +
+  geom_point(eDNAxEnvData, mapping = aes(x = DO, y = temperature, color = Present, shape = Present), inherit.aes = F) +
+    scale_shape_manual(values = c(1, 19)) +
+  theme_bw() +
+  theme(text = element_text(size = 15), strip.text = element_text(size = 8), strip.background = element_rect(fill = "gray95")) +
+  labs(title = "Dissolved Oxygen vs. Temp + Species Presence", y = "Temperature") +
+  facet_wrap(facets = vars(Species))
+ggsave(filename = here("OCNMS_Project", "Plots", "SpeciesPresence_TempxDO.png"), width = 2500, height = 2000, units = "px")
+```
+
+## Check for linearity
+
+"Assumption #5 involves the necessity of a linear relationship between the continuous independent variables and the logit transformation of the dependent variable. This linearity assumption implies that **for continuous independent variables** like income level, hours of exercise per week, and blood sugar levels, **there should be a linear relationship with the logit of the dependent variable**, such as the probability of developing diabetes. Various methods can be employed to assess this linearity, with one common approach being the **Box-Tidwell procedure.** This technique involves creating interaction terms between each continuous independent variable and its natural logarithm and adding these to the logistic regression model. This technique can be implemented using software like **SPSS Statistics, which offers the Binary Logistic procedure to test for this assumption.** The results of this test are then interpreted to decide the next steps in the analysis, depending on whether the linearity assumption holds or is violated. If the assumption is met, the analysis can proceed as planned. However, if the assumption is not met, adjustments to the model or alternative methods may be necessary to address the non-linearity appropriately." - [Binomial Logistic Regression](https://www.amstatisticalconsulting.com/binomial-logistic-regression/)
+
+
+Basically, this equation needs to have a somewhat linear relationship with the independent variable: 
+
+$$g(p) = log\left( \frac{p}{1-p} \right)$$
+Where p = probability of 1 (if 1, p. if 0, 1-p)?
+
+```{r}
+library(car) # Has a function for the Box-Tidwell procedure
+?boxTidwell
+
+joinSpeciesList <- lapply(joinSpeciesList, drop_na, DO)
+
+# joinSpeciesList, glm, formula = Present ~ DO
+
+# Single test
+boxTidwell(Present ~ DO, other.x = ~ year, data = joinSpeciesList[[1]]) # other.x = any factors not to be transformed. i had to make year into a factor to make it accept this lmao
+
+# Loop to test all for linearity
+for (i in 1:length(joinSpeciesList)) {
+  print(paste(names(joinSpeciesList)[i], sep = " ", "Presence vs DO"))
+  print(boxTidwell(Present ~ DO, other.x = ~ year, data = joinSpeciesList[[i]]))
+}
+
+for (i in 1:length(joinSpeciesList)) {
+  print(paste(names(joinSpeciesList)[i], sep = " ", "Presence vs Temp"))
+  print(boxTidwell(Present ~ temperature, other.x = ~ year, data = joinSpeciesList[[i]]))
+}
 ```
 
