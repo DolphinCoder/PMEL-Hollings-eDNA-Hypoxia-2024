@@ -10,6 +10,8 @@ output:
 urlcolor: blue
 ---
 
+# Setup
+
 ```{r Package Imports, message = F, warning = F}
 # Warnings and startup messages suppressed
 library(tidyverse)
@@ -21,13 +23,16 @@ library(here)
 ```
 
 ```{r}
-SOI_IDs <- read_csv(here("OCNMS_eDNA", "Data", "All_SOI_IDs.csv")) # Identifications of species of interest
+SOI_IDs_ESV <- read_csv(here("OCNMS_eDNA", "Data", "All_SOI_IDs.csv")) # Identifications of species of interest (grouped by ESV)
+SOI_IDs <- read_csv(here("OCNMS_eDNA", "Data", "All_SOI_IDs_Species.csv")) # Already grouped by species, mainly using this
 ref <- read_csv(here("OCNMS_eDNA", "Outputs", "FishPlusCOI_Reads.csv")) # Pivoted detection data + metadata, for reference
 ```
 
-# Group by species, not ESV
-```{r}
-salmontest <- SOI_IDs %>% filter(Species == "Oncorhynchus kisutch")
+# OLD Group by species, not ESV
+```{r, eval = F}
+# This whole chunk is old code + testing - grouping by species is now done in OCNMS_eDNA_Exploration, 1 step before this
+
+salmontest <- SOI_IDs_ESV %>% filter(Species == "Oncorhynchus kisutch")
 # ESV and sample ID differ, need to group by both to avoid deleting dates
 # Technical replicates may also differ
 unique(salmontest) # Same size - good, no duplicates
@@ -37,17 +42,22 @@ unique(salmontest) # Same size - good, no duplicates
 #  filter(nReads != 0)
 
 # I'm just gonna group by everything except ESV and sequence lmaooooo, basically all the data comes from SampleId x metadata anyway
-SOI_ID_Species <- SOI_IDs %>% 
+SOI_ID_Speciestest <- SOI_IDs_ESV %>% 
   group_by(Family, Genus, Species, JV_Sample_Name, Barcode.x, Barcode_mod, SampleId, Biological_Replicate, Technical_Replicate, Cruise_ID_short, Cast_No., Rosette_position, Field_collection_method, Preservation, Station, Depth_m, Field_Notes, Date_UTC, Date_local, Lat_dec, Lon_dec, Run, Client, Replicate, Amplicon, Barcode.y, Marker) %>% 
   summarize(TotalnReads = sum(nReads), avgpctMatch = mean(pctMatch)) %>%  # Result is smaller than SOI_ID2 - good!
   mutate(Present = case_when(TotalnReads == 0 ~ F, TotalnReads != 0 ~ T)) # Add presence/absence
 
-SOI_ID_Species_Z <- SOI_IDs %>%  # Zack's suggested method
+SOI_ID_Species_Z <- SOI_IDs_ESV %>%  # Zack's suggested method
   group_by(Family, Genus, Species, JV_Sample_Name, Barcode.x, Barcode_mod, SampleId, Biological_Replicate, Technical_Replicate, Cruise_ID_short, Cast_No., Rosette_position, Field_collection_method, Preservation, Station, Depth_m, Field_Notes, Date_UTC, Date_local, Lat_dec, Lon_dec, Run, Client, Replicate, Amplicon, Barcode.y, Marker) %>% 
   summarize(TotalnReads = sum(nReads), avgpctMatch = mean(pctMatch)) %>%
   mutate(PA = if_else(TotalnReads >0, 1,0))
 ```
 
+# Add presence/absence
+```{r}
+SOI_ID_Species <- SOI_IDs %>%  
+  mutate(Present = case_when(TotalnReads == 0 ~ F, TotalnReads != 0 ~ T))
+```
 
 # Filter for >10 detections
 ```{r}
@@ -85,6 +95,8 @@ ZCheck <- ref %>%
   filter(Species == "Oncorhynchus tshawytscha")
 ```
 
+
+# Export
 
 ```{r}
 SOI_ID_Sp_10Detect <- SOI_ID_Species %>% 

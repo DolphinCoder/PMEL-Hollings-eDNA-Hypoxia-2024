@@ -1,0 +1,334 @@
+---
+title: "eDNA Compared To Oxygen Saturation"
+author: "Eleanor (Ella) Crotty"
+header-includes:
+  \usepackage{fvextra}
+  \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,commandchars=\\\{\}}
+output:
+  pdf_document:
+    toc: TRUE
+urlcolor: blue
+---
+
+```{r Package Imports, message = F, warning = F}
+# Warnings and startup messages suppressed
+library(tidyverse)
+library(patchwork)
+library(scales)
+library(ggrepel)
+library(readxl)
+library(here)
+library(gsw)
+library(R.matlab)
+```
+
+# Import data 
+
+```{r}
+allReads_Species <- read_csv(here("OCNMS_eDNA", "Outputs", "AllReads_Species.csv"))
+envData <- read_csv(here("OCNMS_Hypoxia", "Outputs", "EnvironmentalDataset1.csv")) %>% 
+  filter(year != 2023) %>%  # Ignoring 2023 due to gaps for now
+  mutate(year = as.factor(year))
+```
+
+```{r}
+SpeciesDetect <- allReads_Species %>% 
+  mutate(Present = case_when(TotalnReads == 0 ~ F, TotalnReads != 0 ~ T)) %>% 
+  relocate(Present, .after = TotalnReads)
+```
+
+# Horrid MatLab Sidequest
+
+Trying to figure out if the density units are correct
+
+time: [4040x1 double] (MATLAB datenum)
+dens: [4040x1 double] (sigma‐theta)
+
+Is this the same as the envData potential_density?
+
+```{r}
+TH21 <- readMat(here("OCNMS_Hypoxia", "Data", "2021.mat"))
+str(TH21) # Data structure
+```
+
+This does say density is in sigma-theta
+
+```{r}
+lst21 <- TH21$CT.TH042.210608.038
+datenum21 <- c(lst21[[2]][[4]]) # datenums as vector/timeJ
+dates21 <- as.POSIXct((datenum21 - 719529)*86400, origin = "1970-01-01", tz = "UTC") # subtract to get origin = January 0, 0000 (this is a made up date so as.POSIXct won't handle it natively), need to multiply by seconds in a day to go from datenum (days since made up Matlab epoch) to POSIXct (seconds since Unix epoch). Just kinda hoping they were using UTC here.
+dens21 <- c(lst21[[2]][[6]]) # Density as vector
+temp21 <- c(lst21[[2]][[1]]) # Temperature as vector
+
+matCheck <- data.frame(dates21, dens21, temp21)
+```
+
+This did not match at all.
+
+
+
+```{r Graph Checks}
+# Just some sanity checks to make sure I have what I think I have
+ggplot(data = envData, aes(x = date, y = DO, color = source)) +
+  geom_point(size = 0.5) +
+  facet_wrap(facets = vars(year), scales = "free_x") +
+  theme_bw()
+
+ggplot(data = SpeciesDetect, aes(x = Date_UTC)) +
+  geom_histogram(bins = 100) +
+  theme_bw()
+```
+# Calculate oxygen saturation state
+
+[R package documentation for this](https://search.r-project.org/CRAN/refmans/gsw/html/gsw_O2sol_SP_pt.html)
+Then in units of umol kg-1 compare [O2]measured / [O2]saturated *100% = saturation %.
+
+**Usage**
+
+gsw_O2sol_SP_pt(SP, pt)
+
+**Arguments**
+SP: Practical Salinity (PSS-78) [ unitless ]
+pt: potential temperature (ITS-90) [ degC ]
+
+**Value**
+Oxygen solubility in micro-moles per kg. 
+
+To go from O2 in ml/l to O2 in μmol/kg multiply by 44.660 and divide by density in CGS. [There is a small issue regarding what density to use, but it gets buried in the decimal place weeds. It is best to use sigma-0, i.e. (1000 + sigma0)/1000 in CGS.] - Converting O2 in volume units (ml/l) to O2 in mass units (μmol/kg) with Java OceanAtlas Custom Calculations (and also conversion of nutrients in μmol/l to μmol/kg), James h. Swift, UCSC Scripps Institution of Oceanography September 2021
+
+1 mL/L = 1.42903 mg/L
+
+## Evan says: 
+
+Potential density is just sigma_theta+1000 (g kg-1; this is the definition of sigma compared to rho). That gives 1026.15 to 1026.18 in the table above (pretty close to the zero-order assumption!)
+
+And in terms of the conversion, I always check the stoichiometric unit conversions: mg/L * mmol/mg * umol/mmol * L/g * g/kg -> mmol kg
+So you don't need to convert to mL/L at all (units that only matter for titrations), just calculate the concentration directly from your input units.
+Example: 3 mg/L * (mmol/31.9988 mg) * (1000 umol/mmol) * (L/1026g) * (1000 g/kg) = 3/31.9988/1026*1e6 = ~91 umol kg-1
+
+$$
+DO~\frac{mg}{L} \times \frac{mmol}{31.9988~mg} \times \frac{1000~\mu mol}{mmol} \times \frac{L}{1026 g} (density) \times \frac{1000 g}{kg}
+$$
+
+```{r}
+envDataSat <- envData %>% 
+  mutate(O2meas = DO/31.9988/(potential_density + 1000)*(1000^2), O2sat = gsw_O2sol_SP_pt(salinity, temperature), SatPct = (O2meas/O2sat)*100) %>% 
+  relocate(c(O2meas, O2sat, SatPct), .after = DO)
+```
+
+# Join the data
+
+```{r Data join}
+EnvRd <- envDataSat %>% 
+  mutate(DateMatch = round_date(date, unit = "10 minutes")) # Round to the nearest 10 minutes? 
+DetectRd <- SpeciesDetect %>% 
+  mutate(DateMatch = round_date(Date_UTC, unit = "10 minutes"), Date_local_hr = round_date(Date_local, unit = "hour")) # Spot check - looks good. 
+
+eDNAxEnvDataSat <- left_join(DetectRd, EnvRd, by = join_by(DateMatch)) 
+
+investigate <- eDNAxEnvDataSat %>% select(Species, DateMatch, Date_UTC, Date_local_hr, source, temperature, DO, SampleId, Rosette_position, Amplicon)
+
+
+```
+
+# Graphs
+
+## Presence
+
+```{r}
+eDNAxEnvDataSat_SOI <- eDNAxEnvDataSat %>% 
+  filter(Species %in% c("Acartia longiremis", "Calanus pacificus", "Clupea pallasii", "Oncorhynchus tshawytscha")) %>% 
+  filter(year %in% c(2021, 2022))
+ggplot(data = envDataSat, aes(x = date, y = SatPct)) +
+  geom_line(color = "gray90") +
+  geom_point(data = eDNAxEnvDataSat_SOI, aes(x = DateMatch, y = SatPct, shape = Present, size = Present, color = Present)) +
+  scale_shape_manual(values = c(1, 19)) +
+  scale_size_manual(values = c(1,1)) + 
+  theme_bw() +
+  facet_wrap(facets = vars(Species, year(date)), scales = "free_x", ncol = 4) +
+  scale_x_datetime(breaks = "month", date_labels = "%b-%y") +
+  theme(text = element_text(size = 20), axis.text.x = element_text(angle = 45, hjust = 1), strip.text = element_text(size = 8), strip.background = element_rect(fill = "gray95")) +
+  geom_hline(yintercept = 30, linetype = 2) +
+  labs(title = "Species Presence and Absence Over Dissolved Oxygen", x = "Date", y = "Dissolved Oxygen (Saturation %) At TH042")
+
+ggsave(filename = here("OCNMS_Project", "Plots", "SpeciesPresence_Oxygen_pO2.png"), width = 2500, height = 2000, units = "px")
+```
+## Hypoxic Events
+
+Work in progress
+
+```{r}
+EnvDataRange <- envDataSat %>% 
+  filter(date > as.POSIXct("2021-08-15 00:00:00", tz = "UTC"))
+
+EnvDataRange <- EnvDataRange %>% 
+  mutate(dayLocal = as.Date(date, tz = "America/Los_Angeles"))
+  
+Hypoxia <- EnvDataRange %>% 
+  filter(SatPct < 30) %>% 
+  relocate(dayLocal, .after = date)
+
+dayLocalHypoxia <- EnvDataRange %>% 
+  mutate(dayLocal = as.Date(date)) %>% 
+  relocate(dayLocal, .after = date) %>% 
+  group_by(source, dayLocal, year) %>% 
+  summarize(avTemp = mean(temperature), avDO = mean(SatPct)) %>% 
+  filter(avDO < 30) 
+
+# For threshold 30%:
+# 2021-08-15 to 2021-09-26
+# 2022-06-13 to 2022-06-16
+# 2022-07-29 to 2022-09-20
+
+start1 <- "2021-08-15"
+end1 <- "2021-09-26"
+start2 <- "2022-06-13"
+end2 <- "2022-06-16"
+start3 <- "2022-07-29"
+end3 <- "2022-09-20"
+
+# Manually enter the starts & ends of dates
+hypoxiaDates <- c(start1, end1, start2, end2, start3, end3)
+hypoxiaDatetimes <- as.POSIXct(hypoxiaDates, tz = "America/Los_Angeles") # as.POSIXct for graphing
+hypoxiaLines <- data.frame(Label = hypoxiaDates, Date = hypoxiaDatetimes) %>% 
+  mutate(year = year(Date))
+
+HypoxicEvents <- EnvDataRange %>% # Cut down the entire dataset to the hypoxic event dates from dayLocalHypoxia
+  mutate(Event = case_when(dayLocal >= as.Date(start1) & dayLocal <= as.Date(end1) ~ 1,
+                           dayLocal >= as.Date(start2) & dayLocal <= as.Date(end2) ~ 2,
+                           dayLocal >= as.Date(start3) & dayLocal <= as.Date(end3) ~ 3))
+
+HypoxicEventsSummary <- HypoxicEvents %>% # Take the average DO and temp, and also calculate lengths
+  group_by(Event) %>% 
+  summarize(Start = min(date), End = max(date), AvgOxygen = mean(SatPct, na.rm = T), AvgTemp = mean(temperature)) %>% 
+  mutate(Length = End - Start)
+
+ytext1 <- 10
+ytext2 <- 5
+labelsize <- 3
+
+ggplot(EnvDataRange, aes(x = date, y = SatPct)) +
+  geom_line() + 
+  theme_bw() +
+  geom_hline(yintercept = 30, 
+             color = "red", 
+             linetype = 2) + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        axis.text.x.top = element_blank(), # Needed to delete the extra axis created by ggbreak
+        axis.ticks.x.top = element_blank(),
+        axis.line.x.top = element_blank()) +
+  scale_x_datetime(breaks = "2 weeks", 
+                   date_labels = "%y-%m-%d",
+                   limits = c(as.POSIXct("2021-08-10"), as.POSIXct("2022-09-20"))) + # Need to extend a little for line label
+  geom_point(data = Hypoxia, 
+             aes(x = date, y = SatPct), 
+             color = "red", 
+             size = 0.1) +
+  geom_vline(
+    xintercept = hypoxiaDatetimes, 
+    color = "red") +
+  geom_label(data = hypoxiaLines, 
+            aes(x=Date, y=80, label=Label),
+            inherit.aes = T,
+            vjust = 0.5,
+            angle = 90,
+            size = 3) +
+  annotate(geom = "text", x = as.POSIXct("2021-09-10 12:00:00"), y = ytext1, label = "43 days", size = labelsize) +
+  annotate(geom = "text", x = as.POSIXct("2022-06-25 20:00:00"), y = ytext1, label = "<- 4 d", size = labelsize) +
+  annotate(geom = "text", x = as.POSIXct("2022-09-01"), y = ytext1, label = "54 d", size = labelsize) +
+  annotate(geom = "text", x = as.POSIXct("2021-09-10 20:00:00"), y = ytext2, label = "24%", size = labelsize) +
+  annotate(geom = "text", x = as.POSIXct("2022-06-25 20:00:00"), y = ytext2, label = "27%", size = labelsize) +
+  annotate(geom = "text", x = as.POSIXct("2022-09-01"), y = ytext2, label = "20%", size = labelsize) +
+  scale_x_break(as.POSIXct(c("2021-10-12", "2022-05-24"))) +
+  labs(title = "Lenghth & Severity of OCNMS Hypoxic Events", x = "Date", y = "Dissolved Oxygen (Saturation %)", caption = "Hypoxic events were defined here as periods where the daily average oxygen saturation was < 30%")
+
+ggsave(here("OCNMS_Project", "Plots", "HypoxicEvents_pO2.png"))
+```
+
+
+# Binomial Regression
+
+**Binomial Regression Assumptions**
+
+1. Independent observations - *Check!*
+2. No multicollinearity: Continuous independent variables should not be correlated with each other - *NOT MET - shouldn't do a DO x Temp x Presence model*
+3. Binomial dependent variable, with two **mutually exclusive** values - *Check!*
+4. Continuous independent variable - *Check!*
+5. Linearity between the binomial and continuous variables - this is checked with a logit transformation - *See below, this varies by species*
+6. Sufficient obeservations - the source I found recommends > 15 - *Check! 10 should be alright but I will note it in the results*
+7. No outliers - *One outlier, which appears to be part of a real heatwave - I have not filtered it out yet*
+
+
+## Check for outliers
+
+```{r}
+ggplot(EnvDataRange, aes(x = SatPct, y = temperature)) +
+  geom_point(color = "gray90", alpha = 0.5) +
+  geom_point(eDNAxEnvDataSat_SOI, mapping = aes(x = SatPct, y = temperature, color = Present, shape = Present), inherit.aes = F) +
+    scale_shape_manual(values = c(1, 19)) +
+  theme_bw() +
+  theme(text = element_text(size = 15), strip.text = element_text(size = 8), strip.background = element_rect(fill = "gray95")) +
+  labs(title = "Dissolved Oxygen vs. Temp + Species Presence", y = "Temperature") +
+  facet_wrap(facets = vars(Species))
+ggsave(filename = here("OCNMS_Project", "Plots", "SpeciesPresence_TempxDO.png"), width = 2500, height = 2000, units = "px")
+```
+
+## Filter out outliers - currently not using
+
+```{r}
+eDNAxEnvDataSat_SOI <- eDNAxEnvDataSat_SOI %>% 
+  filter(temperature < 11)
+```
+
+```{r}
+ggplot(EnvDataRange, aes(x = SatPct, y = temperature)) +
+  geom_point(color = "gray90", alpha = 0.5) +
+  geom_point(eDNAxEnvDataSat_SOI, mapping = aes(x = SatPct, y = temperature, color = Present, shape = Present), inherit.aes = F) +
+    scale_shape_manual(values = c(1, 19)) +
+  theme_bw() +
+  theme(text = element_text(size = 15), strip.text = element_text(size = 8), strip.background = element_rect(fill = "gray95")) +
+  labs(title = "Dissolved Oxygen vs. Temp + Species Presence", y = "Temperature") +
+  facet_wrap(facets = vars(Species))
+```
+
+
+## Check for linearity
+
+"Assumption #5 involves the necessity of a linear relationship between the continuous independent variables and the logit transformation of the dependent variable. This linearity assumption implies that **for continuous independent variables** like income level, hours of exercise per week, and blood sugar levels, **there should be a linear relationship with the logit of the dependent variable**, such as the probability of developing diabetes. Various methods can be employed to assess this linearity, with one common approach being the **Box-Tidwell procedure.** This technique involves creating interaction terms between each continuous independent variable and its natural logarithm and adding these to the logistic regression model. This technique can be implemented using software like **SPSS Statistics, which offers the Binary Logistic procedure to test for this assumption.** The results of this test are then interpreted to decide the next steps in the analysis, depending on whether the linearity assumption holds or is violated. If the assumption is met, the analysis can proceed as planned. However, if the assumption is not met, adjustments to the model or alternative methods may be necessary to address the non-linearity appropriately." - [Binomial Logistic Regression](https://www.amstatisticalconsulting.com/binomial-logistic-regression/)
+
+
+Basically, this equation needs to have a somewhat linear relationship with the independent variable: 
+
+$$g(p) = log\left( \frac{p}{1-p} \right)$$
+Where p = probability of 1 (if 1, p. if 0, 1-p)?
+
+```{r}
+joinSpeciesList <- split(eDNAxEnvDataSat_SOI, eDNAxEnvDataSat_SOI$Species) # Split by species
+
+library(car) # Has a function for the Box-Tidwell procedure
+?boxTidwell
+
+joinSpeciesList <- lapply(joinSpeciesList, drop_na, SatPct)
+
+
+# Single test
+boxTidwell(Present ~ SatPct, other.x = ~ year, data = joinSpeciesList[[1]]) # other.x = any factors not to be transformed. i had to make year into a factor to make it accept this lmao, so I'm not sure this is valid!
+
+# Loop to test all for linearity with DO
+for (i in 1:length(joinSpeciesList)) {
+  print(paste(names(joinSpeciesList)[i], sep = " ", "Presence vs Oxygen"))
+  print(boxTidwell(Present ~ SatPct, other.x = ~ year, data = joinSpeciesList[[i]]))
+}
+```
+
+## Calculate regression
+
+```{r}
+oxmodels <- lapply(joinSpeciesList, glm, formula = Present ~ SatPct, family = "binomial") # Make the model for each species
+lapply(oxmodels, summary) # Print the summary of each model
+```
+
+
+
+S Xu#, M Chen#, T Feng, L Zhan, L Zhou, G Yu*. Use ggbreak to effectively utilize plotting space to deal with large datasets and outliers. Frontiers in Genetics. 2021, 12:774846. doi: 10.3389/fgene.2021.774846
+

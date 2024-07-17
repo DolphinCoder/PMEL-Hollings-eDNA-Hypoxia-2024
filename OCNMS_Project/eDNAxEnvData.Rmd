@@ -1,28 +1,32 @@
 ---
 title: "Combining Species Presence/Absence with Environmental Data"
 author: "Eleanor (Ella) Crotty"
-header-includes:
-  \usepackage{fvextra}
-  \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,commandchars=\\\{\}}
+header-includes: \usepackage{fvextra} \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,commandchars=\\\{\}}
 output:
   pdf_document:
-    toc: TRUE
+    toc: yes
+  html_document:
+    toc: yes
+    df_print: paged
+  word_document:
+    toc: yes
 urlcolor: blue
 ---
 
 # Setup 
 
-```{r Package Imports, message = F, warning = F}
+```{r Package Imports, message = F, warning = F, results = F}
 # Warnings and startup messages suppressed
 library(tidyverse)
 library(patchwork)
 library(scales)
 library(ggrepel)
+library(ggbreak)
 library(readxl)
 library(here)
 ```
 
-```{r}
+```{r, results = F, message = F}
 # Import data
 SpeciesDetections <- read_csv(here("OCNMS_Project", "Outputs", "SOI_IDs_Species10Detections.csv")) %>% 
   filter(year(Date_UTC) != 2023)
@@ -66,16 +70,11 @@ ggplot(EnvData1, aes(x = date, y = DO, color = source, alpha = source)) +
 
 # Data Join
 
-```{r Data Join}
-messyjoin <- full_join(EnvData1, SpeciesDetections, by = join_by(date == Date_UTC)) # did not work, unsurprised
+```{r Data Join, results = F, message = F}
 EnvRd <- EnvData1 %>% 
-  mutate(DateMatch = round_date(date, unit = "10 minutes")) # well at least it didn't immediately explode. However, this still has many datapoints per hour. Maybe round to the nearest 10 minutes? 
+  mutate(DateMatch = round_date(date, unit = "10 minutes")) # Round to the nearest 10 minutes? 
 DetectRd <- SpeciesDetections %>% 
   mutate(DateMatch = round_date(Date_UTC, unit = "10 minutes"), Date_local_hr = round_date(Date_local, unit = "hour")) # Spot check - looks good. 
-
-messyrdjoin <- full_join(EnvRd, DetectRd, by = join_by(DateMatch)) # Many to many is probably expected - There's several detections per time point
-
-# Ok, that was pretty good! To try and avoid many-to-many, perhaps a specific join. Don't care about EnvHr without DetectHr matches, so make DetectHr x and do a left join (A left_join() keeps all observations in x.)
 
 eDNAxEnvData <- left_join(DetectRd, EnvRd, by = join_by(DateMatch)) 
 
@@ -84,7 +83,8 @@ investigate <- eDNAxEnvData %>% select(Species, DateMatch, Date_UTC, Date_local_
 
 # Joined data graphs
 
-```{r Graph eDNAxEnvData}
+```{r Graph eDNAxEnvData, fig.show = 'hide'}
+# Currently hidden because these aren't super helpful
 ggplot(eDNAxEnvData, aes(x = DateMatch, y = DO, shape = Present, size = Present, color = Present)) +
   scale_shape_manual(values = c(1, 19)) +
   scale_size_manual(values = c(1,1)) +
@@ -133,27 +133,121 @@ ggplot(data = EnvDataRange, aes(x = date, y = temperature)) +
 ggsave(filename = here("OCNMS_Project", "Plots", "SpeciesPresence_Temp_Preliminary.png"), width = 2500, height = 2000, units = "px")
 ```
 
++
+  annotate(geom = "label",
+    x = hypoxiaDatetimes,
+    y = rep(3, 6), # 3 mg/L, 6 times
+    label = hypoxiaDates,
+    vjust = rep(2, 6))
+    
+# Hypoxic Events
+```{r}
+EnvDataRange <- EnvDataRange %>% 
+  mutate(dayLocal = as.Date(date, tz = "America/Los_Angeles"))
+  
+Hypoxia <- EnvDataRange %>% 
+  filter(DO < 2) %>% 
+  relocate(dayLocal, .after = date)
+
+dayLocalHypoxia <- EnvDataRange %>% 
+  mutate(dayLocal = as.Date(date)) %>% 
+  relocate(dayLocal, .after = date) %>% 
+  group_by(source, dayLocal, year) %>% 
+  summarize(avTemp = mean(temperature), avDO = mean(DO)) %>% 
+  filter(avDO < 2) 
+
+# For threshold 2 mg/L:
+# Approx. 2021-08-15 to 08-31
+# Approx. 2021-09-20 to 09-26
+# Approx. 2022-08-11 to 09-20
+
+# Manually enter the starts & ends of dates
+hypoxiaDates <- c("2021-08-15", "2021-08-31", "2021-09-20", "2021-09-26", "2022-08-11", "2022-09-20")
+hypoxiaDatetimes <- as.POSIXct(hypoxiaDates, tz = "America/Los_Angeles") # as.POSIXct for graphing
+hypoxiaLines <- data.frame(Label = hypoxiaDates, Date = hypoxiaDatetimes) %>% 
+  mutate(year = year(Date))
+
+HypoxicEvents <- EnvDataRange %>% # Cut down the entire dataset to the hypoxic event dates from dayLocalHypoxia
+  mutate(Event = case_when(dayLocal >= as.Date("2021-08-15") & dayLocal <= as.Date("2021-08-31") ~ 1,
+                           dayLocal >= as.Date("2021-09-20") & dayLocal <= as.Date("2021-09-26") ~ 2,
+                           dayLocal >= as.Date("2022-08-11") & dayLocal <= as.Date("2022-09-20") ~ 3))
+
+HypoxicEventsSummary <- HypoxicEvents %>% # Take the average DO and temp, and also calculate lengths
+  group_by(Event) %>% 
+  summarize(Start = min(date), End = max(date), AvgOxygen = mean(DO, na.rm = T), AvgTemp = mean(temperature)) %>% 
+  mutate(Length = End - Start)
+
+ytext1 <- 0.5
+ytext2 <- 0.2
+
+ggplot(EnvDataRange, aes(x = date, y = DO)) +
+  geom_line() + 
+  theme_bw() +
+  geom_hline(yintercept = 2, 
+             color = "red", 
+             linetype = 2) + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        axis.text.x.top = element_blank(), # Needed to delete the extra axis created by ggbreak
+        axis.ticks.x.top = element_blank(),
+        axis.line.x.top = element_blank()) +
+  scale_x_datetime(breaks = "2 weeks", 
+                   date_labels = "%y-%m-%d",
+                   limits = c(as.POSIXct("2021-08-10"), as.POSIXct("2022-09-20"))) + # Need to extend a little for line label
+  geom_point(data = Hypoxia, 
+             aes(x = date, y = DO), 
+             color = "red", 
+             size = 0.1) +
+  geom_vline(
+    xintercept = hypoxiaDatetimes, 
+    color = "red") +
+  geom_text(data = hypoxiaLines, 
+            aes(x=Date, y=7.5, label=Label),
+            inherit.aes = T,
+            vjust = -0.5,
+            angle = 90) +
+  annotate(geom = "text", x = as.POSIXct("2021-08-22 12:00:00"), y = ytext1, label = "16 days", size = 3) +
+  annotate(geom = "text", x = as.POSIXct("2021-09-30 20:00:00"), y = ytext1, label = "<- 6 d", size = 3) +
+  annotate(geom = "text", x = as.POSIXct("2022-08-30"), y = ytext1, label = "39 d", size = 3) +
+  annotate(geom = "text", x = as.POSIXct("2021-08-22 20:00:00"), y = ytext2, label = "1.91 mg/L", size = 3) +
+  annotate(geom = "text", x = as.POSIXct("2021-10-05 20:00:00"), y = ytext2, label = "1.75 mg/L", size = 3) +
+  annotate(geom = "text", x = as.POSIXct("2022-08-30"), y = ytext2, label = "1.61 mg/L", size = 3) +
+  scale_x_break(as.POSIXct(c("2021-10-12", "2022-05-24"))) +
+  labs(title = "Lenghth & Severity of OCNMS Hypoxic Events", x = "Date", y = "Dissolved Oxygen (mg/L)", caption = "Hypoxic events were defined here as periods where the daily average DO was < 2 mg/L")
+
+ggsave(here("OCNMS_Project", "Plots", "HypoxicEvents.png"))
+
+ggplot(EnvDataRange, aes(x = date, y = DO)) +
+  geom_line() + 
+  theme_bw() +
+  facet_wrap(facets = vars(year), scales = "free_x") +
+  geom_hline(yintercept = 2, color = "red", linetype = 2) +
+  scale_x_datetime(breaks = "2 weeks", date_labels = "%y-%m-%d") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  geom_point(data = dayLocalHypoxia, aes(x = as.POSIXct(dayLocal), y = avDO), color = "red", size = 2)
+```
+
+
 # DO x Temp graphs
 
-```{r}
-ggplot(EnvDataRange, aes(x = temperature, y = DO, shape = source, color = as.factor(year))) +
+```{r, warning = F}
+full <- ggplot(EnvDataRange, aes(x = temperature, y = DO, shape = source, color = as.factor(year))) +
   scale_shape_manual(values = c(4,19)) +
   scale_color_manual(values = c("blue", "black")) +
   geom_point(shape = 1, alpha = 0.5) +
   theme_bw() +
   labs(title = "DO vs Temp during sampling years")
-ggsave(here("OCNMS_eDNA", "Plots", "DO_vs_Temp.png"))
+ggsave(here("OCNMS_eDNA", "Plots", "DO_vs_Temp.png"), plot = full)
 
-ggplot(EnvDataRange, aes(x = temperature, y = DO, shape = source, color = as.factor(year))) +
+full_yr <- ggplot(EnvDataRange, aes(x = temperature, y = DO, shape = source, color = as.factor(year))) +
   scale_shape_manual(values = c(4,19)) +
   scale_color_manual(values = c("blue", "black")) +
   geom_point(shape = 1, alpha = 0.5) +
   theme_bw() +
   facet_wrap(facets = vars(year)) +
   labs(title = "DO vs Temp during sampling years")
-ggsave(here("OCNMS_eDNA", "Plots", "DO_vs_TempYear.png"))
+ggsave(here("OCNMS_eDNA", "Plots", "DO_vs_TempYear.png"), plot = full_yr)
 
-ggplot(EnvDataRange, aes(x = temperature, y = DO, shape = source, color = as.factor(year))) +
+zoom <- ggplot(EnvDataRange, aes(x = temperature, y = DO, shape = source, color = as.factor(year))) +
   scale_shape_manual(values = c(4,19)) +
   scale_color_manual(values = c("blue", "black")) +
   geom_point(shape = 1, alpha = 0.5) +
@@ -161,9 +255,9 @@ ggplot(EnvDataRange, aes(x = temperature, y = DO, shape = source, color = as.fac
   scale_y_continuous(limits = c(0,6)) +
   theme_bw() +
   labs(title = "DO vs Temp during sampling years (Zoomed in)")
-ggsave(here("OCNMS_eDNA", "Plots", "DO_vs_Temp_Zoomed.png"))
+ggsave(here("OCNMS_eDNA", "Plots", "DO_vs_Temp_Zoomed.png"), plot = zoom)
 
-ggplot(EnvDataRange, aes(x = temperature, y = DO, shape = source, color = as.factor(year))) +
+zoom_yr <- ggplot(EnvDataRange, aes(x = temperature, y = DO, shape = source, color = as.factor(year))) +
   scale_shape_manual(values = c(4,19)) +
   scale_color_manual(values = c("blue", "black")) +
   geom_point(shape = 1, alpha = 0.5) +
@@ -172,20 +266,23 @@ ggplot(EnvDataRange, aes(x = temperature, y = DO, shape = source, color = as.fac
   theme_bw() +
   facet_wrap(facets = vars(year)) +
   labs(title = "DO vs Temp during sampling years (Zoomed in)")
-ggsave(here("OCNMS_eDNA", "Plots", "DO_vs_Temp_ZoomedYear.png"))
+ggsave(here("OCNMS_eDNA", "Plots", "DO_vs_Temp_ZoomedYear.png"), plot = zoom_yr)
+
+(full + full_yr) / (zoom + zoom_yr)
 ```
 
 # Binomial Regression
 
-```{r}
-joinSpeciesList <- split(eDNAxEnvData, eDNAxEnvData$Species)
+**Binomial Regression Assumptions**
 
-oxmodels <- lapply(joinSpeciesList, glm, formula = Present ~ DO, family = "binomial")
-lapply(oxmodels, summary)
+1. Independent observations - *Check!*
+2. No multicollinearity: Continuous independent variables should not be correlated with each other - *NOT MET - shouldn't do a DO x Temp x Presence model*
+3. Binomial dependent variable, with two **mutually exclusive** values - *Check!*
+4. Continuous independent variable - *Check!*
+5. Linearity between the binomial and continuous variables - this is checked with a logit transformation - *See below, this varies by species*
+6. Sufficient obeservations - the source I found recommends > 15 - *Check! 10 should be alright but I will note it in the results*
+7. No outliers - *One outlier, which appears to be part of a real heatwave - I have not filtered it out yet*
 
-tmodels <- lapply(joinSpeciesList, glm, formula = Present ~ temperature, family = "binomial")
-lapply(tmodels, summary)
-```
 
 ## Check for outliers
 
@@ -201,6 +298,26 @@ ggplot(EnvDataRange, aes(x = DO, y = temperature)) +
 ggsave(filename = here("OCNMS_Project", "Plots", "SpeciesPresence_TempxDO.png"), width = 2500, height = 2000, units = "px")
 ```
 
+## Filter out outliers - currently not using
+
+```{r}
+eDNAxEnvData_forlm <- eDNAxEnvData %>% 
+  filter(temperature < 11)
+```
+
+```{r}
+ggplot(EnvDataRange, aes(x = DO, y = temperature)) +
+  geom_point(color = "gray90", alpha = 0.5) +
+  geom_point(eDNAxEnvData_forlm, mapping = aes(x = DO, y = temperature, color = Present, shape = Present), inherit.aes = F) +
+    scale_shape_manual(values = c(1, 19)) +
+  theme_bw() +
+  theme(text = element_text(size = 15), strip.text = element_text(size = 8), strip.background = element_rect(fill = "gray95")) +
+  labs(title = "Dissolved Oxygen vs. Temp + Species Presence", y = "Temperature") +
+  facet_wrap(facets = vars(Species))
+ggsave(filename = here("OCNMS_Project", "Plots", "SpeciesPresence_TempxDO.png"), width = 2500, height = 2000, units = "px")
+```
+
+
 ## Check for linearity
 
 "Assumption #5 involves the necessity of a linear relationship between the continuous independent variables and the logit transformation of the dependent variable. This linearity assumption implies that **for continuous independent variables** like income level, hours of exercise per week, and blood sugar levels, **there should be a linear relationship with the logit of the dependent variable**, such as the probability of developing diabetes. Various methods can be employed to assess this linearity, with one common approach being the **Box-Tidwell procedure.** This technique involves creating interaction terms between each continuous independent variable and its natural logarithm and adding these to the logistic regression model. This technique can be implemented using software like **SPSS Statistics, which offers the Binary Logistic procedure to test for this assumption.** The results of this test are then interpreted to decide the next steps in the analysis, depending on whether the linearity assumption holds or is violated. If the assumption is met, the analysis can proceed as planned. However, if the assumption is not met, adjustments to the model or alternative methods may be necessary to address the non-linearity appropriately." - [Binomial Logistic Regression](https://www.amstatisticalconsulting.com/binomial-logistic-regression/)
@@ -212,6 +329,8 @@ $$g(p) = log\left( \frac{p}{1-p} \right)$$
 Where p = probability of 1 (if 1, p. if 0, 1-p)?
 
 ```{r}
+joinSpeciesList <- split(eDNAxEnvData, eDNAxEnvData$Species) # Split by species
+
 library(car) # Has a function for the Box-Tidwell procedure
 ?boxTidwell
 
@@ -220,17 +339,31 @@ joinSpeciesList <- lapply(joinSpeciesList, drop_na, DO)
 # joinSpeciesList, glm, formula = Present ~ DO
 
 # Single test
-boxTidwell(Present ~ DO, other.x = ~ year, data = joinSpeciesList[[1]]) # other.x = any factors not to be transformed. i had to make year into a factor to make it accept this lmao
+boxTidwell(Present ~ DO, other.x = ~ year, data = joinSpeciesList[[1]]) # other.x = any factors not to be transformed. i had to make year into a factor to make it accept this lmao, so I'm not sure this is valid!
 
-# Loop to test all for linearity
+# Loop to test all for linearity with temperature
 for (i in 1:length(joinSpeciesList)) {
   print(paste(names(joinSpeciesList)[i], sep = " ", "Presence vs DO"))
   print(boxTidwell(Present ~ DO, other.x = ~ year, data = joinSpeciesList[[i]]))
 }
-
+# Loop to test all for linearity with DO
 for (i in 1:length(joinSpeciesList)) {
   print(paste(names(joinSpeciesList)[i], sep = " ", "Presence vs Temp"))
   print(boxTidwell(Present ~ temperature, other.x = ~ year, data = joinSpeciesList[[i]]))
 }
 ```
+
+## Calculate regression
+
+```{r}
+oxmodels <- lapply(joinSpeciesList, glm, formula = Present ~ DO, family = "binomial") # Make the model for each species
+lapply(oxmodels, summary) # Print the summary of each model
+
+tmodels <- lapply(joinSpeciesList, glm, formula = Present ~ temperature, family = "binomial") # Make the model for each species (temperature)
+lapply(tmodels, summary) # Print the summary of each model
+```
+
+
+
+S Xu#, M Chen#, T Feng, L Zhan, L Zhou, G Yu*. Use ggbreak to effectively utilize plotting space to deal with large datasets and outliers. Frontiers in Genetics. 2021, 12:774846. doi: 10.3389/fgene.2021.774846
 

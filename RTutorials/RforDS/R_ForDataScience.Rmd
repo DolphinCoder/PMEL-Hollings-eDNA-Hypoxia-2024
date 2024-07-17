@@ -20,10 +20,12 @@ library(nycflights13)
 ```
 
 # Markdown
+
 * Don't put a space between `{r` and the chunk title
   * Also, chunks in a document must have unique titles!
 * `[text] (link)` but with no space between `](`
 * See header of this document for my favorite settings
+* [This website has some info on hiding various things in chunk options](https://bookdown.org/yihui/rmarkdown-cookbook/hide-one.html)
 
 Table!
 

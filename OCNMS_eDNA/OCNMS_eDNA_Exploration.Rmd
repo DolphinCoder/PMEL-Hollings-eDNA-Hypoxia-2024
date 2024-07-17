@@ -31,6 +31,8 @@ fishReads <- fishReads %>%
   filter(Cast_No. == "TH042") 
 # No more Chris. yay.
 
+OCNMS_metadata <- read.csv(here("OCNMS_eDNA", "Data", "OCNMS_eDNA_sampleData_full.csv"))
+
 coiReads <- read.csv(here("OCNMS_eDNA", "Data", "OCNMS_COI_Data.csv"))
 coiReads <- coiReads %>% 
   mutate(Marker = "Uni_CO1", Barcode_mod = NA) %>% # Barcode_mod just needs to be there to match fish.
@@ -38,10 +40,69 @@ coiReads <- coiReads %>%
   filter(Cast_No. == "TH042") 
 ```
 
+# Make allReads
+
 ```{r}
 allReads <- rbind(fishReads, coiReads)
 write_csv(allReads, here("OCNMS_eDNA", "Outputs", "FishPlusCOI_Reads.csv")) # Save all the reads for reference
 ```
+
+## Deal with PCR replicates
+
+```{r}
+PCR_reps_combine <- function(df) {
+  print(head(df))
+  
+  # Separate out Sample_Name into three informational columns
+  df_out <- df %>% 
+    separate(Sample_Name, 
+             into=c("E_no", "Cruise1", "PCR_Rep"), 
+             remove=F, 
+             fill = "right") %>% # sep is a regular expression which is annoying, but the default recognizes any non-alphanumeric characters so the default works here
+    mutate(.)
+  
+  # Define which columns to group by
+  id_cols1 <- colnames(df_out) # Pull out column names
+  id_cols1 <- id_cols1[! id_cols1 %in% c("X", "SampleId","Sample_Name", "PCR_Rep", "pctMatch", "JV_Sample_Name", "Technical_Replicate", "nReads", "Barcode.y")] # Remove SampleId and Sample_Name, as well as other things that differ by PCR replicate
+  print(id_cols1)
+  
+  df_out <- df_out %>% 
+    group_by_at(id_cols1) %>% 
+    dplyr::mutate(SampleId = dplyr::first(SampleId)) %>% 
+    summarize(nReads = mean(nReads)) %>% 
+    relocate(nReads, .after = PI)
+    
+  df_out
+}
+
+df_out1 <- PCR_reps_combine(allReads)
+```
+
+
+## Group by species
+
+```{r}
+id_cols <- colnames(allReads) # Pull out column names
+id_cols <- id_cols[! id_cols %in% c("X", "ESV", "sequence", "pctMatch", "nReads")] # Remove ESV + pctMatch + nreads
+
+allReads_species <- allReads %>% 
+  group_by_at(id_cols) %>% # group_by_at can take a vector
+  summarize(TotalnReads = sum(nReads), avgpctMatch = mean(pctMatch)) %>% 
+  relocate(TotalnReads, .after = SampleId)
+
+write_csv(allReads_species, here("OCNMS_eDNA", "Outputs", "AllReads_Species.csv"))
+
+fishReads_species <- fishReads %>% 
+  group_by_at(id_cols) %>% # group_by_at can take a vector
+  summarize(TotalnReads = sum(nReads), avgpctMatch = mean(pctMatch)) %>% 
+  relocate(TotalnReads, .after = SampleId)
+
+coiReads_species <- coiReads %>% 
+  group_by_at(id_cols) %>% # group_by_at can take a vector
+  summarize(TotalnReads = sum(nReads), avgpctMatch = mean(pctMatch)) %>% 
+  relocate(TotalnReads, .after = SampleId)
+```
+
 
 # Import species of interest
 
@@ -53,7 +114,7 @@ families <- c("Ammodytidae", "Acipenseridae")
 SpeciesOfInterest <- c(SOI_df$Taxon, SOI_invert_df$Taxon)
 ```
 
-# Functions
+# SOI Functions
 
 ```{r}
 # Summaries
@@ -105,24 +166,45 @@ COI_SOI_IDs <- SOI_full_fn(coiReads)
 SOI_IDs <- rbind(MiFish_SOI_IDs, COI_SOI_IDs) %>% 
   group_by(Family, Genus, Species)
 ```
+Old code:
+```
+# Group by species, not ESV
+SOI_ID_Species <- SOI_IDs %>% 
+  group_by(Family, Genus, Species, JV_Sample_Name, Barcode.x, Barcode_mod, SampleId, Biological_Replicate, Technical_Replicate, Cruise_ID_short, Cast_No., Rosette_position, Field_collection_method, Preservation, Station, Depth_m, Field_Notes, Date_UTC, Date_local, Lat_dec, Lon_dec, Run, Client, Replicate, Amplicon, Barcode.y, Marker) %>% 
+  summarize(TotalnReads = sum(nReads), avgpctMatch = mean(pctMatch))
+```
+
+I named this SOI_ID_Speciestest in the next script to see if it matched when I ran theortically similar code here. It matches!
+
+  
+```{r}
+id_cols <- colnames(SOI_IDs) # Pull out column names
+id_cols <- id_cols[-c(1,2,3,11,18)] # Remove ESV + pctMatch + nreads
+
+SOI_ID_Species <- SOI_IDs %>% 
+  group_by_at(id_cols) %>% # group_by_at can take a vector
+  summarize(TotalnReads = sum(nReads), avgpctMatch = mean(pctMatch))
+```
+
+
+# Export SOI
 
 ```{r}
 write_csv(MiFish_SOI_IDs, here("OCNMS_eDNA", "Data", "MiFish_SOI_IDs.csv"))
 write_csv(COI_SOI_IDs, here("OCNMS_eDNA", "Data", "COI_SOI_IDs.csv"))
 write_csv(SOI_IDs, here("OCNMS_eDNA", "Data", "All_SOI_IDs.csv"))
+write_csv(SOI_ID_Species, here("OCNMS_eDNA", "Data", "All_SOI_IDs_Species.csv"))
 ```
 
 
 ```{r}
+SOI_IDsyr <- SOI_IDs %>% 
+  mutate(Date_UTC = as.POSIXct(Date_UTC, tz = "UTC"), year = as.factor(year(as.POSIXct(Date_UTC, tz = "UTC"))))
 # Take allReads and start poking at dates and stuff!
-ggplot(SOI_IDs, aes(x = as.POSIXct(Date_UTC, tz = "UTC"), fill = Species)) +
-  geom_histogram() +
-  facet_wrap(facets = vars(year(as.POSIXct(Date_UTC, tz = "UTC"))), scales = "free_x", ncol = 1) +
-  theme_bw()
 ```
 
 ```{r}
-ggplot(SOI_IDs, aes(x = Species)) +
+ggplot(SOI_IDsyr, aes(x = Species)) +
   geom_bar() +
   theme_bw() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
@@ -141,5 +223,116 @@ SOI_IDs %>%
   filter(n > 10)
 ```
 
+# Calculate eDNA index
 
+```{r}
+index1dummy <- allReads %>%
+  dplyr::group_by(SampleId) %>% 
+  mutate(Tot = sum(nReads),
+      	Row.sums = nReads / Tot) %>% # calculate proportions - 0 reads/0 total = NaN, need to replace with 0 to make max() work
+  relocate(c(Tot, Row.sums), .after = SampleId)
+```
+
+## There's a bunch of sample with no reads of any species
+
+Just gonna filter those out for now
+
+```{r}
+problemchildren <- index1dummy %>% 
+  filter(Tot == 0)
+problemchildrencount <- problemchildren %>% 
+  group_by(SampleId) %>% 
+  summarize(n = n())
+problemchildrenID <- problemchildrencount$SampleId
+problem_meta <- OCNMS_metadata %>% 
+  filter(SampleId %in% problemchildrenID)
+problem_full <- allReads %>% 
+  filter(SampleId %in% problemchildrenID)
+write.csv(problem_meta, here("OCNMS_eDNA", "Data", "Flag", "DetectionProblem_Metadata.csv"))
+write.csv(problem_full, here("OCNMS_eDNA", "Data", "Flag", "DetectionProblem_Full.csv"))
+```
+
+## MiFish
+
+### By ESV
+
+```{r}
+MF_index1 <- fishReads %>%
+  filter(!(SampleId %in% problemchildrenID)) %>% 
+  dplyr::group_by(SampleId) %>% 
+  mutate(Tot = sum(nReads),
+      	Row.sums = nReads / Tot) %>% # calculate proportions - 0 reads/0 total = NaN, need to replace with 0 to make max() work
+  relocate(c(nReads, Tot, Row.sums), .after = SampleId)
+
+MF_eDNA_index_ESV <- MF_index1 %>% 
+  dplyr::group_by(ESV) %>%
+  mutate(Colmax = max(Row.sums), Normalized.reads = Row.sums / Colmax) %>%  #transforms raw number of reads to eDNA index
+  mutate(Normalized.reads = case_when(Normalized.reads == "NaN" ~ 0, 
+                                      .default = Normalized.reads)) %>% 
+  relocate(c(Colmax, Normalized.reads), .after = Row.sums) 
+```
+
+### By species
+```{r}
+# Index by species 
+
+MF_index1_sp <- fishReads_species %>%
+  filter(!(SampleId %in% problemchildrenID)) %>% 
+  dplyr::group_by(SampleId) %>% 
+  mutate(Tot = sum(TotalnReads),
+      	Row.sums = TotalnReads / Tot) %>% # calculate proportions - 0 reads/0 total = NaN, need to replace with 0 to make max() work
+  relocate(c(TotalnReads, Tot, Row.sums), .after = SampleId)
+
+MF_eDNA_index_Species <- MF_index1_sp %>% 
+  dplyr::group_by(Species) %>%
+  mutate(Colmax = max(Row.sums), Normalized.reads = Row.sums / Colmax) %>%  #transforms raw number of reads to eDNA index
+  mutate(Normalized.reads = case_when(Normalized.reads == "NaN" ~ 0, 
+                                      .default = Normalized.reads)) %>% 
+  relocate(c(Colmax, Normalized.reads), .after = Row.sums) 
+```
+
+## CO1
+
+### By ESV
+
+```{r}
+C_index1 <- coiReads %>%
+  filter(!(SampleId %in% problemchildrenID)) %>% 
+  dplyr::group_by(SampleId) %>% 
+  mutate(Tot = sum(nReads),
+      	Row.sums = nReads / Tot) %>% # calculate proportions - 0 reads/0 total = NaN, need to replace with 0 to make max() work
+  relocate(c(nReads, Tot, Row.sums), .after = SampleId)
+
+C_eDNA_index_ESV <- C_index1 %>% 
+  dplyr::group_by(ESV) %>%
+  mutate(Colmax = max(Row.sums), Normalized.reads = Row.sums / Colmax) %>%  #transforms raw number of reads to eDNA index
+  mutate(Normalized.reads = case_when(Normalized.reads == "NaN" ~ 0, 
+                                      .default = Normalized.reads)) %>% 
+  relocate(c(Colmax, Normalized.reads), .after = Row.sums) 
+```
+
+### By species (for export)
+```{r}
+# Index by species 
+
+C_index1_sp <- coiReads_species %>%
+  filter(!(SampleId %in% problemchildrenID)) %>% 
+  dplyr::group_by(SampleId) %>% 
+  mutate(Tot = sum(TotalnReads),
+      	Row.sums = TotalnReads / Tot) %>% # calculate proportions - 0 reads/0 total = NaN, need to replace with 0 to make max() work
+  relocate(c(TotalnReads, Tot, Row.sums), .after = SampleId)
+
+C_eDNA_index_Species <- C_index1_sp %>% 
+  dplyr::group_by(Species) %>%
+  mutate(Colmax = max(Row.sums), Normalized.reads = Row.sums / Colmax) %>%  #transforms raw number of reads to eDNA index
+  mutate(Normalized.reads = case_when(Normalized.reads == "NaN" ~ 0, 
+                                      .default = Normalized.reads)) %>% 
+  relocate(c(Colmax, Normalized.reads), .after = Row.sums) 
+```
+
+# Export eDNA index
+```{r}
+write_csv(C_eDNA_index_Species, here("OCNMS_Project", "Data", "COI_eDNA_index.csv"))
+write_csv(MF_eDNA_index_Species, here("OCNMS_Project", "Data", "MiFish_eDNA_index.csv"))
+```
 
