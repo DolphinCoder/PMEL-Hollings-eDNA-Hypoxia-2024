@@ -27,7 +27,7 @@ library(ggbreak)
 # Import data 
 
 ```{r}
-allReads_Species <- read_csv(here("OCNMS_eDNA", "Outputs", "AllReads_Species.csv"))
+allReads_Species <- read_csv(here("OCNMS_eDNA", "Outputs", "AllReads_Species.csv")) # Combined PCR replicates, combined ESVs in species
 envData <- read_csv(here("OCNMS_Hypoxia", "Outputs", "EnvironmentalDataset1.csv")) %>% 
   filter(year != 2023) %>%  # Ignoring 2023 due to gaps for now
   mutate(year = as.factor(year))
@@ -128,7 +128,7 @@ DetectRd <- SpeciesDetect %>%
 
 eDNAxEnvDataSat <- left_join(DetectRd, EnvRd, by = join_by(DateMatch)) 
 
-investigate <- eDNAxEnvDataSat %>% select(Species, DateMatch, Date_UTC, Date_local_hr, source, temperature, DO, SampleId, Rosette_position, Amplicon)
+investigate <- eDNAxEnvDataSat %>% select(Species, DateMatch, Date_UTC, Date_local_hr, source, temperature, DO, E_no, Rosette_position, Amplicon)
 
 system("say Data Join Complete")
 ```
@@ -309,16 +309,16 @@ $$g(p) = log\left( \frac{p}{1-p} \right)$$
 Where p = probability of 1 (if 1, p. if 0, 1-p)?
 
 ```{r}
-joinSpeciesList <- split(eDNAxEnvDataSat_SOI, eDNAxEnvDataSat_SOI$Species) # Split by species
+eDNAxEnvDataSat_SOI_box <- eDNAxEnvDataSat_SOI %>% 
+  filter(!is.na(SatPct), !is.na(Present), !is.na(year)) %>% 
+  filter(Species %in% c("Calanus pacificus", "Clupea pallasii", "Oncorhynchus tshawytscha")) # For some goddamn reason there's a species or two that REFUSES to box tidwell
+joinSpeciesList <- split(eDNAxEnvDataSat_SOI_box, eDNAxEnvDataSat_SOI_box$Species) # Split by species
 
 library(car) # Has a function for the Box-Tidwell procedure
 ?boxTidwell
 
-joinSpeciesList <- lapply(joinSpeciesList, drop_na, SatPct)
-
-
 # Single test
-boxTidwell(Present ~ SatPct, other.x = ~ year, data = joinSpeciesList[[1]]) # other.x = any factors not to be transformed. i had to make year into a factor to make it accept this lmao, so I'm not sure this is valid!
+boxTidwell(Present ~ SatPct, other.x = ~ year, data = joinSpeciesList[[1]]) # other.x = any factors not to be transformed. i had to make year into a factor to make it accept this, not sure what it's doing.
 
 # Loop to test all for linearity with DO
 for (i in 1:length(joinSpeciesList)) {
@@ -455,10 +455,15 @@ system("say Binomial Regression Models Computed")
 
 ## Box Tidwell Loop
 ```{r}
-SigSpBox <- eDNAxEnvDataSatClean %>% 
-  filter(Species %in% c("Aphanomyces astaci", "Aureococcus anophagefferens", "Heterosigma akashiwo", "Thecamonas trahens", "Chaetoceros socialis", "Lithodesmium intricatum", "Cyphoderia ampulla", "Bathycoccus prasinos", "Citharichthys sordidus", "Clytia gregaria", "Paramoeba branchiphila", "Vannella sp.", "Parvamoeba rugata", "Chrysochromulina sp. NIES-1333", "Thermocyclops inversus", "Pennaria disticha", "Stephanopyxis turris")) # Species I actually want to run this on, NA values removed
+SigSpBox <- eDNAxEnvDataSatClean %>%
+  filter(!is.na(SatPct)) %>% 
+  filter(Species %in% c("Aphanomyces astaci", "Aureococcus anophagefferens", "Thecamonas trahens", "Chaetoceros socialis", "Lithodesmium intricatum", "Cyphoderia ampulla", "Bathycoccus prasinos", "Clytia gregaria", "Paramoeba branchiphila", "Parvamoeba rugata", "Citharichthys sordidus",  "Thermocyclops inversus", "Pennaria disticha", "Clupea pallasii")) # Species I actually want to run this on, NA values removed
+
+fail <- c("Acartia longiremis", "Chrysochromulina sp. NIES-1333", "Stephanopyxis turris", "Vannella sp.", "Heterosigma akashiwo") # Species where box-tidwell failed - they have SatPct NA values but the drop_na should fix that
 
 LinearSplit <- split(SigSpBox, SigSpBox$Species) # Split by species, deleting species that broke the Box-Tidwell test for now
+
+LinearSplit <- lapply(LinearSplit, drop_na, c(SatPct, Present, year))
 
 test <- LinearSplit[[1]]
 test2 <- LinearSplit[[2]]
@@ -470,7 +475,11 @@ BoxTidwellP <- c()
 
 for (i in 1:length(LinearSplit)) {
   print(paste(names(LinearSplit)[i], sep = " ", "Presence vs Oxygen"))
-  box <- boxTidwell(Present ~ SatPct, other.x = ~ year, data = LinearSplit[[i]])
+  box <- boxTidwell(Present ~ SatPct, 
+                    other.x = ~ year, 
+                    data = LinearSplit[[i]], 
+                    na.action = na.exclude)
+  
   x <- round(box$result[3], digits = 5)
   SpeciesBox <- c(SpeciesBox, names(LinearSplit)[i])
   BoxTidwellP <- c(BoxTidwellP, x)
@@ -555,16 +564,7 @@ BigRateChange <- PercentageComparison %>%
   filter(abs(Delta) > 50)
 ```
 
-# Graphs (Part 2)
-
-```{r}
-source(here("OCNMS_Project", "PresenceEnvGraphFunction.R"))
-x <- test(2) # Should print 4 and assign x to 6
-presenceGraphVars()
-
-# Test the function
-presenceGraph(eDNAxEnvDataSat_SOI, envCond = "SatPct", envCondName = "Oxygen", thresholdLvl = 30, widthpx = 3000, ylab = "Oxygen Saturation (%)")
-```
+# New SOI list
 
 ```{r}
 # Acquire the data I want
@@ -584,9 +584,22 @@ EllaInterestDF <- eDNAxEnvDataSatClean %>%
   filter(Species %in% EllaInterest$Species)
 ```
 
+# Graphs (Part 2)
+
+```{r}
+source(here("OCNMS_Project", "PresenceEnvGraphFunction.R"))
+x <- test(2) # Should print 4 and assign x to 6
+presenceGraphVars()
+
+# Test the function
+presenceGraph(eDNAxEnvDataSat_SOI, envCond = "SatPct", envCondName = "Oxygen", thresholdLvl = 30, widthpx = 3000, ylab = "Oxygen Saturation (%)")
+```
+
 ```{r}
 # Run the function on my data of interest
 presenceGraph(EllaInterestDF, envCond = "SatPct", envCondName = "Oxygen", thresholdLvl = 20, heightpx = 1500, widthpx = 3000, ylab = "Oxygen Saturation (%)")
+
+presenceGraph(EllaInterestDF, envCond = "temperature", envCondName = "Temperature", thresholdLvl = 20, heightpx = 1500, widthpx = 3000, ylab = "Temperature (ºC)")
 
 system("say Presence and absence graphs complete!")
 ```
@@ -635,13 +648,6 @@ S Xu#, M Chen#, T Feng, L Zhan, L Zhou, G Yu*. Use ggbreak to effectively utiliz
 system("say Script Complete! Beep Beep!")
 ```
 
-To kill enter in terminal `while true; do pkill -9 say; done`
-
-```{r, eval = F}
-for (i in 1:length(SpeciesMod2)) {
-  x <- SpeciesMod2[i]
-  system(paste("say", x))
-}
-```
+To kill the talking enter in terminal `while true; do pkill -9 say; done`
 
 

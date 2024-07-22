@@ -5,24 +5,27 @@
 #stop("ERROR: Data must be an object of type data.frame")
 #}
 
+# This basically only works in eDNAxpO2.Rmd which is fine. Don't expect it to be adaptable to much else.
+
 test <- function(number, by = NA){
   print(number*2)
   return(number*3)
 }
 
 presenceGraphVars <- function() {
-  print("df, envCond, filename, filepath, title, ylab, widthpx = 2500, heightpx = 2000, threshold, thresholdLvl = 0")
+  print("df, envCond, filename, filepath, title, ylab, widthpx = 2500, heightpx = 2000, threshold, thresholdLvl = 0, labelLoc = 75")
 }
 
-presenceGraph <- function(df, 
-                          envCond, 
-                          envCondName = "EnvCondName",
-                          filepath = here("OCNMS_Project", "Plots", "PresenceAbsence"), 
-                          ylab = "Environmental Data",
-                          widthpx = 2500,
-                          heightpx = 2000,
-                          threshold = T,
-                          thresholdLvl = 0
+presenceGraph <- function(df, # Dataframe of species presence/absence + environmental factors
+                          envCond, # Environmental condition VARIABLE name for plotting
+                          envCondName = "EnvCondName", # Environmental condition name for export filename and plot title
+                          filepath = here("OCNMS_Project", "Plots", "PresenceAbsence"), # Where to save the file for export (a directory)
+                          ylab = "Environmental Data", # Y label
+                          widthpx = 2500, # Width for export
+                          heightpx = 2000, # Height for export
+                          threshold = T, # Whether or not to draw a horizontal line with a "threshold" for the environmental factor
+                          thresholdLvl = 0, # If threshold = T, y-intercept of the horizontal line
+                          labelLoc = 75 # Y location of the delta label (picked from EllaInterest)
                           ) {
   print("HEADS UP: Date/time must be called exactly date and be in POSIXct, and envCond must be entered as a string (in quotes)")
   print("If you don't want a threshold line, set threshold = F instead of setting a thresholdLvl")
@@ -31,8 +34,18 @@ presenceGraph <- function(df,
 
   for (i in 1:length(dfsplit)) {
     species <- dfsplit[[i]]$Species[1]
+    print(species)
     title <- paste(paste(species, sep = " ", "Presence vs"), sep = " ", envCondName)
     print(title)
+    
+    spStats <- EllaInterest %>% filter(Species == species) # The statistics of this species from my spreadsheet
+    # print(spStats)
+    # Commented out because it prints a dataframe, can be used to check
+    pctLab <- spStats$DetectionRateDelta
+
+    pct_labels <- data.frame(year = c(2021, 2022), label = c("", pctLab)) 
+    # Make the labels - pick out the detection rate delta, make the label for 2021 blank to put it on only one facet
+    
     
     if (threshold == T) { # If threshold, include geom_hline
       print(
@@ -50,6 +63,7 @@ presenceGraph <- function(df,
                 strip.text = element_text(size = 12), 
                 strip.background = element_rect(fill = "gray95")) +
           geom_hline(yintercept = thresholdLvl, linetype = 2) +
+          geom_text(x = as.POSIXct("2022-08-22"), y = labelLoc, aes(label = label), data = pct_labels) +
           labs(title = title, x = "Date", y = ylab)
       )
     } else { # If no threshold, don't include the geom_hline
@@ -67,6 +81,7 @@ presenceGraph <- function(df,
                 axis.text.x = element_text(angle = 45, hjust = 1), 
                 strip.text = element_text(size = 12), 
                 strip.background = element_rect(fill = "gray95")) +
+          geom_text(x = as.POSIXct("2022-08-22"), y = labelLoc, aes(label = label), data = pct_labels) +
           labs(title = title, x = "Date", y = ylab)
       )
     }

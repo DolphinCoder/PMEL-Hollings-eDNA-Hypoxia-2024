@@ -51,7 +51,7 @@ write_csv(allReads, here("OCNMS_eDNA", "Outputs", "FishPlusCOI_Reads.csv")) # Sa
 
 ```{r}
 PCR_reps_combine <- function(df) {
-  print(head(df))
+  # print(head(df))
   
   # Separate out Sample_Name into three informational columns
   df_out <- df %>% 
@@ -68,39 +68,47 @@ PCR_reps_combine <- function(df) {
   
   df_out <- df_out %>% 
     group_by_at(id_cols1) %>% 
-    dplyr::mutate(SampleId = dplyr::first(SampleId)) %>% 
+    # dplyr::mutate(SampleId = dplyr::first(SampleId)) %>% # Just ignoring sampleid for now and using E-no as unique
     summarize(nReads = mean(nReads)) %>% 
     relocate(nReads, .after = PI)
     
   df_out
 }
 
-df_out1 <- PCR_reps_combine(allReads)
+df_out1 <- PCR_reps_combine(allReads) # Spot check on E1032 worked
+
+allReads_PCRcomb <- PCR_reps_combine(allReads)
 ```
 
 
 ## Group by species
+## Export AllReads
 
 ```{r}
-id_cols <- colnames(allReads) # Pull out column names
-id_cols <- id_cols[! id_cols %in% c("X", "ESV", "sequence", "pctMatch", "nReads")] # Remove ESV + pctMatch + nreads
+# Replace with allReads_PCRcomb when done
 
-allReads_species <- allReads %>% 
+id_cols <- colnames(allReads_PCRcomb) # Pull out column names
+id_cols <- id_cols[! id_cols %in% c("X", "ESV", "sequence", "nReads")] # Remove ESV + nreads
+
+id_cols2 <- colnames(fishReads) # Pull out column names
+id_cols <- id_cols[! id_cols %in% c("X", "ESV", "sequence", "nReads", "pctMatch")] # Remove ESV + nreads + pctMatch
+
+allReads_species <- allReads_PCRcomb %>% 
   group_by_at(id_cols) %>% # group_by_at can take a vector
-  summarize(TotalnReads = sum(nReads), avgpctMatch = mean(pctMatch)) %>% 
-  relocate(TotalnReads, .after = SampleId)
+  summarize(TotalnReads = sum(nReads)) %>% # Removed , avgpctMatch = mean(pctMatch) because I had to remove pctMatch to combine PCR replicates
+  relocate(TotalnReads, .after = PI)
 
 write_csv(allReads_species, here("OCNMS_eDNA", "Outputs", "AllReads_Species.csv"))
 
 fishReads_species <- fishReads %>% 
-  group_by_at(id_cols) %>% # group_by_at can take a vector
-  summarize(TotalnReads = sum(nReads), avgpctMatch = mean(pctMatch)) %>% 
-  relocate(TotalnReads, .after = SampleId)
+  group_by_at(id_cols2) %>% # group_by_at can take a vector
+  summarize(TotalnReads = sum(nReads)) %>% 
+  relocate(TotalnReads, .after = PI)
 
 coiReads_species <- coiReads %>% 
-  group_by_at(id_cols) %>% # group_by_at can take a vector
-  summarize(TotalnReads = sum(nReads), avgpctMatch = mean(pctMatch)) %>% 
-  relocate(TotalnReads, .after = SampleId)
+  group_by_at(id_cols2) %>% # group_by_at can take a vector
+  summarize(TotalnReads = sum(nReads)) %>% 
+  relocate(TotalnReads, .after = PI)
 ```
 
 
@@ -224,6 +232,8 @@ SOI_IDs %>%
 ```
 
 # Calculate eDNA index
+
+Warning: This uses the data with PCR replicates NOT combined (except allReads_species, which does have them combined)
 
 ```{r}
 index1dummy <- allReads %>%

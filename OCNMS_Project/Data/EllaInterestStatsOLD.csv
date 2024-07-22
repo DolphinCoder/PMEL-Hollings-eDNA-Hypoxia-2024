@@ -1,0 +1,24 @@
+Species,CommonName,BinomSig,DeltaSig30,DetectionRateDelta,BinomP,LinearityTest
+Thermocyclops inversus,Copepod,T,T,-0.59,0.00003,T
+Thecamonas trahens,Protist,F,T,0.52,0.00024,F
+Pennaria disticha,Christmas tree hydroid,F,T,-0.51,0.00004,F
+Stephanopyxis turris,Diatom,F,T,-0.45,0.00718,F
+Heterosigma akishiwo,Algae,F,T,0.43,0.0008,F
+Clytia gregaria,Gregarious jellyfish,F,T,-0.36,0.00082,F
+Lithodesmium intricatum,Algae,F,T,0.34,0.00001,F
+Acanthamoeba comandoni,Amoeba,F,T,0.32,0.24776,NA
+Hemiaulus sinensis,Diatom,F,T,-0.30,0.97813,NA
+Microgradus proximus,Pacific tomcod,F,T,0.30,0.11047,NA
+Citharichthys sordidus,Pacific sanddab,T,F,-0.28,0.00594,T
+Vannella sp.,Amoeba,T,F,0.10,0.01425,T
+Parvamoeba rugata,Amoeba,T,F,0.06,0.01753,T
+Aphanomyces astaci,THE CRAYFISH PLAGUE,T,F,-0.13,0.01383,T
+Cyphoderia ampulla,Ameboid,T,F,0.14,0.00345,T
+Aureococcus anophagefferens,Diatom,T,T,0.54,0.00002,T
+Chaetoceros socialis,Phytoplankton,T,F,0.21,0.00002,T
+Bathycoccus prasinos,Picoplankton,F,F,0.28,0.00308,F
+Paramoeba branchiphilia,Amoeba,F,F,0.25,0.00254,F
+Chrysochromulina sp. NIES-1333,Phytoplankton,F,F,0.12,0.00842,F
+Paracalanus sp. C AC-2013,Copepod,NA,F,-0.24,0.00987,NA
+Acartia longiremis,Copepod,F,F,0.04,0.50648,T
+Clupea pallasii,Pacific herring,F,F,0.11,0.7581,F
