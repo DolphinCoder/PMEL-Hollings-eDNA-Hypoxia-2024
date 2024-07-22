@@ -16,10 +16,12 @@ library(tidyverse)
 library(patchwork)
 library(scales)
 library(ggrepel)
+library(ggpmisc)
 library(readxl)
 library(here)
 library(gsw)
 library(R.matlab)
+library(ggbreak)
 ```
 
 # Import data 
@@ -46,14 +48,14 @@ dens: [4040x1 double] (sigma‐theta)
 
 Is this the same as the envData potential_density?
 
-```{r}
+```{r, eval = F}
 TH21 <- readMat(here("OCNMS_Hypoxia", "Data", "2021.mat"))
 str(TH21) # Data structure
 ```
 
 This does say density is in sigma-theta
 
-```{r}
+```{r, eval = F}
 lst21 <- TH21$CT.TH042.210608.038
 datenum21 <- c(lst21[[2]][[4]]) # datenums as vector/timeJ
 dates21 <- as.POSIXct((datenum21 - 719529)*86400, origin = "1970-01-01", tz = "UTC") # subtract to get origin = January 0, 0000 (this is a made up date so as.POSIXct won't handle it natively), need to multiply by seconds in a day to go from datenum (days since made up Matlab epoch) to POSIXct (seconds since Unix epoch). Just kinda hoping they were using UTC here.
@@ -128,7 +130,7 @@ eDNAxEnvDataSat <- left_join(DetectRd, EnvRd, by = join_by(DateMatch))
 
 investigate <- eDNAxEnvDataSat %>% select(Species, DateMatch, Date_UTC, Date_local_hr, source, temperature, DO, SampleId, Rosette_position, Amplicon)
 
-
+system("say Data Join Complete")
 ```
 
 # Graphs
@@ -136,9 +138,13 @@ investigate <- eDNAxEnvDataSat %>% select(Species, DateMatch, Date_UTC, Date_loc
 ## Presence
 
 ```{r}
-eDNAxEnvDataSat_SOI <- eDNAxEnvDataSat %>% 
-  filter(Species %in% c("Acartia longiremis", "Calanus pacificus", "Clupea pallasii", "Oncorhynchus tshawytscha")) %>% 
+# Filter for years of interest
+eDNAxEnvDataSat <- eDNAxEnvDataSat %>% 
   filter(year %in% c(2021, 2022))
+# Filter for species of interest
+eDNAxEnvDataSat_SOI <- eDNAxEnvDataSat %>% 
+  filter(Species %in% c("Acartia longiremis", "Calanus pacificus", "Clupea pallasii", "Oncorhynchus tshawytscha")) 
+
 ggplot(data = envDataSat, aes(x = date, y = SatPct)) +
   geom_line(color = "gray90") +
   geom_point(data = eDNAxEnvDataSat_SOI, aes(x = DateMatch, y = SatPct, shape = Present, size = Present, color = Present)) +
@@ -154,8 +160,6 @@ ggplot(data = envDataSat, aes(x = date, y = SatPct)) +
 ggsave(filename = here("OCNMS_Project", "Plots", "SpeciesPresence_Oxygen_pO2.png"), width = 2500, height = 2000, units = "px")
 ```
 ## Hypoxic Events
-
-Work in progress
 
 ```{r}
 EnvDataRange <- envDataSat %>% 
@@ -243,6 +247,8 @@ ggplot(EnvDataRange, aes(x = date, y = SatPct)) +
   labs(title = "Lenghth & Severity of OCNMS Hypoxic Events", x = "Date", y = "Dissolved Oxygen (Saturation %)", caption = "Hypoxic events were defined here as periods where the daily average oxygen saturation was < 30%")
 
 ggsave(here("OCNMS_Project", "Plots", "HypoxicEvents_pO2.png"))
+
+system("say Hypoxic Event Graphs Saved")
 ```
 
 
@@ -275,7 +281,7 @@ ggsave(filename = here("OCNMS_Project", "Plots", "SpeciesPresence_TempxDO.png"),
 
 ## Filter out outliers - currently not using
 
-```{r}
+```{r, eval = F}
 eDNAxEnvDataSat_SOI <- eDNAxEnvDataSat_SOI %>% 
   filter(temperature < 11)
 ```
@@ -328,7 +334,314 @@ oxmodels <- lapply(joinSpeciesList, glm, formula = Present ~ SatPct, family = "b
 lapply(oxmodels, summary) # Print the summary of each model
 ```
 
+## Looped Binomial Regression
+
+```{r}
+# First, filter for more than 50 detections
+
+Detect50Sum <- eDNAxEnvDataSat %>% 
+  group_by(Species) %>% 
+  summarize(Detections = sum(Present)) %>% 
+  arrange(desc(Detections)) %>% 
+  filter(Detections > 50 & !is.na(Species)) 
+Detect50Species <- Detect50Sum$Species # 37 species
+
+Detect50 <- eDNAxEnvDataSat %>% 
+  filter(Species %in% Detect50Species) %>% 
+  mutate(year = as.factor(year)) %>% # Clean for boxtidwell
+  filter(!is.na(Present) & !is.na(SatPct) & !is.na(year))
+
+Detect50Split <- split(Detect50, Detect50$Species) # Split by species
+
+# Make a function that'll do the binomial regression AND put the results in a dataframe
+
+SpeciesMod <- c()
+InterceptP <- c()
+SlopeP <- c()
+SampleSizes <- c()
+
+#modtest <- glm(Detect50Split[[1]], formula = Present ~ SatPct, family = "binomial")
+#modsum <- summary(modtest)
+#Coefficients: modsum$coeffifients[1 = intercept/2 = slope, 4]
+
+for (i in 1:length(Detect50Split)) {
+  SpName <- names(Detect50Split)[i]
+  SpeciesMod <- c(SpeciesMod, SpName)
+  
+  df <- Detect50Split[[i]]
+  
+  SampleSize <- sum(df$Present)
+  SampleSizes <- c(SampleSizes, SampleSize)
+  
+  # lapply(joinSpeciesList, glm, formula = Present ~ SatPct, family = "binomial")
+  mod <- glm(df, formula = Present ~ SatPct, family = "binomial")
+  modsum <- summary(mod)
+  
+  Intercept <- round(modsum$coefficients[1,4], digits = 5)
+  Slope <- round(modsum$coefficients[2,4], digits = 5)
+  InterceptP <- c(InterceptP, Intercept)
+  SlopeP <- c(SlopeP, Slope)
+}
+
+BinomialRegressionResults <- data.frame(Species = SpeciesMod, InterceptP, SlopeP, n = SampleSizes)
+
+SignificantSlopes <- BinomialRegressionResults %>% filter(SlopeP < 0.05)
+SignificantIntercepts <- BinomialRegressionResults %>% filter(InterceptP < 0.05)
+
+SigSp <- SignificantSlopes$Species
+SigSpDf <- eDNAxEnvDataSat %>% 
+  filter(Species %in% SigSp)
+```
+
+ [1] "Paracalanus sp. C AC-2013"!!bad      "Chaetoceros socialis"          
+ [3] "Lithodesmium intricatum"        "Cyphoderia ampulla"            
+ [5] "Bathycoccus prasinos"           "Citharichthys sordidus"        
+ [7] "Clytia gregaria"                "Paramoeba branchiphila"        
+ [9] "Vannella sp."                   "Parvamoeba rugata"             
+[11] "Chrysochromulina sp. NIES-1333" "Aphanomyces astaci"            
+[13] "Aureococcus anophagefferens"    "Heterosigma akashiwo"          
+[15] "Thecamonas trahens"     
+
+## ALLLLLLL REGRESSIONS
+```{r}
+# Don't filter for more than 50 detections
+
+eDNAxEnvDataSatClean <- eDNAxEnvDataSat %>% 
+  mutate(year = as.factor(year)) %>% # Clean for boxtidwell
+  filter(!is.na(Present) & !is.na(SatPct) & !is.na(year)) # Clean for NA values
+
+AllSplit <- split(eDNAxEnvDataSatClean, eDNAxEnvDataSatClean$Species) # Split by species
+
+# Make a function that'll do the binomial regression AND put the results in a dataframe
+
+SpeciesMod2 <- c()
+InterceptP2 <- c()
+SlopeP2 <- c()
+SampleSizes2 <- c()
+
+#modtest <- glm(Detect50Split[[1]], formula = Present ~ SatPct, family = "binomial")
+#modsum <- summary(modtest)
+#Coefficients: modsum$coeffifients[1 = intercept/2 = slope, 4]
+
+for (i in 1:length(AllSplit)) {
+  SpName <- names(AllSplit)[i]
+  SpeciesMod2 <- c(SpeciesMod2, SpName)
+  
+  df <- AllSplit[[i]]
+  
+  SampleSize <- sum(df$Present)
+  SampleSizes2 <- c(SampleSizes2, SampleSize)
+  
+  mod <- glm(df, formula = Present ~ SatPct, family = "binomial")
+  modsum <- summary(mod)
+  
+  Intercept <- round(modsum$coefficients[1,4], digits = 5)
+  Slope <- round(modsum$coefficients[2,4], digits = 5)
+  InterceptP2 <- c(InterceptP2, Intercept)
+  SlopeP2 <- c(SlopeP2, Slope)
+}
+
+ALLBinomialRegressionResults <- data.frame(Species = SpeciesMod2, InterceptP = InterceptP2, SlopeP = SlopeP2, n = SampleSizes2)
+
+ALLSignificantSlopes <- ALLBinomialRegressionResults %>% filter(SlopeP2 < 0.05)
+ALLSignificantIntercepts <- ALLBinomialRegressionResults %>% filter(InterceptP2 < 0.05)
+
+ALLSigSp <- ALLSignificantSlopes$Species
+ALLSigSpDf <- eDNAxEnvDataSatClean %>% 
+  filter(Species %in% ALLSigSp)
+
+system("say Binomial Regression Models Computed")
+```
+
+## Box Tidwell Loop
+```{r}
+SigSpBox <- eDNAxEnvDataSatClean %>% 
+  filter(Species %in% c("Aphanomyces astaci", "Aureococcus anophagefferens", "Heterosigma akashiwo", "Thecamonas trahens", "Chaetoceros socialis", "Lithodesmium intricatum", "Cyphoderia ampulla", "Bathycoccus prasinos", "Citharichthys sordidus", "Clytia gregaria", "Paramoeba branchiphila", "Vannella sp.", "Parvamoeba rugata", "Chrysochromulina sp. NIES-1333", "Thermocyclops inversus", "Pennaria disticha", "Stephanopyxis turris")) # Species I actually want to run this on, NA values removed
+
+LinearSplit <- split(SigSpBox, SigSpBox$Species) # Split by species, deleting species that broke the Box-Tidwell test for now
+
+test <- LinearSplit[[1]]
+test2 <- LinearSplit[[2]]
+
+# Do a box Tidwell test on everything that had significant slopes
+# This only works on some of the species for some reason?
+SpeciesBox <- c()
+BoxTidwellP <- c()
+
+for (i in 1:length(LinearSplit)) {
+  print(paste(names(LinearSplit)[i], sep = " ", "Presence vs Oxygen"))
+  box <- boxTidwell(Present ~ SatPct, other.x = ~ year, data = LinearSplit[[i]])
+  x <- round(box$result[3], digits = 5)
+  SpeciesBox <- c(SpeciesBox, names(LinearSplit)[i])
+  BoxTidwellP <- c(BoxTidwellP, x)
+}
+
+BoxTidwellResults <- data.frame(SpeciesBox, BoxTidwellP) %>% arrange(desc(BoxTidwellP))
+
+BoxTidwellSuccess <- BoxTidwellResults %>% filter(BoxTidwellP > 0.05)
+```
+
+
+# Graph presence over DO vs temp
+
+```{r}
+Presences <- eDNAxEnvDataSat_SOI %>% 
+  filter(Present == T)
+
+ggplot(EnvDataRange, aes(x = temperature, y = SatPct)) +
+  geom_point(color = "gray90") +
+  geom_point(data = Presences, aes(x = temperature, y = SatPct, color = Species), alpha = 1) +
+  theme_bw()
+```
+
+# Detection Rates
+```{r}
+# Add hypoxia column
+EnvDataRange <- EnvDataRange %>% 
+  mutate(Hypoxia20 = case_when(SatPct < 20 ~ T, .default = F), Hypoxia30 = case_when(SatPct < 30 ~ T, .default = F))
+eDNAxEnvDataSat_SOI <- eDNAxEnvDataSat_SOI %>% 
+  mutate(Hypoxia20 = case_when(SatPct < 20 ~ T, .default = F), Hypoxia30 = case_when(SatPct < 30 ~ T, .default = F))
+eDNAxEnvDataSat <- eDNAxEnvDataSat %>% 
+  mutate(Hypoxia20 = case_when(SatPct < 20 ~ T, .default = F), Hypoxia30 = case_when(SatPct < 30 ~ T, .default = F))
+
+# Calculate herring numbers
+eDNAxEnvDataSat_SOI %>% 
+  filter(Species == "Clupea pallasii", Present == T) %>% 
+  group_by(Hypoxia20) %>% 
+  summarize(Observations = n()) %>% 
+  mutate(Percentage = Observations/sum(Observations))
+
+# Numbers to check with herring
+TotalHerring <- as.numeric(eDNAxEnvDataSat_SOI %>% filter(Species == "Clupea pallasii", Present == T) %>% summarize(n = n()))
+HypoxicHerring <- as.numeric(eDNAxEnvDataSat_SOI %>% filter(Species == "Clupea pallasii", Present == T, Hypoxia20 == T) %>% summarize(n = n()))
+OxicHerring <- as.numeric(eDNAxEnvDataSat_SOI %>% filter(Species == "Clupea pallasii", Present == T, Hypoxia20 == F) %>% summarize(n = n()))
+
+TotalSamples <- as.numeric(eDNAxEnvDataSat_SOI %>% filter(Species == "Clupea pallasii") %>% summarize(n = n()))
+HypoxicSamples <- as.numeric(eDNAxEnvDataSat_SOI %>% filter(Species == "Clupea pallasii", Hypoxia20 == T) %>% summarize(n = n()))
+OxicSamples <- as.numeric(eDNAxEnvDataSat_SOI %>% filter(Species == "Clupea pallasii", Hypoxia20 == F) %>% summarize(n = n()))
+```
+
+```{r}
+# Calculating detection rates for all species
+hypoxic <- eDNAxEnvDataSat %>% 
+  filter(Hypoxia20 == T)
+
+oxic <- eDNAxEnvDataSat %>% 
+  filter(Hypoxia20 == F)
+
+# Samps = samples
+# Dtct = detections
+Hsum <- hypoxic %>% 
+  group_by(Species) %>% 
+  summarize(Dtct_H = sum(Present), Samps_H = n()) %>% 
+  mutate(Pct_Dtct_H = round((Dtct_H/Samps_H)*100, digits = 2))
+
+Osum <- oxic %>% 
+  group_by(Species) %>% 
+  summarize(Dtct_O = sum(Present), Samps_O = n()) %>% 
+  mutate(Pct_Dtct_O = round((Dtct_O/Samps_O)*100, digits = 2))
+
+PercentageComparison <- full_join(Hsum, Osum, by = join_by(Species)) %>% 
+  mutate(TotalDtct = Dtct_H+Dtct_O, 
+         Samps = Samps_H + Samps_O, 
+         Pct_Dtct_Total = round((TotalDtct/Samps)*100, digits = 2), 
+         Delta = Pct_Dtct_O - Pct_Dtct_H, # Delta = Oxic - hypoxic detection percentages
+         AbsDelta = abs(Delta)) # To sort by
+
+# Filter for large differences between hypoxic and non-hypoxic detection rates
+RateChange <- PercentageComparison %>% 
+  filter(abs(Delta) > 20)
+BigRateChange <- PercentageComparison %>% 
+  filter(abs(Delta) > 50)
+```
+
+# Graphs (Part 2)
+
+```{r}
+source(here("OCNMS_Project", "PresenceEnvGraphFunction.R"))
+x <- test(2) # Should print 4 and assign x to 6
+presenceGraphVars()
+
+# Test the function
+presenceGraph(eDNAxEnvDataSat_SOI, envCond = "SatPct", envCondName = "Oxygen", thresholdLvl = 30, widthpx = 3000, ylab = "Oxygen Saturation (%)")
+```
+
+```{r}
+# Acquire the data I want
+EllaInterest <- read_csv(here("OCNMS_Project", "Data", "EllaInterestStats.csv")) %>%  # Importing my spreadsheet of species of interest based on all of those tests. Indicates whether the species are significant by detection rate (>30%) and whether they had a significant binomial regression result with oxygen saturation.
+  mutate(DeltaSig20 = case_when(abs(DetectionRateDelta) >= 0.2 ~ T, .default = F)) %>% 
+  relocate(DeltaSig20, .after = DeltaSig30)
+SigBoth20 <- EllaInterest %>% filter(BinomSig == T & DeltaSig20 == T) # Extract species names that are significant based on binomial regression and change in detection rates above and below the hypoxic threshold
+SigBoth20 <- SigBoth20$Species
+SigBoth <- as.vector(EllaInterest %>% filter(BinomSig == T & DeltaSig30 == T) %>% select(Species))
+SigBinom <- as.vector(EllaInterest %>% filter(BinomSig == T) %>% select(Species)) 
+SigDelta <- as.vector(EllaInterest %>% filter(DeltaSig30 == T) %>% select(Species)) 
+
+SigBoth20df <- eDNAxEnvDataSatClean %>% 
+  filter(Species %in% SigBoth20)
+
+EllaInterestDF <- eDNAxEnvDataSatClean %>% 
+  filter(Species %in% EllaInterest$Species)
+```
+
+```{r}
+# Run the function on my data of interest
+presenceGraph(EllaInterestDF, envCond = "SatPct", envCondName = "Oxygen", thresholdLvl = 20, heightpx = 1500, widthpx = 3000, ylab = "Oxygen Saturation (%)")
+
+system("say Presence and absence graphs complete!")
+```
+
+# Graph binomial regression
+
+```{r}
+binomtest <- EllaInterestDF %>% filter(Species == "Thecamonas trahens") %>% mutate(PresentBin = case_when(Present == T ~ 1, Present == F ~ 0))
+ggplot(binomtest, aes(x = SatPct, y = PresentBin)) +
+  geom_point() +
+  geom_smooth(method = "glm", method.args = list(family = "binomial"), se = F) +
+  stat_poly_eq(use_label(c("eq", "R2"))) +
+  theme_bw()
+```
+
+# Loop to graph binom regresion
+```{r}
+for (i in 1:length(AllSplit)) {
+  df <- AllSplit[[i]] %>% mutate(PresentBin = case_when(Present == T ~ 1, Present == F ~ 0))
+  species <- as.character(AllSplit[[i]][1,7])
+  system(paste("say", species))
+  # print(head(df))
+  
+  ggplot(df, aes(x = SatPct, y = PresentBin)) +
+    geom_point() +
+    geom_smooth(method = "glm", method.args = list(family = "binomial"), se = F) +
+    stat_poly_eq(use_label(c("eq", "R2"))) +
+    theme_bw() +
+    labs(title = species)
+  
+    ggsave(filename = here("OCNMS_Project", "Plots",
+                           "Binomial_Regressions", 
+                           paste(species, sep = ".", "png")), 
+           width = 2300, 
+           height = 2000, 
+           units = "px")
+}
+
+system("say Binomial Regression Graphs Complete!")
+```
 
 
 S Xu#, M Chen#, T Feng, L Zhan, L Zhou, G Yu*. Use ggbreak to effectively utilize plotting space to deal with large datasets and outliers. Frontiers in Genetics. 2021, 12:774846. doi: 10.3389/fgene.2021.774846
+
+```{r}
+system("say Script Complete! Beep Beep!")
+```
+
+To kill enter in terminal `while true; do pkill -9 say; done`
+
+```{r, eval = F}
+for (i in 1:length(SpeciesMod2)) {
+  x <- SpeciesMod2[i]
+  system(paste("say", x))
+}
+```
+
 
