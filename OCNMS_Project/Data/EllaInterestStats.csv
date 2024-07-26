@@ -11,7 +11,7 @@ Clupea pallasii,Pacific herring,F,F,-0.10,0.0645,NA
 Clytia gregaria,Gregarious jellyfish,F,T,-0.34,0.00364,F
 Cyphoderia ampulla,Ameboid,T,F,0.07,0.05854,NA
 Hemiaulus sinensis,Diatom,F,F,-0.11,0.52787,NA
-Heterosigma akishiwo,Algae,F,T,0.32,0.02209,F
+Heterosigma akashiwo,Algae,F,T,0.32,0.02209,F
 Lithodesmium intricatum,Algae,F,T,0.35,0.00051,F
 Microgadus proximus,Pacific tomcod,F,F,0.17,0.6111,NA
 Paracalanus sp. C AC-2013,Copepod,NA,T,-0.31,0.00589,NA
@@ -24,3 +24,6 @@ Thermocyclops inversus,Copepod,T,T,-0.46,0.00061,T
 Vannella sp.,Amoeba,T,F,0.17,0.06329,NA
 Poterioochromonas stipitata,Zooplankton,F,T,-0.34,0.07782,NA
 Pseudocalanus acuspes,Copepod,F,F,0.28,0.09581,NA
+Calanus pacificus,Copepod,NA,NA,NA,NA,NA
+Paracalanus spp.,Copepod,NA,NA,NA,NA,NA
+Euphasia pacifica,Krill,NA,NA,NA,NA,NA

@@ -43,7 +43,7 @@ coiReads <- coiReads %>%
 # Make allReads
 
 ```{r}
-allReads <- rbind(fishReads, coiReads)
+allReads <- rbind(fishReads, coiReads) %>% filter(ESV != "ESV_225890")
 write_csv(allReads, here("OCNMS_eDNA", "Outputs", "FishPlusCOI_Reads.csv")) # Save all the reads for reference
 ```
 
@@ -109,6 +109,27 @@ coiReads_species <- coiReads %>%
   group_by_at(id_cols2) %>% # group_by_at can take a vector
   summarize(TotalnReads = sum(nReads)) %>% 
   relocate(TotalnReads, .after = PI)
+```
+
+# Grab ESVs of interesting species
+
+See eDNAxpO2.Rmd for why these species are interesting. This is just to generate reference ESVs for a BLAST search.
+
+```{r}
+EllaInterest <- read_csv(here("OCNMS_Project", "Data", "EllaInterestStats.csv")) %>%  # Importing my spreadsheet of species of interest based on all of those tests. Indicates whether the species are significant by detection rate (>30%) and whether they had a significant binomial regression result with oxygen saturation.
+  mutate(DeltaSig20 = case_when(abs(DetectionRateDelta) >= 0.2 ~ T, .default = F)) %>% 
+  relocate(DeltaSig20, .after = DeltaSig30)
+
+EllaInterestDF <- allReads %>% 
+  filter(Species %in% EllaInterest$Species)
+
+ESVfinder <- EllaInterestDF %>% 
+  group_by(ESV, sequence, Species) %>% 
+  summarize(Samples = n(), AvgPctMatch = mean(pctMatch), Totalreads = sum(nReads)) %>% 
+  arrange(Species)
+
+litESVfinder <- ESVfinder %>% 
+  filter(Species %in% c("Acanthamoeba comandoni", "Aphanomyces astaci", "Aureococcus anophagefferens", "Bathycoccus prasinos", "Citharichthys sordidus", "Clupea pallasii", "Clytia gregaria", "Heterosigma akashiwo", "Lithodesmium intricatum", "Paracalanus sp. C AC-2013", "Pennaria disticha", "Poterioochromonas stipitata", "Pseudocalanus acuspes", "Stephanopyxis turris", "Thecamonas trahens", "Thermocyclops inversus"))
 ```
 
 
