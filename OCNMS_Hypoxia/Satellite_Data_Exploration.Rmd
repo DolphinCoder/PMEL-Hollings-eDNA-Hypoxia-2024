@@ -11,6 +11,8 @@ output:
 urlcolor: blue
 ---
 
+**This code is not necessary to the overall workflow, as I ended up using the mooring data.**
+
 # Setup
 
 ```{r Package Imports, message = F, warning = F}

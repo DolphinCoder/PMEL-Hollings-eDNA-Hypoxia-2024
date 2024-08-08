@@ -11,6 +11,8 @@ output:
 urlcolor: blue
 ---
 
+**This code should be run before HypoxiaTimeSeries.Rmd, but is not strictly necessary to this workflow, as I only ended up using the CTD data points to validate that the mooring wasn't totally off-base. Using OCNMS_Mooring_CleanData.csv to go into eDNAxEnvData.Rmd is totally fine.**
+
 # Setup
 
 ```{r Package Imports, message = F, warning = F}

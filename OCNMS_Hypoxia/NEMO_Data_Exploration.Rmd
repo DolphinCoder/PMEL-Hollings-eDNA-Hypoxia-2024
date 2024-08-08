@@ -10,6 +10,8 @@ output:
 urlcolor: blue
 ---
 
+**I did not end up using any of this in the final workflow, so this code is not necessary to the overall workflow.**
+
 # Setup
 
 ```{r Change Depths}

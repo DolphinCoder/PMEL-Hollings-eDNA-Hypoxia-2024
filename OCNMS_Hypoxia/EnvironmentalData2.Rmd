@@ -1,0 +1,89 @@
+---
+title: "Adding Satellite Data"
+author: "Eleanor (Ella) Crotty"
+header-includes:
+  \usepackage{fvextra}
+  \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,commandchars=\\\{\}}
+output:
+  pdf_document:
+    toc: TRUE
+urlcolor: blue
+---
+
+```{r Package Imports, message = F, warning = F}
+# Warnings and startup messages suppressed
+library(tidyverse)
+library(patchwork)
+library(scales)
+library(ggrepel)
+library(readxl)
+library(here)
+```
+
+```{r Import Data}
+SatelliteData <- read.csv(here("OCNMS_Hypoxia", "Outputs", "SatelliteData_all.csv")) # Import satellite sea surface temperature and chlorophyll data from within 0.1 degrees latitude & longitude of the TH mooring
+MooringCTD_Data <- read.csv(here("OCNMS_Hypoxia", "Outputs", "EnvironmentalDataset1.csv")) # Import mooring and CTD environmental data from 2021-2023 + 30-45 meters deep
+```
+
+```{r Check Data}
+SatelliteData$source = "Satellite"
+SatelliteData <- SatelliteData %>% 
+  mutate(date = as.POSIXct(date), year = year(date)) %>% 
+  select(source, date, year, SST_C, Chlor_a_mg_m_3, Mean_SST_Error)
+MooringCTD_Data <- MooringCTD_Data %>% 
+  mutate(date = as.POSIXct(date)) %>% 
+  select(source, date, year, temperature, DO, salinity, potential_density, pres, cond, sampleID)
+head(SatelliteData)
+head(MooringCTD_Data)
+```
+
+```{r Plot Data}
+plt1 <- ggplot(MooringCTD_Data, aes(x = date, y = temperature, color = source)) +
+  geom_point(shape = 1) +
+  scale_x_datetime(date_breaks = "2 months", date_labels = "%m-%y") +
+  theme_bw()
+
+plt2 <- ggplot(SatelliteData, aes(x = date, y = SST_C, color = source)) +
+  geom_point(shape = 1) +
+  scale_x_datetime(date_breaks = "2 months", date_labels = "%m-%y") +
+  theme_bw()
+
+plt1/plt2
+```
+
+These definitely aren't super correlated. For now, let's just slap that daily satellite data in for summer 2023, but the surface to mooring data do not match.
+
+```{r Fill 2023 gap}
+MooringCTD_Data %>% filter(year == 2023) %>% arrange(date)
+# Missing until August 31
+GapFill <- SatelliteData %>% filter(year == 2023, date < as.POSIXct("2023-08-31 00:00:00")) %>% mutate(temperature = SST_C) %>% select(-c(SST_C))
+# Add some NA columns for rbind
+MooringCTD_Data$Chlor_a_mg_m_3 = NA
+MooringCTD_Data$Mean_SST_Error = NA
+GapFill$DO = NA
+GapFill$salinity = NA
+GapFill$potential_density = NA
+GapFill$pres = NA
+GapFill$cond = NA
+GapFill$sampleID = NA
+
+MooringCTD_Data <- MooringCTD_Data %>% select(source, date, year, temperature, DO, salinity, potential_density, pres, cond, sampleID, Chlor_a_mg_m_3, Mean_SST_Error)
+GapFill <- GapFill %>% select(source, date, year, temperature, DO, salinity, potential_density, pres, cond, sampleID, Chlor_a_mg_m_3, Mean_SST_Error)
+
+EnvironmentalData2GapFilled <- rbind(MooringCTD_Data, GapFill) %>% arrange(date)
+```
+
+```{r Plot gap filled}
+ggplot(EnvironmentalData2GapFilled, aes(x = date, y = temperature, color = source)) +
+  geom_point(shape = 1) +
+  scale_x_datetime(date_breaks = "2 months", date_labels = "%m-%y") +
+  theme_bw()
+
+ggsave(here("OCNMS_Hypoxia", "Plots", "GapsFilledTimeSeries.png"))
+
+write.csv(EnvironmentalData2GapFilled, file = here("OCNMS_Hypoxia", "Outputs", "EnvironmentalDataset2.csv"))
+```
+
+Based on the huge gap between the satellite and CTD data, this isn't a great option - ask Simone about models? 
+
+

@@ -14,51 +14,31 @@ urlcolor: blue
 
 ```{r Package Imports, message = F, warning = F}
 # Warnings and startup messages suppressed
-library(tidyverse)
-library(patchwork)
-library(scales)
-library(ggrepel)
-library(readxl)
-library(here)
-library(R.matlab)
+library(tidyverse) # ggplot, dplyr, lubridate, etc
+library(patchwork) # put plots next to each other
+library(scales) # ggplot enhancement
+library(ggrepel) # ggplot enhancement
+library(here) # Make nicer filepaths relative to this directory
+library(R.matlab) # For checking against original mat files
 ```
 
-**Date Formats Understood by Readr**
-
-| Type  | Code| Meaning    | 
-|:-----:|:-----|:-----------|
-| Year  | `%Y` | **4 digit year** |
-|       | `%y` | 2 digit year |
-| Month | `%m` | Number       |
-|       | `%b` | **Abbreviated (ex. Feb)** |
-|       | `%B` | Full name |
-| Day   | `%d` | 1-2 digits |
-|       | `%e` | **2 digits** |
-| Time  | `%H` | 24 hour hour |
-|       | `%I` | 12 hour hour |
-|       | `%p` | am or pm |
-|       | `%M` | Minutes |
-|       | `%S` | Seconds |
-|       | `%OS`| Seconds with decimal component|
-|       | `%Z` | Time zone name |
-|       | `%z` | Offset from UTC |
-| Other | `%.` | Skip one non-digit, (ex. :) |
-|       | `%*` | Skip any number of non-digits |
-
 ```{r Data Imports}
+# Set working directories (this will work within the PMEL-Hollings-eDNA-Hypoxia directory through the here() command)
 wd <- "OCNMS_Hypoxia/Data"
 exp <- "OCNMS_Hypoxia/Outputs"
 pltpath <- "OCNMS_Hypoxia/Plots/Mooring_Data_Exploration_Plots"
 
-TH042 <- read.csv(here(wd, "MooringData_CTPO_TH042.csv"), na = "NaN")
+TH042 <- read.csv(here(wd, "MooringData_CTPO_TH042.csv"), na = "NaN") # Import Teawhit Head 42m depth mooring data
 
-TH042$time <- as.POSIXct(TH042$time, tryFormats = c("%e-%b-%Y %H:%M:%S"), tz = "UTC")
+TH042$time <- as.POSIXct(TH042$time, tryFormats = c("%e-%b-%Y %H:%M:%S"), tz = "UTC") # Convert time to POSIXct (datetime) class
 TH042 <- TH042 %>%
-  mutate(year = as.factor(year(time)))
+  mutate(year = as.factor(year(time))) # Create year column
 ```
 
-```{r}
+```{r, eval = F}
 # Check times against .mat files
+# This chunk is a pain in the neck and does not need to be run again, but if you feel like checking against the mooring matlab files, go ahead
+
 MoorMat21 <- readMat(here("OCNMS_Hypoxia", "Data", "2021.mat"))
 # str(MoorMat21) # Data structure
 lst <- MoorMat21$CT.CA042.210610.038 # Extract data structure
@@ -156,6 +136,7 @@ histogram <- function(df, var, binwidth) {
 ```
 
 ```{r Scatterplot Functions}
+# Function to speed up ggplot a little for basic data exploration
 scatterplt <- function(df, x, y, shape = 16, alpha = 1) {
   label <- rlang::englue("A scatterplot of {{x}} vs {{y}} in {{df}}")
   
@@ -177,18 +158,21 @@ scatterplt_fill <- function(df, x, y, color, shape = 16, alpha = 1) {
 }
 ```
 
-# Cleaning
+# Rename variables
 
-```{r}
+```{r Rename Variables}
+# Renname a few columns for consistency
 TH042 <- TH042 %>% 
   rename(DO = oxy_mg, temperature = temp, salinity = sal, date = time, potential_density = dens)
 ```
 
 # Data Exploration
 
+All of these chunks are optional and can be used to explore the mooring data
+
 ## Histograms
-```{r}
-histogram_fill(TH042, depth, 0.5, fill = year) # Range 40-45 m - ok to clip CTD data to that?
+```{r All Histograms, eval = F}
+histogram_fill(TH042, depth, 0.5, fill = year) # Range 40-45 me
 histogram_fill(TH042, temperature, 0.5, fill = year)
 histogram_fill(TH042, salinity, 0.1, fill = year)
 histogram_fill(TH042, potential_density, 0.1, fill = year)
@@ -198,7 +182,7 @@ histogram_fill(TH042, DO, 0.1, fill = year)
 
 ## Scatterplots
 
-```{r}
+```{r Scatterplots, eval = F}
 scatterplt(TH042, potential_density, salinity, alpha = 0.1)
 scatterplt_fill(TH042, potential_density, salinity, color = year)
 ```
@@ -207,7 +191,7 @@ scatterplt_fill(TH042, potential_density, salinity, color = year)
 # Oxygen Data Exploration
 
 ## Histograms
-```{r Oxygen Histograms}
+```{r Oxygen Histograms, eval = F}
 histogram(TH042, DO, 0.5)
 
 histogram(TH042, DO, 0.5) +
@@ -218,7 +202,7 @@ histogram_fill(TH042, DO, 0.5, fill = year)
 
 ## Time Series
 
-```{r}
+```{r, eval = F}
 # Graph of oxygen levels around 42 meters for each year
 TH042 %>% 
   ggplot(aes(x = date, y = DO, color = depth)) +
@@ -232,11 +216,11 @@ ggsave("OCNMS_Mooring_Oxygen_FacetYear.png", path = here(pltpath), width = 3000,
 # Export
 
 ```{r Export Mooring Data}
-# Add + reorder columns so that it can bind with the CTD data
+# Add + reorder columns so that it can bind with the CTD data if desired
 TH042$sampleID = NA
 TH042$source = "Mooring"
 TH042 <- TH042 %>% select("source", "date", "year", "temperature", "DO", "salinity", "potential_density", "pres", "cond", "sampleID") # Just ignoring depth since the mooring's depth reading changes with the currents, but it's always near 42m
 
-write.csv(TH042, file = here("OCNMS_Hypoxia", "Outputs", "OCNMS_Mooring_CleanData.csv"))
+write.csv(TH042, file = here("OCNMS_Hypoxia", "Outputs", "OCNMS_Mooring_CleanData.csv")) # Export file to hypoxia outputs
 ```
 

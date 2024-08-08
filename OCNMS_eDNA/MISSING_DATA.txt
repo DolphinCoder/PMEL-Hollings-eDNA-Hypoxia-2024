@@ -4,5 +4,5 @@ There are three files missing from this folder because they are too large.
 3. FishPlusCOI_Reads.csv
 
 They are very important, because they are the source of all the DNA data. 
-If you are only interested in the same species of interest as the Olympic Coast National Marine Sanctuary, you can skip to the OCNMS_Project folder and use All_SOI_IDs.csv, a filtered version of all of the reads. 
-If not, you can access the full dataset by [emailing Zack? emailing Shannon? set up a file hosting thing?]
+
+To generate these files, you need to run eDNA_SampleData_Exploration.Rmd in OCNMS_sample_metadata_zjg/OCNMS before running any files in OCNMS_eDNA. This will take significant time and RAM if you are using a laptop.

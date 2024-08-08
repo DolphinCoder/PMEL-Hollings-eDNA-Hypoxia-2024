@@ -91,8 +91,8 @@ presenceGraph <- function(df, # Dataframe of species presence/absence + environm
                  size = 0.1) +
       geom_point(data = dfsplit[[i]], aes(x = DateMatch, y = .data[[envCond]], shape = Present, color = Present), 
                  size = 1, stroke = 2) +
-      scale_color_manual(values = c("TRUE" = "dodgerblue3", "FALSE" = "orange2")) +
-      scale_shape_manual(values = c(1, 19)) +
+      scale_color_manual(labels = c("Present", "Absent"), values = c("TRUE" = "dodgerblue3", "FALSE" = "orange2")) +
+      scale_shape_manual(labels = c("Present", "Absent"), values = c(1, 19)) +
       SampHighlight1 +
       SampHighlight2 +
       SampHighlight3 +
@@ -111,7 +111,9 @@ presenceGraph <- function(df, # Dataframe of species presence/absence + environm
       labs(
         title = title, 
         x = "Date", 
-        y = ylab
+        y = ylab, 
+        color = "Detection",
+        shape = "Detection"
         )
     
     if (threshold == T) { # If threshold, include geom_hline

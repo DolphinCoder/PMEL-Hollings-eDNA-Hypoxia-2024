@@ -13,6 +13,8 @@ urlcolor: blue
 
 Goal: Combine CTD and mooring data to assemble a hypoxia time series
 
+**This document is not strictly necessary to this workflow, as I only ended up using the CTD data points to validate that the mooring wasn't totally off-base. Using OCNMS_Mooring_CleanData.csv to go into eDNAxEnvData.Rmd is fine, but it's nice to have the CTD data for comparison and the code is currently written to work with the mooring + CTD data.**
+
 Questions:
 
 - Which depths can I use? Can I average them?
@@ -23,12 +25,13 @@ Questions:
 
 ```{r Package Imports, message = F, warning = F}
 # Warnings and startup messages suppressed
-library(tidyverse)
+library(tidyverse) # ggplot, dplyr, lubridate, etc.
+# Various ggplot enhancements that I use
 library(patchwork)
 library(scales)
 library(ggrepel)
-library(readxl)
-library(here)
+library(readxl) # Read excel files
+library(here) # Make nicer filepaths relative to this directory
 ```
 
 ```{r Data Imports}
@@ -36,12 +39,15 @@ wd <- "OCNMS_Hypoxia/Outputs"
 exp <- "OCNMS_Hypoxia/Outputs"
 pltpath <- "OCNMS_Hypoxia/Plots"
 
+# Import cleaned CTD data
 CTD_short <- read.csv(here(wd, "OCNMS_CTD_TH042_CleanData.csv")) %>% 
   mutate(date = as.POSIXct(date, tz = "UTC"), year = as.factor(year), source = as.factor(source)) # only 39.9-44.9 meters, not priority
 CTD <- read.csv(here(wd, "OCNMS_CTD_TH042ext_CleanData.csv")) %>% 
-  mutate(date = as.POSIXct(date, tz = "UTC"), year = as.factor(year), source = as.factor(source)) # priority
+  mutate(date = as.POSIXct(date, tz = "UTC"), year = as.factor(year), source = as.factor(source)) # wider depth range, priority
+
+# Import mooring data
 Mooring <- read.csv(here(wd, "OCNMS_Mooring_CleanData.csv")) %>% 
-  mutate(date = as.POSIXct(date, tz = "UTC"), year = as.factor(year), source = as.factor(source))
+  mutate(date = as.POSIXct(date, tz = "UTC"), year = as.factor(year), source = as.factor(source)) # Get the date in date format immediately to avoid conversions
 
 # Group CTD casts together by sampleID (all depths) and average the environmental factors
 

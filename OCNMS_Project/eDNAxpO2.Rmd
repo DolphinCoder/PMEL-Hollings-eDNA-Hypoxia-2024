@@ -303,7 +303,8 @@ ggplot(EnvDataRange, aes(x = date, y = SatPct)) +
   geom_vline(
     xintercept = hypoxiaDatetimes, 
     color = "red") +
-  geom_vline(data = SamplingDates2, aes(xintercept = Date)) +
+  geom_point(data = SamplingDates2, aes(x = Date, y = 65), size = 2, color = "black") +
+  #geom_vline(data = SamplingDates2, aes(xintercept = Date)) +
   scale_x_break(as.POSIXct(c("2021-10-12", "2022-05-24"))) +
   labs(title = "Length & Severity of OCNMS Hypoxic Events", 
        subtitle = "+ eDNA Sampling Dates",
