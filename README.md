@@ -2,7 +2,6 @@
 
 ## Questions/to-do before making public:
 
-- Shannon: Is it OK to just describe `OCNMS_SpeciesOfInterest.csv` as "the list of priority species I used," or should I explain the criteria/how the list was assembled?
 - Zack: I have a note that says "JV = Jonah Ventures, the DNA metabarcoding service we use" - is this an appropriate definition for "JV" as a directory name? I was using my understanding based on lab meeting notes.
 - Need to add reference to Sam's CTD data cleaning code 
 
@@ -35,7 +34,7 @@ This directory contains code for cleaning oceanographic data from a mooring, CTD
 
 - `JV_bioinformatics` contains the results of DNA metabarcoding from the OCNMS eDNA samples, as well as the JV sample data that is used to combine the JV data with the OME metadata. Sub-folders contain the results from different primers.
 - `OCNMS_JV2_sample_metadata.Rmd` is an example of how to filter the data, focused on Alaska
-- `eDNA_SampleData_Exploration.Rmd`: I recommend consulting the flowchart to understand this one better. It imports the MiFish and CO1 Universal primer datasets (`primer_tab+taxa.csv`), the Jonah Ventures metadata, and the Ocean Molecular Ecology group metadata. It cleans the metadata, pivots the species detection metabarcoding data so that each sample + species detection combination is a row, and combines the species detection data with the metadata. The species detections now have dates, locations, and collection methods attached. It also incorporates the list of priority species that I used to filter the data initially.
+- `eDNA_SampleData_Exploration.Rmd`: I recommend consulting the flowchart to understand this one better. It imports the MiFish and CO1 Universal primer datasets (`primer_tab+taxa.csv`), the Jonah Ventures metadata, and the Ocean Molecular Ecology group metadata. It cleans the metadata, pivots the species detection metabarcoding data so that each sample + species detection combination is a row, and combines the species detection data with the metadata. The species detections now have dates, locations, and collection methods attached. It also imports and filters by the preliminary list of priority species compiled by the Olympic Coast National Marine Sanctuary in collaboration with coastal treaty tribes.
 - The pivoting code takes a lot of time and RAM. Be warned. If you are replicating this workflow directly it's probably easier to go straight to `OCNMS_eDNA`, where the pivoted data already exists. 
 - Exports cleaned eDNA data to `OCNMS_eDNA`
 
