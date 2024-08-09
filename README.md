@@ -1,4 +1,4 @@
-# PMEL-Hollings-eDNA-Hypoxia-2024
+# Combining eDNA Species Detection Data With Environmental Data
 
 ## Questions/to-do before making public:
 
