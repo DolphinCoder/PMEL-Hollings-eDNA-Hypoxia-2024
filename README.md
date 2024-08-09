@@ -3,7 +3,6 @@
 ## Questions/to-do before making public:
 
 - Zack: I have a note that says "JV = Jonah Ventures, the DNA metabarcoding service we use" - is this an appropriate definition for "JV" as a directory name? I was using my understanding based on lab meeting notes.
-- Need to add reference to Sam's CTD data cleaning code 
 
 This workflow processes a variety of environmental data and pairs it with environmental DNA species detection data by date and time. These directories and files are listed approximately in the order in which they should be run, but the most accurate order for this workflow is in the flowchart.
 
@@ -20,7 +19,7 @@ Eleanor Crotty's 2024 Hollings Scholarship project: Leveraging environmental DNA
 This directory contains code for cleaning oceanographic data from a mooring, CTD casts, satellite (VIIRS and MODIS), and NEMO (nearby moored profiler at Cha'ba mooring, data provided as .mat files). It also contains code for combining the mooring and CTD data for use in `OCNMS_Project`. The code for combining the satellite data with the mooring + CTD data is in `OCNMS_Project/EnvironmentalData2.Rmd`. The code for combining the NEMO data with the mooring + CTD data is in `OCNMS_eDNA/EnvironmentalDataxSampleDates.Rmd`.
 
 - `Mooring_Data_Exploration.Rmd`: Produces plots of TH042 data and cleans the data from the mooring. **Important output: `OCNMS_Mooring_CleanData.csv`**
-- `CTD_Data_Exploration.Rmd`: Produces plots of CTD data and exports the clean CTD data, which is averaged over 30-45 meters depth in order to match the TH042 data. This CTD data was pre-processed using **[add Sam's GitHub link]**. **Important output: `OCNMS_CTD_TH042ext_CleanData.csv`**
+- `CTD_Data_Exploration.Rmd`: Produces plots of CTD data and exports the clean CTD data, which is averaged over 30-45 meters depth in order to match the TH042 data. This CTD data was pre-processed using code from @DiatomSetta. **Important output: `OCNMS_CTD_TH042ext_CleanData.csv`**
 - *`CTD_` and `Mooring_Data_Exploration.Rmd` both include code to make the two datasets compatible by renaming variables, formatting the dates as POSIXct, etc.*
 - `HypoxiaTimeSeries.Rmd`: Combines CTD and mooring data and makes some graphs to compare them. **Important output: `EnvironmentalDataset1.csv`**
 - `NEMO_Data_Exploration.Rmd` and `Satellite_Data_Exploration.Rmd` are both attempts at investigating alternate sources of data to fill the gap in mooring data in 2023. These data sources did not match well with TH042 in 2021-22, so I did not use them for 2023.
