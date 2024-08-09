@@ -15,6 +15,8 @@ Eleanor Crotty's 2024 Hollings Scholarship project: Leveraging environmental DNA
 - `OCNMS_Project`: Combining the environmental DNA data with the environmental data. Also includes code to compare sampling dates from the metadata with the environmental data to identify gaps in the needed data.
 - Each directory has subdirectories `Data` (inputs), `Outputs` (outputs, usually cleaned or filtered data), and `Plots` (any plots saved from code in the parent directory)
 
+## File Details
+
 ### Files in `OCNMS_Hypoxia`
 This directory contains code for cleaning oceanographic data from a mooring, CTD casts, satellite (VIIRS and MODIS), and NEMO (nearby moored profiler at Cha'ba mooring, data provided as .mat files). It also contains code for combining the mooring and CTD data for use in `OCNMS_Project`. The code for combining the satellite data with the mooring + CTD data is in `OCNMS_Project/EnvironmentalData2.Rmd`. The code for combining the NEMO data with the mooring + CTD data is in `OCNMS_eDNA/EnvironmentalDataxSampleDates.Rmd`.
 
