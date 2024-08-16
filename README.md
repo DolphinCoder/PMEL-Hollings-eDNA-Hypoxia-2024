@@ -11,6 +11,19 @@ Eleanor Crotty's 2024 Hollings Scholarship project: Leveraging environmental DNA
 - `OCNMS_Project`: Combining the environmental DNA data with the environmental data. Also includes code to compare sampling dates from the metadata with the environmental data to identify gaps in the needed data.
 - Each directory has subdirectories `Data` (inputs), `Outputs` (outputs, usually cleaned or filtered data), and `Plots` (any plots saved from code in the parent directory)
 
+## Recommended Workflow
+
+Run the scripts in this order.
+
+1. OCNMS_sample_metadata_zjd/eDNA_SampleData_Exploration.Rmd
+2. OCNMS_eDNA/OCNMS_eDNA_Exploration.Rmd
+3. OCNMS_Project/OCNMS_SpeciesDetectons_Cleaning.Rmd
+4. [Ctd_file_processing.Rmd](https://github.com/DolphinCoder/OCNMS_ctd_data_Ella) if needed
+5. OCNMS_Hypoxia/CTD_Data_Exploration.Rmd if using CTD data
+6. OCNMS_Hypoxia/Mooring_Data_Exploration.Rmd if using mooring data
+7. OCNMS_Hypoxia/HypoxiaTimeSeries.Rmd to clean and combine data
+8. OCNMS_Project/eDNAxpO2.Rmd
+
 ## File Details
 
 ### Files in `OCNMS_Hypoxia`
