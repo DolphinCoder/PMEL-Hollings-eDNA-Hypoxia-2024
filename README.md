@@ -18,7 +18,7 @@ Run the scripts in this order.
 1. OCNMS_sample_metadata_zjd/eDNA_SampleData_Exploration.Rmd
 2. OCNMS_eDNA/OCNMS_eDNA_Exploration.Rmd
 3. OCNMS_Project/OCNMS_SpeciesDetectons_Cleaning.Rmd
-4. [Ctd_file_processing.Rmd](https://github.com/DolphinCoder/OCNMS_ctd_data_Ella) if needed
+4. [Ctd_file_processing.Rmd](https://github.com/DolphinCoder/OCNMS_ctd_data_Ella) if needed (currently private, the output is in this repository though)
 5. OCNMS_Hypoxia/CTD_Data_Exploration.Rmd if using CTD data
 6. OCNMS_Hypoxia/Mooring_Data_Exploration.Rmd if using mooring data
 7. OCNMS_Hypoxia/HypoxiaTimeSeries.Rmd to clean and combine data
