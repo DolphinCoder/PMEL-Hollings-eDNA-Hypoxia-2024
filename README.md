@@ -1,9 +1,5 @@
 # Combining eDNA Species Detection Data With Environmental Data
 
-## Questions/to-do before making public:
-
-- Zack: I have a note that says "JV = Jonah Ventures, the DNA metabarcoding service we use" - is this an appropriate definition for "JV" as a directory name? I was using my understanding based on lab meeting notes.
-
 This workflow processes a variety of environmental data and pairs it with environmental DNA species detection data by date and time. These directories and files are listed approximately in the order in which they should be run, but the most accurate order for this workflow is in the flowchart.
 
 Eleanor Crotty's 2024 Hollings Scholarship project: Leveraging environmental DNA approaches to understand impacts of episodic hypoxia events on Olympic Coast National Marine Sanctuary marine ecosystems. In addition to this `README` file, this repository also contains several PDF files called "Hollings Project Workflow *", which are flowcharts explaining how all of these .Rmd files and data sources connect, focused on the inputs and outputs that are critical to replicate my workflow and generate the final dataset of species detections with associated environmental data.
@@ -31,9 +27,9 @@ This directory contains code for cleaning oceanographic data from a mooring, CTD
 [Hollings Project Workflow-EnvData.pdf](https://github.com/user-attachments/files/16059843/Hollings.Project.Workflow-EnvData.pdf)
 
 ### Files in `OCNMS_sample_metadata_zjd/OCNMS`
-*This data and code was provided by Zachary Gold and modified for this workflow by Ella Crotty.* JV = Jonah Ventures, the DNA metabarcoding service we use (*sic, this is my understanding from lab meetings*)
+*This data and code was provided by Zachary Gold and modified for this workflow by Ella Crotty.* JV = Jonah Ventures, the DNA sequencing service we use who provided processed metabarcoding data following their standard protocols. Details are available upon on request and will be made available upon peer review of the results. 
 
-- `JV_bioinformatics` contains the results of DNA metabarcoding from the OCNMS eDNA samples, as well as the JV sample data that is used to combine the JV data with the OME metadata. Sub-folders contain the results from different primers.
+- `JV_bioinformatics` contains the results of DNA metabarcoding from the OCNMS eDNA samples, as well as the JV sample data that is used to combine the JV specific sample names with the OME metadata. Sub-folders contain the results from different primers.
 - `OCNMS_JV2_sample_metadata.Rmd` is an example of how to filter the data, focused on Alaska
 - `eDNA_SampleData_Exploration.Rmd`: I recommend consulting the flowchart to understand this one better. It imports the MiFish and CO1 Universal primer datasets (`primer_tab+taxa.csv`), the Jonah Ventures metadata, and the Ocean Molecular Ecology group metadata. It cleans the metadata, pivots the species detection metabarcoding data so that each sample + species detection combination is a row, and combines the species detection data with the metadata. The species detections now have dates, locations, and collection methods attached. It also imports and filters by the preliminary list of priority species compiled by the Olympic Coast National Marine Sanctuary in collaboration with coastal treaty tribes.
 - The pivoting code takes a lot of time and RAM. Be warned. If you are replicating this workflow directly it's probably easier to go straight to `OCNMS_eDNA`, where the pivoted data already exists. 
