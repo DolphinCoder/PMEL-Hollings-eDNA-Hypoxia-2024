@@ -1,0 +1,926 @@
+---
+title: "eDNA Compared To Oxygen Saturation"
+author: "Eleanor (Ella) Crotty"
+header-includes:
+  \usepackage{fvextra}
+  \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,commandchars=\\\{\}}
+output:
+  pdf_document:
+    toc: TRUE
+urlcolor: blue
+---
+
+```{r Package Imports, message = F, warning = F}
+# Warnings and startup messages suppressed
+library(tidyverse)
+library(patchwork)
+library(scales)
+library(ggrepel)
+library(ggpmisc)
+library(readxl)
+library(here)
+library(gsw)
+library(R.matlab)
+library(ggbreak)
+```
+
+# Import data 
+
+```{r}
+allReads_Species <- read_csv(here("OCNMS_eDNA", "Outputs", "AllReads_Species.csv")) # Combined PCR replicates, combined ESVs in species
+envData <- read_csv(here("OCNMS_Hypoxia", "Outputs", "EnvironmentalDataset1.csv")) %>% 
+  filter(year != 2023) %>%  # Ignoring 2023 due to gaps for now
+  mutate(year = as.factor(year))
+```
+
+```{r}
+SpeciesDetect <- allReads_Species %>% 
+  mutate(Present = case_when(TotalnReads == 0 ~ F, TotalnReads != 0 ~ T)) %>% 
+  relocate(Present, .after = TotalnReads)
+```
+
+# Horrid MatLab Sidequest
+
+Trying to figure out if the density units are correct
+
+time: [4040x1 double] (MATLAB datenum)
+dens: [4040x1 double] (sigma‐theta)
+
+Is this the same as the envData potential_density?
+
+```{r, eval = F}
+TH21 <- readMat(here("OCNMS_Hypoxia", "Data", "2021.mat"))
+str(TH21) # Data structure
+```
+
+This does say density is in sigma-theta
+
+```{r, eval = F}
+lst21 <- TH21$CT.TH042.210608.038
+datenum21 <- c(lst21[[2]][[4]]) # datenums as vector/timeJ
+dates21 <- as.POSIXct((datenum21 - 719529)*86400, origin = "1970-01-01", tz = "UTC") # subtract to get origin = January 0, 0000 (this is a made up date so as.POSIXct won't handle it natively), need to multiply by seconds in a day to go from datenum (days since made up Matlab epoch) to POSIXct (seconds since Unix epoch). Just kinda hoping they were using UTC here.
+dens21 <- c(lst21[[2]][[6]]) # Density as vector
+temp21 <- c(lst21[[2]][[1]]) # Temperature as vector
+
+matCheck <- data.frame(dates21, dens21, temp21)
+```
+
+This did not match at all.
+
+
+
+```{r Graph Checks}
+# Just some sanity checks to make sure I have what I think I have
+ggplot(data = envData, aes(x = date, y = DO, color = source)) +
+  geom_point(size = 0.5) +
+  facet_wrap(facets = vars(year), scales = "free_x") +
+  theme_bw()
+
+ggplot(data = SpeciesDetect, aes(x = Date_UTC)) +
+  geom_histogram(bins = 100) +
+  theme_bw()
+```
+# Calculate oxygen saturation state
+
+[R package documentation for this](https://search.r-project.org/CRAN/refmans/gsw/html/gsw_O2sol_SP_pt.html)
+Then in units of umol kg-1 compare [O2]measured / [O2]saturated *100% = saturation %.
+
+**Usage**
+
+gsw_O2sol_SP_pt(SP, pt)
+
+**Arguments**
+SP: Practical Salinity (PSS-78) [ unitless ]
+pt: potential temperature (ITS-90) [ degC ]
+
+**Value**
+Oxygen solubility in micro-moles per kg. 
+
+To go from O2 in ml/l to O2 in μmol/kg multiply by 44.660 and divide by density in CGS. [There is a small issue regarding what density to use, but it gets buried in the decimal place weeds. It is best to use sigma-0, i.e. (1000 + sigma0)/1000 in CGS.] - Converting O2 in volume units (ml/l) to O2 in mass units (μmol/kg) with Java OceanAtlas Custom Calculations (and also conversion of nutrients in μmol/l to μmol/kg), James h. Swift, UCSC Scripps Institution of Oceanography September 2021
+
+1 mL/L = 1.42903 mg/L
+
+## Evan says: 
+
+Potential density is just sigma_theta+1000 (g kg-1; this is the definition of sigma compared to rho). That gives 1026.15 to 1026.18 in the table above (pretty close to the zero-order assumption!)
+
+And in terms of the conversion, I always check the stoichiometric unit conversions: mg/L * mmol/mg * umol/mmol * L/g * g/kg -> mmol kg
+So you don't need to convert to mL/L at all (units that only matter for titrations), just calculate the concentration directly from your input units.
+Example: 3 mg/L * (mmol/31.9988 mg) * (1000 umol/mmol) * (L/1026g) * (1000 g/kg) = 3/31.9988/1026*1e6 = ~91 umol kg-1
+
+$$
+DO~\frac{mg}{L} \times \frac{mmol}{31.9988~mg} \times \frac{1000~\mu mol}{mmol} \times \frac{L}{1026 g} (density) \times \frac{1000 g}{kg}
+$$
+
+```{r}
+envDataSat <- envData %>% 
+  mutate(O2meas = DO/31.9988/(potential_density + 1000)*(1000^2), O2sat = gsw_O2sol_SP_pt(salinity, temperature), SatPct = (O2meas/O2sat)*100) %>% 
+  relocate(c(O2meas, O2sat, SatPct), .after = DO)
+```
+
+# Join the data
+
+```{r Data join}
+EnvRd <- envDataSat %>% 
+  mutate(DateMatch = round_date(date, unit = "10 minutes")) # Round to the nearest 10 minutes? 
+DetectRd <- SpeciesDetect %>% 
+  mutate(DateMatch = round_date(Date_UTC, unit = "10 minutes"), Date_local_hr = round_date(Date_local, unit = "hour")) # Spot check - looks good. 
+
+eDNAxEnvDataSat <- left_join(DetectRd, EnvRd, by = join_by(DateMatch)) 
+
+investigate <- eDNAxEnvDataSat %>% select(Species, DateMatch, Date_UTC, Date_local_hr, source, temperature, DO, E_no, Rosette_position, Amplicon)
+
+system("say Data Join Complete")
+```
+
+# Graphs
+
+## Presence
+
+```{r}
+# Filter for years of interest
+eDNAxEnvDataSat <- eDNAxEnvDataSat %>% 
+  filter(year %in% c(2021, 2022))
+# Filter for species of interest
+eDNAxEnvDataSat_SOI <- eDNAxEnvDataSat %>% 
+  filter(Species %in% c("Acartia longiremis", "Calanus pacificus", "Clupea pallasii", "Oncorhynchus tshawytscha")) 
+
+ggplot(data = envDataSat, aes(x = date, y = SatPct)) +
+  geom_line(color = "gray90") +
+  geom_point(data = eDNAxEnvDataSat_SOI, aes(x = DateMatch, y = SatPct, shape = Present, size = Present, color = Present)) +
+  scale_shape_manual(values = c(1, 19)) +
+  scale_size_manual(values = c(1,1)) + 
+  theme_bw() +
+  facet_wrap(facets = vars(Species, year(date)), scales = "free_x", ncol = 4) +
+  scale_x_datetime(breaks = "month", date_labels = "%b-%y") +
+  theme(text = element_text(size = 20), axis.text.x = element_text(angle = 45, hjust = 1), strip.text = element_text(size = 8), strip.background = element_rect(fill = "gray95")) +
+  geom_hline(yintercept = 30, linetype = 2) +
+  labs(title = "Species Presence and Absence Over Dissolved Oxygen", x = "Date", y = "Dissolved Oxygen (Saturation %) At TH042")
+
+ggsave(filename = here("OCNMS_Project", "Plots", "SpeciesPresence_Oxygen_pO2.png"), width = 2500, height = 2000, units = "px")
+```
+## Define Hypoxic Events
+
+```{r}
+EnvDataRange <- envDataSat %>% 
+  filter(date > as.POSIXct("2021-08-15 00:00:00", tz = "UTC"))
+
+EnvDataRange <- EnvDataRange %>% 
+  mutate(dayLocal = as.Date(date, tz = "America/Los_Angeles"))
+  
+Hypoxia <- EnvDataRange %>% 
+  filter(SatPct < 20) %>% 
+  relocate(dayLocal, .after = date)
+
+dayLocalHypoxia <- EnvDataRange %>% 
+  mutate(dayLocal = as.Date(date)) %>% 
+  relocate(dayLocal, .after = date) %>% 
+  group_by(source, dayLocal, year) %>% 
+  summarize(avTemp = mean(temperature), avDO = mean(SatPct)) %>% 
+  filter(avDO < 20) 
+
+# For threshold 30%:
+# 2021-08-15 to 2021-09-26
+# 2022-06-13 to 2022-06-16
+# 2022-07-29 to 2022-09-20
+
+# For threshold 20%:
+# 2021-08-15 to 2021-08-31 (spotty)
+# 2021-09-22 to 2021-09-26
+# 2022-08-13 to 2022-09-20 (spotty)
+
+start1 <- "2021-08-15"
+end1 <- "2021-08-31"
+start2 <- "2021-09-22"
+end2 <- "2021-09-26"
+start3 <- "2022-08-13"
+end3 <- "2022-09-20"
+
+# Manually enter the starts & ends of dates
+hypoxiaDates <- c(start1, end1, start2, end2, start3, end3)
+hypoxiaDatetimes <- as.POSIXct(hypoxiaDates, tz = "America/Los_Angeles") # as.POSIXct for graphing
+hypoxiaLines <- data.frame(Label = hypoxiaDates, Date = hypoxiaDatetimes) %>% 
+  mutate(year = year(Date))
+
+HypoxicEvents <- EnvDataRange %>% # Cut down the entire dataset to the hypoxic event dates from dayLocalHypoxia
+  mutate(Event = case_when(dayLocal >= as.Date(start1) & dayLocal <= as.Date(end1) ~ 1,
+                           dayLocal >= as.Date(start2) & dayLocal <= as.Date(end2) ~ 2,
+                           dayLocal >= as.Date(start3) & dayLocal <= as.Date(end3) ~ 3))
+
+HypoxicEventsSummary <- HypoxicEvents %>% # Take the average DO and temp, and also calculate lengths
+  group_by(Event) %>% 
+  summarize(Start = min(date), End = max(date), AvgOxygen = mean(SatPct, na.rm = T), AvgTemp = mean(temperature)) %>% 
+  mutate(Length = End - Start)
+
+ytext1 <- 8
+ytext2 <- 3
+labelsize <- 4
+```
+
+## Plot Hypoxic Events
+```{r}
+ggplot(EnvDataRange, aes(x = date, y = SatPct)) +
+  geom_line(color = "gray50") + 
+  theme_bw() +
+  geom_hline(yintercept = 20, 
+             color = "red", 
+             linetype = 2) + 
+  theme(text = element_text(size = 20),
+        axis.text.x = element_text(angle = 45, hjust = 1, size = 20),
+        axis.text.x.top = element_blank(), # Needed to delete the extra axis created by ggbreak
+        axis.ticks.x.top = element_blank(),
+        axis.line.x.top = element_blank()
+        ) +
+  scale_x_datetime(breaks = "month", 
+                   date_labels = "%b-%y",
+                   limits = c(as.POSIXct("2021-08-10"), as.POSIXct("2022-09-22"))) + # Need to extend a little for line label
+  geom_point(data = Hypoxia, 
+             aes(x = date, y = SatPct), 
+             color = "red", 
+             size = 0.1) +
+  geom_vline(
+    xintercept = hypoxiaDatetimes, 
+    color = "red") +
+  geom_label(data = hypoxiaLines, 
+            aes(x=Date, y=80, label=Label),
+            inherit.aes = T,
+            vjust = 0.5,
+            angle = 90,
+            size = 5) +
+  annotate(geom = "text", 
+           x = as.POSIXct("2021-08-22 12:00:00"), y = ytext1, 
+           label = "17 days", size = labelsize) +
+  annotate(geom = "text", 
+           x = as.POSIXct("2021-10-01 20:00:00"), y = ytext1, 
+           label = "<- 5 d", size = labelsize) +
+  annotate(geom = "text", 
+           x = as.POSIXct("2022-09-01"), y = ytext1, 
+           label = "39 d", size = labelsize) +
+  annotate(geom = "text", 
+           x = as.POSIXct("2021-08-22 20:00:00"), y = ytext2, 
+           label = "20%", size = labelsize) +
+  annotate(geom = "text", 
+           x = as.POSIXct("2021-09-30 20:00:00"), y = ytext2, 
+           label = "17%", size = labelsize) +
+  annotate(geom = "text", 
+           x = as.POSIXct("2022-09-01"), y = ytext2, 
+           label = "17%", size = labelsize) +
+  scale_x_break(as.POSIXct(c("2021-10-12", "2022-05-24"))) +
+  labs(title = "Length & Severity of OCNMS Hypoxic Events", 
+       x = "Date", 
+       y = "Dissolved Oxygen (Saturation %)", 
+       caption = "Hypoxic event = period where the daily average oxygen saturation was < 20%")
+
+ggsave(here("OCNMS_Project", "Plots", "HypoxicEvents_pO2.png"), width = 3000, height = 2000, units = "px")
+```
+
+```{r}
+# Plot with sampling dates
+
+SamplingDates2 <- read_csv(here("OCNMS_Project", "Data", "SamplingDates2.csv")) %>%  # Exported from EnvironmentalDataxSampleDates.Rmd, simple dataframe of all datetimes of samples
+  filter(year(Date) != 2023) %>% # Ignoring 2023 due to gaps for now
+  mutate(Source = case_when(Source == "Bottle_DNA" ~ "Bottle_DNA_Sampled", Source == "PPS_DNA" ~ "Automated_DNA_Sampler"))
+
+ggplot(EnvDataRange, aes(x = date, y = SatPct)) +
+  geom_line(color = "gray50") + 
+  theme_bw() +
+  geom_hline(yintercept = 20, 
+             color = "red", 
+             linetype = 2) + 
+  theme(text = element_text(size = 20),
+        axis.text.x = element_text(angle = 45, hjust = 1, size = 20),
+        axis.text.x.top = element_blank(), # Needed to delete the extra axis created by ggbreak
+        axis.ticks.x.top = element_blank(),
+        axis.line.x.top = element_blank()
+        ) +
+  scale_x_datetime(breaks = "month", 
+                   date_labels = "%b-%y",
+                   limits = c(as.POSIXct("2021-08-10"), as.POSIXct("2022-09-22"))) + # Need to extend a little for line label
+  geom_point(data = Hypoxia, 
+             aes(x = date, y = SatPct), 
+             color = "red", 
+             size = 0.1) +
+  geom_vline(
+    xintercept = hypoxiaDatetimes, 
+    color = "red") +
+  geom_point(data = SamplingDates2, aes(x = Date, y = 65), size = 2, color = "black") +
+  #geom_vline(data = SamplingDates2, aes(xintercept = Date)) +
+  scale_x_break(as.POSIXct(c("2021-10-12", "2022-05-24"))) +
+  labs(title = "Length & Severity of OCNMS Hypoxic Events", 
+       subtitle = "+ eDNA Sampling Dates",
+       x = "Date", 
+       y = "Dissolved Oxygen (Saturation %)", 
+       caption = "Hypoxic event = period where the daily average oxygen saturation was < 20%")
+
+ggsave(here("OCNMS_Project", "Plots", "HypoxicEvents_Sampling.png"), width = 3000, height = 2000, units = "px")
+
+sampleHighlight <- tibble(x1b = as.POSIXct("2021-08-25"), x1e = as.POSIXct("2021-10-08"), 
+                          x2b = as.POSIXct("2022-06-23"), x2e = as.POSIXct("2022-07-19"),
+                          x3b = as.POSIXct("2022-08-22"), x3e = as.POSIXct("2022-09-21"),
+                          y1 = -Inf, y2 = +Inf)
+
+SampHighlight1 <- geom_rect(data = sampleHighlight,
+            inherit.aes = FALSE,
+            mapping = aes(xmin = x1b, xmax = x1e,
+                          ymin = y1, ymax = y2),
+            color = "black",
+            fill = "gray50",
+            stroke = 2,
+            alpha = 0.2)
+SampHighlight2 <- geom_rect(data = sampleHighlight,
+            inherit.aes = FALSE,
+            mapping = aes(xmin = x2b, xmax = x2e,
+                          ymin = y1, ymax = y2),
+            color = "black",
+            fill = "gray50",
+            stroke = 2,
+            alpha = 0.2)
+SampHighlight3 <- geom_rect(data = sampleHighlight,
+            inherit.aes = FALSE,
+            mapping = aes(xmin = x3b, xmax = x3e,
+                          ymin = y1, ymax = y2),
+            color = "black",
+            fill = "gray50",
+            stroke = 2,
+            alpha = 0.2)
+
+ggplot(EnvDataRange, aes(x = date, y = SatPct)) +
+  geom_line(color = "gray50") + 
+  theme_bw() +
+  geom_hline(yintercept = 20, 
+             color = "red", 
+             linetype = 2) + 
+  theme(text = element_text(size = 20),
+        axis.text.x = element_text(angle = 45, hjust = 1, size = 20),
+        axis.text.x.top = element_blank(), # Needed to delete the extra axis created by ggbreak
+        axis.ticks.x.top = element_blank(),
+        axis.line.x.top = element_blank()
+        ) +
+  scale_x_datetime(breaks = "month", 
+                   date_labels = "%b-%y",
+                   limits = c(as.POSIXct("2021-08-10"), as.POSIXct("2022-09-22"))) + # Need to extend a little for line label
+  geom_point(data = Hypoxia, 
+             aes(x = date, y = SatPct), 
+             color = "red", 
+             size = 0.1) +
+  geom_vline(
+    xintercept = hypoxiaDatetimes, 
+    color = "red") +
+  SampHighlight1 +
+  SampHighlight2 +
+  SampHighlight3 +
+  scale_x_break(as.POSIXct(c("2021-10-12", "2022-05-24"))) +
+  labs(title = "Length & Severity of OCNMS Hypoxic Events", 
+       subtitle = "+ eDNA Sampling Dates",
+       x = "Date", 
+       y = "Dissolved Oxygen (Saturation %)", 
+       caption = "Hypoxic event = period where the daily average oxygen saturation was < 20%")
+
+ggsave(here("OCNMS_Project", "Plots", "HypoxicEvents_Sampling_Boxes.png"), width = 3000, height = 2000, units = "px")
+```
+
+## Plot temperature over sampling windows
+```{r}
+ggplot(EnvDataRange, aes(x = date, y = temperature)) +
+  geom_line(color = "gray50") + 
+  theme_bw() +
+  theme(text = element_text(size = 20),
+        axis.text.x = element_text(angle = 45, hjust = 1, size = 20),
+        axis.text.x.top = element_blank(), # Needed to delete the extra axis created by ggbreak
+        axis.ticks.x.top = element_blank(),
+        axis.line.x.top = element_blank()
+        ) +
+  scale_x_datetime(breaks = "month", 
+                   date_labels = "%b-%y",
+                   limits = c(as.POSIXct("2021-08-10"), as.POSIXct("2022-09-22"))) + # Need to extend a little for line label
+  geom_vline(
+    xintercept = hypoxiaDatetimes, 
+    color = "red") +
+  SampHighlight1 +
+  SampHighlight2 +
+  SampHighlight3 +
+  scale_x_break(as.POSIXct(c("2021-10-12", "2022-05-24"))) +
+  labs(title = "Temperature Comparison", 
+       subtitle = "+ eDNA Sampling Dates",
+       x = "Date", 
+       y = "Temperature (ºC)", 
+       caption = "Hypoxic event = period where the daily average oxygen saturation was < 20%")
+
+ggsave(here("OCNMS_Project", "Plots", "Temperature_Sampling_Boxes.png"), width = 3000, height = 2000, units = "px")
+```
+
+## Temp vs DO
+```{r}
+ggplot(EnvDataRange, aes(x = temperature, y = SatPct)) +
+  geom_point() +
+    theme_bw() +
+  theme(text = element_text(size = 20),
+        axis.text.x = element_text(size = 25),
+        axis.text.y = element_text(size = 25)
+        ) +
+  geom_smooth(method = "lm", se = F) +
+  labs(title = "Oxygen vs Temperature", x = "Temperature (ºC)", y = "Dissolved Oxygen (Saturation %)")
+
+ggsave(here("OCNMS_Project", "Plots", "OxygenSaturation_Temperature.png"), width = 2000, height = 2000, units = "px")
+```
+
+# Binomial Regression
+
+**Binomial Regression Assumptions**
+
+1. Independent observations - *Check!*
+2. No multicollinearity: Continuous independent variables should not be correlated with each other - *NOT MET - shouldn't do a DO x Temp x Presence model*
+3. Binomial dependent variable, with two **mutually exclusive** values - *Check!*
+4. Continuous independent variable - *Check!*
+5. Linearity between the binomial and continuous variables - this is checked with a logit transformation - *See below, this varies by species*
+6. Sufficient obeservations - the source I found recommends > 15 - *Check! 10 should be alright but I will note it in the results*
+7. No outliers - *One outlier, which appears to be part of a real heatwave - I have not filtered it out yet*
+
+
+## Check for outliers
+
+```{r}
+ggplot(EnvDataRange, aes(x = SatPct, y = temperature)) +
+  geom_point(color = "gray90", alpha = 0.5) +
+  geom_point(eDNAxEnvDataSat_SOI, mapping = aes(x = SatPct, y = temperature, color = Present, shape = Present), inherit.aes = F) +
+    scale_shape_manual(values = c(1, 19)) +
+  theme_bw() +
+  theme(text = element_text(size = 15), strip.text = element_text(size = 8), strip.background = element_rect(fill = "gray95")) +
+  labs(title = "Dissolved Oxygen vs. Temp + Species Presence", y = "Temperature") +
+  facet_wrap(facets = vars(Species))
+ggsave(filename = here("OCNMS_Project", "Plots", "SpeciesPresence_TempxDO.png"), width = 2500, height = 2000, units = "px")
+```
+
+## Filter out outliers 
+
+```{r, eval = T}
+eDNAxEnvDataSat_SOI <- eDNAxEnvDataSat_SOI %>% 
+  filter(temperature < 11)
+```
+
+```{r}
+ggplot(EnvDataRange, aes(x = SatPct, y = temperature)) +
+  geom_point(color = "gray90", alpha = 0.5) +
+  geom_point(eDNAxEnvDataSat_SOI, mapping = aes(x = SatPct, y = temperature, color = Present, shape = Present), inherit.aes = F) +
+    scale_shape_manual(values = c(1, 19)) +
+  theme_bw() +
+  theme(text = element_text(size = 15), strip.text = element_text(size = 8), strip.background = element_rect(fill = "gray95")) +
+  labs(title = "Dissolved Oxygen vs. Temp + Species Presence", y = "Temperature") +
+  facet_wrap(facets = vars(Species))
+```
+
+
+## Check for linearity
+
+"Assumption #5 involves the necessity of a linear relationship between the continuous independent variables and the logit transformation of the dependent variable. This linearity assumption implies that **for continuous independent variables** like income level, hours of exercise per week, and blood sugar levels, **there should be a linear relationship with the logit of the dependent variable**, such as the probability of developing diabetes. Various methods can be employed to assess this linearity, with one common approach being the **Box-Tidwell procedure.** This technique involves creating interaction terms between each continuous independent variable and its natural logarithm and adding these to the logistic regression model. This technique can be implemented using software like **SPSS Statistics, which offers the Binary Logistic procedure to test for this assumption.** The results of this test are then interpreted to decide the next steps in the analysis, depending on whether the linearity assumption holds or is violated. If the assumption is met, the analysis can proceed as planned. However, if the assumption is not met, adjustments to the model or alternative methods may be necessary to address the non-linearity appropriately." - [Binomial Logistic Regression](https://www.amstatisticalconsulting.com/binomial-logistic-regression/)
+
+
+Basically, this equation needs to have a somewhat linear relationship with the independent variable: 
+
+$$g(p) = log\left( \frac{p}{1-p} \right)$$
+Where p = probability of 1 (if 1, p. if 0, 1-p)?
+
+```{r}
+eDNAxEnvDataSat_SOI_box <- eDNAxEnvDataSat_SOI %>% 
+  filter(!is.na(SatPct), !is.na(Present), !is.na(year)) %>% 
+  filter(Species %in% c("Calanus pacificus", "Clupea pallasii", "Oncorhynchus tshawytscha")) # For some goddamn reason there's a species or two that REFUSES to box tidwell
+joinSpeciesList <- split(eDNAxEnvDataSat_SOI_box, eDNAxEnvDataSat_SOI_box$Species) # Split by species
+
+library(car) # Has a function for the Box-Tidwell procedure
+?boxTidwell
+
+# Single test
+boxTidwell(Present ~ SatPct, other.x = ~ year, data = joinSpeciesList[[1]]) # other.x = any factors not to be transformed. i had to make year into a factor to make it accept this, not sure what it's doing.
+
+# Loop to test all for linearity with DO
+for (i in 1:length(joinSpeciesList)) {
+  print(paste(names(joinSpeciesList)[i], sep = " ", "Presence vs Oxygen"))
+  print(boxTidwell(Present ~ SatPct, other.x = ~ year, data = joinSpeciesList[[i]]))
+}
+```
+
+## Calculate regression
+
+```{r}
+oxmodels <- lapply(joinSpeciesList, glm, formula = Present ~ SatPct, family = "binomial") # Make the model for each species
+lapply(oxmodels, summary) # Print the summary of each model
+```
+
+## Looped Binomial Regression
+
+```{r}
+# First, filter for more than 50 detections
+
+Detect50Sum <- eDNAxEnvDataSat %>% 
+  group_by(Species) %>% 
+  summarize(Detections = sum(Present)) %>% 
+  arrange(desc(Detections)) %>% 
+  filter(Detections > 50 & !is.na(Species)) 
+Detect50Species <- Detect50Sum$Species # 37 species
+
+Detect50 <- eDNAxEnvDataSat %>% 
+  filter(Species %in% Detect50Species) %>% 
+  mutate(year = as.factor(year)) %>% # Clean for boxtidwell
+  filter(!is.na(Present) & !is.na(SatPct) & !is.na(year))
+
+Detect50Split <- split(Detect50, Detect50$Species) # Split by species
+
+# Make a function that'll do the binomial regression AND put the results in a dataframe
+
+SpeciesMod <- c()
+InterceptP <- c()
+SlopeP <- c()
+SampleSizes <- c()
+
+#modtest <- glm(Detect50Split[[1]], formula = Present ~ SatPct, family = "binomial")
+#modsum <- summary(modtest)
+#Coefficients: modsum$coeffifients[1 = intercept/2 = slope, 4]
+
+for (i in 1:length(Detect50Split)) {
+  SpName <- names(Detect50Split)[i]
+  SpeciesMod <- c(SpeciesMod, SpName)
+  
+  df <- Detect50Split[[i]]
+  
+  SampleSize <- sum(df$Present)
+  SampleSizes <- c(SampleSizes, SampleSize)
+  
+  # lapply(joinSpeciesList, glm, formula = Present ~ SatPct, family = "binomial")
+  mod <- glm(df, formula = Present ~ SatPct, family = "binomial")
+  modsum <- summary(mod)
+  
+  Intercept <- round(modsum$coefficients[1,4], digits = 5)
+  Slope <- round(modsum$coefficients[2,4], digits = 5)
+  InterceptP <- c(InterceptP, Intercept)
+  SlopeP <- c(SlopeP, Slope)
+}
+
+BinomialRegressionResults <- data.frame(Species = SpeciesMod, InterceptP, SlopeP, n = SampleSizes)
+
+SignificantSlopes <- BinomialRegressionResults %>% filter(SlopeP < 0.05)
+SignificantIntercepts <- BinomialRegressionResults %>% filter(InterceptP < 0.05)
+
+SigSp <- SignificantSlopes$Species
+SigSpDf <- eDNAxEnvDataSat %>% 
+  filter(Species %in% SigSp)
+```
+
+ [1] "Paracalanus sp. C AC-2013"!!bad      "Chaetoceros socialis"          
+ [3] "Lithodesmium intricatum"        "Cyphoderia ampulla"            
+ [5] "Bathycoccus prasinos"           "Citharichthys sordidus"        
+ [7] "Clytia gregaria"                "Paramoeba branchiphila"        
+ [9] "Vannella sp."                   "Parvamoeba rugata"             
+[11] "Chrysochromulina sp. NIES-1333" "Aphanomyces astaci"            
+[13] "Aureococcus anophagefferens"    "Heterosigma akashiwo"          
+[15] "Thecamonas trahens"     
+
+## ALLLLLLL REGRESSIONS
+```{r}
+# Don't filter for more than 50 detections
+
+eDNAxEnvDataSatClean <- eDNAxEnvDataSat %>% 
+  mutate(year = as.factor(year)) %>% # Clean for boxtidwell
+  filter(!is.na(Present) & !is.na(SatPct) & !is.na(year)) %>%  # Clean for NA values
+  filter(temperature < 11)
+
+AllSplit <- split(eDNAxEnvDataSatClean, eDNAxEnvDataSatClean$Species) # Split by species
+
+# Make a function that'll do the binomial regression AND put the results in a dataframe
+
+SpeciesMod2 <- c()
+InterceptP2 <- c()
+SlopeP2 <- c()
+SampleSizes2 <- c()
+
+#modtest <- glm(Detect50Split[[1]], formula = Present ~ SatPct, family = "binomial")
+#modsum <- summary(modtest)
+#Coefficients: modsum$coeffifients[1 = intercept/2 = slope, 4]
+
+for (i in 1:length(AllSplit)) {
+  SpName <- names(AllSplit)[i]
+  SpeciesMod2 <- c(SpeciesMod2, SpName)
+  
+  df <- AllSplit[[i]]
+  
+  SampleSize <- sum(df$Present)
+  SampleSizes2 <- c(SampleSizes2, SampleSize)
+  
+  mod <- glm(df, formula = Present ~ SatPct, family = "binomial")
+  modsum <- summary(mod)
+  
+  Intercept <- round(modsum$coefficients[1,4], digits = 5)
+  Slope <- round(modsum$coefficients[2,4], digits = 5)
+  InterceptP2 <- c(InterceptP2, Intercept)
+  SlopeP2 <- c(SlopeP2, Slope)
+}
+
+ALLBinomialRegressionResults <- data.frame(Species = SpeciesMod2, InterceptP = InterceptP2, SlopeP = SlopeP2, n = SampleSizes2)
+
+ALLSignificantSlopes <- ALLBinomialRegressionResults %>% filter(SlopeP2 < 0.05)
+ALLSignificantIntercepts <- ALLBinomialRegressionResults %>% filter(InterceptP2 < 0.05)
+
+ALLSigSp <- ALLSignificantSlopes$Species
+ALLSigSpDf <- eDNAxEnvDataSatClean %>% 
+  filter(Species %in% ALLSigSp)
+
+system("say Binomial Regression Models Computed")
+```
+
+## Box Tidwell Loop
+```{r}
+SigSpBox <- eDNAxEnvDataSatClean %>%
+  filter(!is.na(SatPct)) %>% 
+  filter(Species %in% c("Aphanomyces astaci", "Aureococcus anophagefferens", "Thecamonas trahens", "Chaetoceros socialis", "Lithodesmium intricatum", "Cyphoderia ampulla", "Bathycoccus prasinos", "Clytia gregaria", "Paramoeba branchiphila", "Citharichthys sordidus",  "Thermocyclops inversus", "Pennaria disticha", "Clupea pallasii")) # Species I actually want to run this on, NA values removed
+
+fail <- c("Acartia longiremis", "Chrysochromulina sp. NIES-1333", "Stephanopyxis turris", "Vannella sp.", "Heterosigma akashiwo", "Parvamoeba rugata") # Species where box-tidwell failed - they have SatPct NA values but the drop_na should fix that
+
+LinearSplit <- split(SigSpBox, SigSpBox$Species) # Split by species, deleting species that broke the Box-Tidwell test for now
+
+LinearSplit <- lapply(LinearSplit, drop_na, c(SatPct, Present, year))
+
+test <- LinearSplit[[1]]
+test2 <- LinearSplit[[2]]
+
+# Do a box Tidwell test on everything that had significant slopes
+# This only works on some of the species for some reason?
+SpeciesBox <- c()
+BoxTidwellP <- c()
+
+for (i in 1:length(LinearSplit)) {
+  print(paste(names(LinearSplit)[i], sep = " ", "Presence vs Oxygen"))
+  box <- boxTidwell(Present ~ SatPct, 
+                    other.x = ~ year, 
+                    data = LinearSplit[[i]], 
+                    na.action = na.exclude)
+  
+  x <- round(box$result[3], digits = 5)
+  SpeciesBox <- c(SpeciesBox, names(LinearSplit)[i])
+  BoxTidwellP <- c(BoxTidwellP, x)
+}
+
+BoxTidwellResults <- data.frame(SpeciesBox, BoxTidwellP) %>% arrange(desc(BoxTidwellP))
+
+BoxTidwellSuccess <- BoxTidwellResults %>% filter(BoxTidwellP > 0.05)
+```
+
+
+# Graph presence over DO vs temp
+
+```{r}
+Presences <- eDNAxEnvDataSat_SOI %>% 
+  filter(Present == T)
+
+ggplot(EnvDataRange, aes(x = temperature, y = SatPct)) +
+  geom_point(color = "gray90") +
+  geom_point(data = Presences, aes(x = temperature, y = SatPct, color = Species), alpha = 1) +
+  theme_bw()
+```
+
+# Detection Rates
+```{r}
+# Add hypoxia column
+EnvDataRange <- EnvDataRange %>% 
+  mutate(Hypoxia20 = case_when(SatPct < 20 ~ T, .default = F), Hypoxia30 = case_when(SatPct < 30 ~ T, .default = F))
+eDNAxEnvDataSat_SOI <- eDNAxEnvDataSat_SOI %>% 
+  mutate(Hypoxia20 = case_when(SatPct < 20 ~ T, .default = F), Hypoxia30 = case_when(SatPct < 30 ~ T, .default = F))
+eDNAxEnvDataSat <- eDNAxEnvDataSat %>% 
+  mutate(Hypoxia20 = case_when(SatPct < 20 ~ T, .default = F), Hypoxia30 = case_when(SatPct < 30 ~ T, .default = F))
+
+# Calculate herring numbers
+eDNAxEnvDataSat_SOI %>% 
+  filter(Species == "Clupea pallasii", Present == T) %>% 
+  group_by(Hypoxia20) %>% 
+  summarize(Observations = n()) %>% 
+  mutate(Percentage = Observations/sum(Observations))
+
+# Numbers to check with herring
+TotalHerring <- as.numeric(eDNAxEnvDataSat_SOI %>% filter(Species == "Clupea pallasii", Present == T) %>% summarize(n = n()))
+HypoxicHerring <- as.numeric(eDNAxEnvDataSat_SOI %>% filter(Species == "Clupea pallasii", Present == T, Hypoxia20 == T) %>% summarize(n = n()))
+OxicHerring <- as.numeric(eDNAxEnvDataSat_SOI %>% filter(Species == "Clupea pallasii", Present == T, Hypoxia20 == F) %>% summarize(n = n()))
+
+TotalSamples <- as.numeric(eDNAxEnvDataSat_SOI %>% filter(Species == "Clupea pallasii") %>% summarize(n = n()))
+HypoxicSamples <- as.numeric(eDNAxEnvDataSat_SOI %>% filter(Species == "Clupea pallasii", Hypoxia20 == T) %>% summarize(n = n()))
+OxicSamples <- as.numeric(eDNAxEnvDataSat_SOI %>% filter(Species == "Clupea pallasii", Hypoxia20 == F) %>% summarize(n = n()))
+```
+
+
+
+```{r}
+# Calculating detection rates for all species
+hypoxic <- eDNAxEnvDataSat %>% 
+  filter(Hypoxia20 == T)
+
+oxic <- eDNAxEnvDataSat %>% 
+  filter(Hypoxia20 == F)
+
+# Samps = samples
+# Dtct = detections
+Hsum <- hypoxic %>% 
+  group_by(Species) %>% 
+  summarize(Dtct_H = sum(Present), Samps_H = n()) %>% 
+  mutate(Pct_Dtct_H = round((Dtct_H/Samps_H)*100, digits = 2))
+
+Osum <- oxic %>% 
+  group_by(Species) %>% 
+  summarize(Dtct_O = sum(Present), Samps_O = n()) %>% 
+  mutate(Pct_Dtct_O = round((Dtct_O/Samps_O)*100, digits = 2))
+
+PercentageComparison <- full_join(Hsum, Osum, by = join_by(Species)) %>% 
+  mutate(TotalDtct = Dtct_H+Dtct_O, 
+         Samps = Samps_H + Samps_O, 
+         Pct_Dtct_Total = round((TotalDtct/Samps)*100, digits = 2), 
+         Delta = Pct_Dtct_O - Pct_Dtct_H, # Delta = Oxic - hypoxic detection percentages
+         AbsDelta = abs(Delta)) # To sort by
+
+# Filter for large differences between hypoxic and non-hypoxic detection rates
+RateChange <- PercentageComparison %>% 
+  filter(abs(Delta) > 20)
+BigRateChange <- PercentageComparison %>% 
+  filter(abs(Delta) > 50)
+```
+
+# Northern verus southern copepods
+
+```{r}
+eDNAxEnvDataSat %>% 
+  filter(., Class=="Hexanauplia") %>% 
+  mutate(., Species = if_else(Species=="Pseudocalanus acuspes", "Pseudocalanus mimus", Species)) -> eDNAxEnvDataSat_copepod
+
+northern_copepods_species = c("Pseudocalanus mimus", "Acartia longiremis",  "Calanus marshallae")
+
+southern_copepods_species = c("Acartia tonsa", "Calanus pacificus", "Calocalanus spp.", "Clausocalanus spp.", "Clausocalanus parapergens", "Clausocalanus pergens", "Corycaeus anglicus", "Ctenocalanus vanus", "Mesocalanus tenuicornis",  "Paracalanus spp.", "Paracalanus sp. C AC-2013")
+
+southern_copepods_genera <- c("Calocalanus","Clausocalanus","Paracalanus")
+
+eDNAxEnvDataSat_copepod$Species %>%  unique() %>% sort()
+eDNAxEnvDataSat_copepod$Genus %>%  unique() %>% sort()
+
+eDNAxEnvDataSat_copepod %>% 
+  filter(., Species =="Calanus marshallae") 
+
+eDNAxEnvDataSat_copepod %>% 
+  filter(., str_detect(Genus,"Calocalanus")) #none
+
+
+eDNAxEnvDataSat_copepod %>% 
+  filter(., str_detect(Species,"Paracalanus"))
+
+
+eDNAxEnvDataSat_copepod_clean <- eDNAxEnvDataSat_copepod %>% 
+  mutate(., North_vs_South = case_when(Species %in% northern_copepods_species ~"Northern",
+     Species %in% southern_copepods_species ~"Southern",
+     Genus %in% southern_copepods_genera ~"Southern",
+     TRUE ~"Neither")) %>% 
+  filter(., North_vs_South !="Neither")
+
+eDNAxEnvDataSat_copepod_clean$North_vs_South %>% unique()
+```
+
+
+```{r}
+# Calculating detection rates for all species
+hypoxic_copepod <- eDNAxEnvDataSat_copepod_clean %>% 
+  filter(Hypoxia20 == T)
+
+oxic_copepod  <- eDNAxEnvDataSat_copepod_clean %>% 
+  filter(Hypoxia20 == F)
+
+# Samps = samples
+# Dtct = detections
+Hsum <- hypoxic_copepod %>% 
+  group_by(North_vs_South) %>% 
+  summarize(Dtct_H = sum(Present), Samps_H = n()) %>% 
+  mutate(Pct_Dtct_H = round((Dtct_H/Samps_H)*100, digits = 2))
+
+Osum <- oxic_copepod %>% 
+  group_by(North_vs_South) %>% 
+  summarize(Dtct_O = sum(Present), Samps_O = n()) %>% 
+  mutate(Pct_Dtct_O = round((Dtct_O/Samps_O)*100, digits = 2))
+
+PercentageComparison <- full_join(Hsum, Osum, by = join_by(North_vs_South)) %>% 
+  mutate(TotalDtct = Dtct_H+Dtct_O, 
+         Samps = Samps_H + Samps_O, 
+         Pct_Dtct_Total = round((TotalDtct/Samps)*100, digits = 2), 
+         Delta = Pct_Dtct_O - Pct_Dtct_H, # Delta = Oxic - hypoxic detection percentages
+         AbsDelta = abs(Delta)) # To sort by
+
+PercentageComparison %>%  View()
+```
+
+# New SOI list
+
+```{r}
+# Acquire the data I want
+EllaInterest <- read_csv(here("OCNMS_Project", "Data", "EllaInterestStats.csv")) %>%  # Importing my spreadsheet of species of interest based on all of those tests. Indicates whether the species are significant by detection rate (>30%) and whether they had a significant binomial regression result with oxygen saturation.
+  mutate(DeltaSig20 = case_when(abs(DetectionRateDelta) >= 0.2 ~ T, .default = F)) %>% 
+  relocate(DeltaSig20, .after = DeltaSig30)
+SigBoth20 <- EllaInterest %>% filter(BinomSig == T & DeltaSig20 == T) # Extract species names that are significant based on binomial regression and change in detection rates above and below the hypoxic threshold
+SigBoth20 <- SigBoth20$Species
+SigBoth <- as.vector(EllaInterest %>% filter(BinomSig == T & DeltaSig30 == T) %>% select(Species))
+SigBinom <- as.vector(EllaInterest %>% filter(BinomSig == T) %>% select(Species)) 
+SigDelta <- as.vector(EllaInterest %>% filter(DeltaSig30 == T) %>% select(Species)) 
+
+SigBoth20df <- eDNAxEnvDataSatClean %>% 
+  filter(Species %in% SigBoth20)
+
+EllaInterestDF <- eDNAxEnvDataSatClean %>% 
+  filter(Species %in% EllaInterest$Species)
+```
+
+# Graphs (Part 2)
+
+```{r}
+source(here("OCNMS_Project", "PresenceEnvGraphFunction.R"))
+presenceGraphVars()
+
+# Test the function
+presenceGraph(eDNAxEnvDataSat_SOI, envCond = "SatPct", envCondName = "Oxygen", thresholdLvl = 20, widthpx = 3000, ylab = "Oxygen Saturation (%)")
+```
+
+```{r}
+# Run the function on my data of interest
+presenceGraph(EllaInterestDF, envCond = "SatPct", envCondName = "Oxygen", thresholdLvl = 20, heightpx = 1500, widthpx = 3000, ylab = "Oxygen Saturation (%)")
+
+presenceGraph(EllaInterestDF, envCond = "temperature", envCondName = "Temperature", threshold = F, heightpx = 1500, widthpx = 3000, ylab = "Temperature (ºC)", labelLoc = NA, hypoxicdots = F)
+
+system("say Presence and absence graphs complete!")
+```
+
+# Graph binomial regression
+
+```{r}
+binomtest <- EllaInterestDF %>% filter(Species == "Thecamonas trahens") %>% mutate(PresentBin = case_when(Present == T ~ 1, Present == F ~ 0))
+ggplot(binomtest, aes(x = SatPct, y = PresentBin)) +
+  geom_point(size = 3) +
+  geom_smooth(method = "glm", method.args = list(family = "binomial"), se = F) +
+  stat_poly_eq(use_label(c("eq", "R2")), size = 6) +
+  theme_bw()
+```
+
+# Loop to graph binom regresion
+```{r}
+# Add title
+# Add better axis labels
+for (i in 1:length(AllSplit)) {
+  df <- AllSplit[[i]] %>% mutate(PresentBin = case_when(Present == T ~ 1, Present == F ~ 0)) %>%  # Select one species and mutate to 0/1 so that the regression will run
+    filter(temperature < 11) # Filter out the outlier
+  
+  species <- as.character(AllSplit[[i]][1,7]) # Extract species name for title + export filename
+
+  ggplot(df, aes(x = SatPct, y = PresentBin, color = PresentBin)) +
+    geom_point(size = 4) +
+    scale_color_gradient(high = "dodgerblue3", low = "orange2", guide = "legend", na.value = "black") + # Color to match presence/absence graphs
+    geom_smooth(method = "glm", method.args = list(family = "binomial"), se = F) +
+    # Print the binomial regression
+    stat_poly_eq(use_label(c("R2")), size = 6, label.y = 0.75, label.x = 60) + # Print R^2 and p-value from the model
+    theme_bw() +
+    theme(text = element_text(size = 20)) +
+    labs(title = species, x = "Oxygen Saturation (%)", y = "Species Present?")
+  
+    ggsave(filename = here("OCNMS_Project", "Plots",
+                           "Binomial_Regressions", 
+                           paste(species, sep = ".", "png")), # Save graph
+           width = 2300, 
+           height = 2000, 
+           units = "px")
+}
+
+system("say Binomial Regression Graphs Complete!")
+```
+
+
+S Xu#, M Chen#, T Feng, L Zhan, L Zhou, G Yu*. Use ggbreak to effectively utilize plotting space to deal with large datasets and outliers. Frontiers in Genetics. 2021, 12:774846. doi: 10.3389/fgene.2021.774846
+
+```{r}
+system("say Script Complete! Beep Beep!")
+```
+
+To kill the talking enter in terminal `while true; do pkill -9 say; done`
+
+# Make some copepod graphs
+
+So WoRMS and JV use different copepod taxonomy, which is unfortunate. WoRMS uses one class (Copepoda), but JV uses a class with copepods and some other crustaceans. 
+
+```{r}
+# Trying with OCNMS species
+inverts <- read_csv(here("OCNMS_Project", "Data", "OCNMS_Copepods_Krill.csv"))
+copes <- inverts %>% 
+  filter(!is.na(Notes))
+copepods <- eDNAxEnvDataSatClean %>% 
+  filter(Species %in% copes$Species)
+
+presenceGraph(copepods, envCond = "SatPct", envCondName = "Oxygen", thresholdLvl = 20, heightpx = 1500, widthpx = 3000, ylab = "Oxygen Saturation (%)", filepath = here("OCNMS_Project", "Plots", "CopepodPresence"))
+
+presenceGraph(copepods, envCond = "temperature", envCondName = "Temperature", threshold = F, heightpx = 1500, widthpx = 3000, ylab = "Temperature (ºC)", labelLoc = NA, filepath = here("OCNMS_Project", "Plots", "CopepodPresence"), hypoxicdots = F)
+```
+
+```{r}
+# Where the damn copepods
+copepodsFull <- eDNAxEnvDataSatClean %>% 
+  filter(Class == "Hexanauplia" & Species != "Pescecyclops")
+
+presenceGraph(copepodsFull, envCond = "SatPct", envCondName = "Oxygen", thresholdLvl = 20, heightpx = 1500, widthpx = 3000, ylab = "Oxygen Saturation (%)", filepath = here("OCNMS_Project", "Plots", "CopepodPresence"))
+
+presenceGraph(copepodsFull, envCond = "temperature", envCondName = "Temperature", threshold = F, heightpx = 1500, widthpx = 3000, ylab = "Temperature (ºC)", labelLoc = NA, filepath = here("OCNMS_Project", "Plots", "CopepodPresence"), hypoxicdots = F)
+```
+
