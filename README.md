@@ -6,7 +6,7 @@ Eleanor Crotty's 2024 Hollings Scholarship project: Leveraging environmental DNA
 
 ## Directories
 - `OCNMS_Hypoxia`: Environmental data cleaning and combining. Main sources are OCNMS CTD casts and the Teawhit Head mooring's 42 meter depth sensor (TH042). The folder also includes satellite data and data from the Cha'ba NEMO mooring that I did not end up using.
-- `OCNMS_sample_metadata_zjd`: Contains metadata and all Jonah Ventures sequencing outputs from the samples, as well as code to clean, pivot, and combine with the Ocean Molecular Ecology group's metadata.
+- `OCNMS_sample_metadata_zjd`: Contains metadata and all [Jonah Ventures](https://www.google.com/aclk?sa=l&ai=DChcSEwia6d6avvqHAxUAzcIEHby-FogYABAAGgJwdg&co=1&ase=2&gclid=CjwKCAjw8fu1BhBsEiwAwDrsjAO3m2YGKvDCQghRFG5AGsz50-QKl1t54bUImzpBj8coOLBD_wulTxoCS-gQAvD_BwE&ei=pMi_Zt2IOJW30PEPhMTH8QM&sig=AOD64_3jUM5Xfd7LRLFItlhNQe0nl_hT9Q&q&sqi=2&nis=4&adurl&ved=2ahUKEwjd6tmavvqHAxWVGzQIHQTiMT4Q0Qx6BAgIEAE) sequencing outputs from the samples, as well as code to clean, pivot, and combine with the Ocean Molecular Ecology group's metadata.
 - `OCNMS_eDNA`: Environmental DNA metadata and data cleaning and combining. Contains eDNA species detection data that is pivoted and combined with metadata, as well as code that cleans the species detection data.
 - `OCNMS_Project`: Combining the environmental DNA data with the environmental data. Also includes code to compare sampling dates from the metadata with the environmental data to identify gaps in the needed data.
 - Each directory has subdirectories `Data` (inputs), `Outputs` (outputs, usually cleaned or filtered data), and `Plots` (any plots saved from code in the parent directory)
@@ -27,7 +27,7 @@ This directory contains code for cleaning oceanographic data from a mooring, CTD
 [Hollings Project Workflow-EnvData.pdf](https://github.com/user-attachments/files/16059843/Hollings.Project.Workflow-EnvData.pdf)
 
 ### Files in `OCNMS_sample_metadata_zjd/OCNMS`
-*This data and code was provided by Zachary Gold and modified for this workflow by Ella Crotty.* JV = Jonah Ventures, the DNA sequencing service we use who provided processed metabarcoding data following their standard protocols. Details are available upon on request and will be made available upon peer review of the results. 
+*This data and code was provided by Zachary Gold and modified for this workflow by Ella Crotty.* JV = [Jonah Ventures](https://www.google.com/aclk?sa=l&ai=DChcSEwia6d6avvqHAxUAzcIEHby-FogYABAAGgJwdg&co=1&ase=2&gclid=CjwKCAjw8fu1BhBsEiwAwDrsjAO3m2YGKvDCQghRFG5AGsz50-QKl1t54bUImzpBj8coOLBD_wulTxoCS-gQAvD_BwE&ei=pMi_Zt2IOJW30PEPhMTH8QM&sig=AOD64_3jUM5Xfd7LRLFItlhNQe0nl_hT9Q&q&sqi=2&nis=4&adurl&ved=2ahUKEwjd6tmavvqHAxWVGzQIHQTiMT4Q0Qx6BAgIEAE), the DNA sequencing service we use who provided processed metabarcoding data following their standard protocols. Details are available upon on request and will be made available upon peer review of the results. 
 
 - `JV_bioinformatics` contains the results of DNA metabarcoding from the OCNMS eDNA samples, as well as the JV sample data that is used to combine the JV specific sample names with the OME metadata. Sub-folders contain the results from different primers.
 - `OCNMS_JV2_sample_metadata.Rmd` is an example of how to filter the data, focused on Alaska
