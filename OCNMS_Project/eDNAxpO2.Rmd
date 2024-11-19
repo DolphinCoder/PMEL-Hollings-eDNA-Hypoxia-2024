@@ -131,6 +131,9 @@ eDNAxEnvDataSat <- left_join(DetectRd, EnvRd, by = join_by(DateMatch))
 investigate <- eDNAxEnvDataSat %>% select(Species, DateMatch, Date_UTC, Date_local_hr, source, temperature, DO, E_no, Rosette_position, Amplicon)
 
 system("say Data Join Complete")
+
+# Export the joined data
+write_csv(eDNAxEnvDataSat, here("OCNMS_Project", "Outputs", "eDNAxEnvDataSat.csv"))
 ```
 
 # Graphs

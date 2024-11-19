@@ -1,12 +1,13 @@
 ---
 title: "eDNA Compared To Oxygen Saturation"
 author: "Eleanor (Ella) Crotty"
-header-includes:
-  \usepackage{fvextra}
-  \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,commandchars=\\\{\}}
+header-includes: \usepackage{fvextra} \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,commandchars=\\\{\}}
 output:
+  html_document:
+    toc: yes
+    df_print: paged
   pdf_document:
-    toc: TRUE
+    toc: yes
 urlcolor: blue
 ---
 
@@ -804,7 +805,7 @@ PercentageComparison <- full_join(Hsum, Osum, by = join_by(North_vs_South)) %>%
          Delta = Pct_Dtct_O - Pct_Dtct_H, # Delta = Oxic - hypoxic detection percentages
          AbsDelta = abs(Delta)) # To sort by
 
-PercentageComparison %>%  View()
+View(PercentageComparison)
 ```
 
 # New SOI list
@@ -891,10 +892,6 @@ system("say Binomial Regression Graphs Complete!")
 
 S Xu#, M Chen#, T Feng, L Zhan, L Zhou, G Yu*. Use ggbreak to effectively utilize plotting space to deal with large datasets and outliers. Frontiers in Genetics. 2021, 12:774846. doi: 10.3389/fgene.2021.774846
 
-```{r}
-system("say Script Complete! Beep Beep!")
-```
-
 To kill the talking enter in terminal `while true; do pkill -9 say; done`
 
 # Make some copepod graphs
@@ -915,7 +912,7 @@ presenceGraph(copepods, envCond = "temperature", envCondName = "Temperature", th
 ```
 
 ```{r}
-# Where the damn copepods
+# Where the copepods
 copepodsFull <- eDNAxEnvDataSatClean %>% 
   filter(Class == "Hexanauplia" & Species != "Pescecyclops")
 
@@ -924,3 +921,6 @@ presenceGraph(copepodsFull, envCond = "SatPct", envCondName = "Oxygen", threshol
 presenceGraph(copepodsFull, envCond = "temperature", envCondName = "Temperature", threshold = F, heightpx = 1500, widthpx = 3000, ylab = "Temperature (ºC)", labelLoc = NA, filepath = here("OCNMS_Project", "Plots", "CopepodPresence"), hypoxicdots = F)
 ```
 
+```{r}
+system("say Script Complete! Beep Beep!")
+```
