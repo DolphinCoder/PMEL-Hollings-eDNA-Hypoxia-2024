@@ -17,7 +17,6 @@ library(patchwork)
 library(scales)
 library(ggrepel)
 library(ggpmisc)
-library(readxl)
 library(here)
 library(gsw)
 library(R.matlab)
@@ -579,6 +578,7 @@ SigSpDf <- eDNAxEnvDataSat %>%
 
 ## ALLLLLLL REGRESSIONS
 ```{r}
+library(ggpmisc)
 # Don't filter for more than 50 detections
 
 eDNAxEnvDataSatClean <- eDNAxEnvDataSat %>% 
@@ -805,7 +805,7 @@ for (i in 1:length(AllSplit)) {
     scale_color_gradient(high = "dodgerblue3", low = "orange2", guide = "legend", na.value = "black") + # Color to match presence/absence graphs
     geom_smooth(method = "glm", method.args = list(family = "binomial"), se = F) +
     # Print the binomial regression
-    stat_poly_eq(use_label(c("R2")), size = 6, label.y = 0.75, label.x = 60) + # Print R^2 and p-value from the model
+    stat_poly_eq(use_label(c("R2", "P")), size = 6, label.y = 0.75, label.x = 60) + # Print R^2 and p-value from the model
     theme_bw() +
     theme(text = element_text(size = 20)) +
     labs(title = species, x = "Oxygen Saturation (%)", y = "Species Present?")

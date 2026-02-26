@@ -22,7 +22,6 @@ library(patchwork)
 library(scales)
 library(ggrepel)
 library(ggbreak)
-library(readxl)
 library(here)
 ```
 
@@ -80,6 +79,36 @@ eDNAxEnvData <- left_join(DetectRd, EnvRd, by = join_by(DateMatch))
 
 investigate <- eDNAxEnvData %>% select(Species, DateMatch, Date_UTC, Date_local_hr, source, temperature, DO, SampleId, Rosette_position, Amplicon)
 ```
+
+## For publication - example datas
+```{r}
+ex1 <- EnvData1 %>% 
+  filter(source == "Mooring") %>% 
+  filter(grepl("2021-08-25", date)) %>% 
+  arrange(date) %>% 
+  select(date, temperature, DO)
+ex2 <- EnvRd %>% 
+  filter(source == "Mooring") %>% 
+  filter(grepl("2021-08-25", date)) %>% 
+  arrange(date) %>% 
+  select(date, DateMatch, temperature, DO)
+ex3 <- SpeciesDetections %>% 
+  filter(grepl("2021-08-25", Date_local)) %>% 
+  #filter(grepl("PPS", Field_collection_method)) %>% 
+  arrange(Date_local) %>% 
+  select(Date_local, Species, SampleId)
+ex4 <- DetectRd %>% 
+  filter(grepl("2021-08-25", Date_local)) %>% 
+  #filter(grepl("PPS", Field_collection_method)) %>% 
+  arrange(Date_local) %>% 
+  select(Date_local, DateMatch, Species, SampleId)
+ex5 <- eDNAxEnvData %>% 
+  filter(grepl("2021-08-25", DateMatch)) %>% 
+  arrange(DateMatch) %>% 
+  select(date, Date_local, DateMatch, Species, SampleId, temperature, DO) %>% 
+  rename(EnvDataDate = date, eDNADate = Date_local)
+```
+
 
 # Joined data graphs
 

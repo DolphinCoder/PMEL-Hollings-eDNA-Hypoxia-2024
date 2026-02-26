@@ -16,7 +16,6 @@ library(tidyverse)
 library(patchwork)
 library(scales)
 library(ggrepel)
-library(readxl)
 library(here)
 ```
 
@@ -39,6 +38,28 @@ coiReads <- coiReads %>%
   relocate(Barcode_mod, .after = Barcode.x) %>% 
   filter(Cast_No. == "TH042") 
 ```
+
+```{r}
+# Check metadata for duplicate dates
+OCNMS_metadata %>% 
+  group_by(Sample_Name) %>% 
+  summarize(n = n()) # should = 5 for 5 primers
+
+OCNMS_metadata %>% 
+  group_by(Date_local) %>% 
+  summarize(n = n())
+# more than 5: 2021-08-25 09:48:00	
+# 2021-10-08 11:15:00
+# 2022-06-21 13:28:00	15
+# 2022-07-19 12:58:00
+# 2022-08-22 10:59:00	45	
+# 2022-09-20 11:00:00 45
+# 2023-06-15 14:30:00 15
+# 2023-07-26 12:54:00	15
+
+duplDates <- as.POSIXct(c("2021-08-25 09:48:00", "2021-10-08 11:15:00", "2022-06-21 13:28:00", "2022-07-19 12:58:00", "2022-08-22 10:59:00", "2022-09-20 11:00:00", "2023-06-15 14:30:00", "2023-07-26 12:54:00"))
+```
+
 
 # Make allReads
 
