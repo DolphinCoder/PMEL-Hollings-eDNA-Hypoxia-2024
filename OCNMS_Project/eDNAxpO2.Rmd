@@ -21,6 +21,7 @@ library(here)
 library(gsw)
 library(R.matlab)
 library(ggbreak)
+library(car) # Has a function for the Box-Tidwell procedure
 ```
 
 # Import data 
@@ -488,7 +489,7 @@ eDNAxEnvDataSat_SOI_box <- eDNAxEnvDataSat_SOI %>%
   filter(Species %in% c("Calanus pacificus", "Clupea pallasii", "Oncorhynchus tshawytscha")) # For some goddamn reason there's a species or two that REFUSES to box tidwell
 joinSpeciesList <- split(eDNAxEnvDataSat_SOI_box, eDNAxEnvDataSat_SOI_box$Species) # Split by species
 
-library(car) # Has a function for the Box-Tidwell procedure
+
 ?boxTidwell
 
 # Single test
@@ -652,7 +653,7 @@ BoxTidwellP <- c()
 for (i in 1:length(LinearSplit)) {
   print(paste(names(LinearSplit)[i], sep = " ", "Presence vs Oxygen"))
   box <- boxTidwell(Present ~ SatPct, 
-                    other.x = ~ year, 
+                    other.x = ~ year, # it breaks if i don't do this idk
                     data = LinearSplit[[i]], 
                     na.action = na.exclude)
   
