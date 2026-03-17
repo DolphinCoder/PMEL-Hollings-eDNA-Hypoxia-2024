@@ -1,0 +1,568 @@
+---
+title: "Thesis Goal 1 (without 2023)"
+author: "Eleanor (Ella) Crotty"
+header-includes:
+  \usepackage{fvextra}
+  \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,commandchars=\\\{\}}
+output:
+  pdf_document:
+    toc: TRUE
+urlcolor: blue
+---
+
+```{r Package Imports, message = F, warning = F}
+# Warnings and startup messages suppressed
+library(tidyverse)
+library(patchwork)
+library(scales)
+library(ggrepel)
+library(here)
+library(mgcv)
+#library(gratia)
+library(scales)
+library(ggpmisc) # to put R^2 on binomial regressions
+```
+
+Goal 1: Compare copepod eDNA index, a measure of relative abundance using eDNA detections, to dissolved oxygen data in order to assess whether hypoxia decreases copepod abundance in OCNMS.
+
+# Goals
+
+-   Plot eDNA index over time and oxygen
+-   Make scatterplots of eDNA index vs oxygen
+-   Do a GAM of eDNA index vs oxygen
+-   Compare eDNA to hypoxic thresholds
+
+# Import data
+
+```{r}
+envData <- read_csv(here("Manuscript_Plots", "EnvironmentalDataset1.csv")) %>% 
+  filter(year != 2023) %>%  # Ignoring 2023 due to gaps for now
+  mutate(year = as.factor(year)) %>% 
+  relocate(year, .after = date)
+
+# Fix misidentifications
+re_BLAST_IDs <- read_csv(here("Manuscript_Plots", "re_BLAST_dictionary.csv"))
+allReads1 <- read_csv(here("Manuscript_Plots", "FishPlusCOI_Reads.csv")) %>% # non-cleaned allReads
+  mutate(year = year(Date_local)) %>% 
+  relocate(year, .after = Date_local) %>% 
+  full_join(re_BLAST_IDs, by = join_by(ESV == ESV_loop)) %>% 
+  relocate(c(Re_BLAST_Species, PctMatchLoop), .after = Species) # real fix for the misidentification
+
+allReads <- allReads1 %>% 
+  filter(Re_BLAST_Species != "DELETE" | is.na(Re_BLAST_Species)) %>% # filter out <95% matches
+  mutate(Species = case_when(!is.na(Re_BLAST_Species) ~ Re_BLAST_Species, .default = Species)) %>%  # Re-identify ESVs
+  select(-c(Re_BLAST_Species, PctMatchLoop)) # Remove Re_BLAST_Species and PctMatchLoop bc they are no longer needed and might mess w the code
+
+yrReads <- allReads %>% 
+  filter(year != 2023) %>%   # Ignoring 2023 due to gaps for now
+  mutate(year = as.factor(year))
+```
+
+# Results section
+
+```{r}
+unique(yrReads$Field_collection_method)
+unique(yrReads$Amplicon)
+
+COI <- yrReads %>% 
+  filter(Amplicon == "UniCOI")
+
+print("species detected")
+length(unique(COI$Species))
+
+yrSpResults <- yrReads %>% 
+  mutate(Present = case_when(nReads == 0 ~ F, .default = T)) %>% 
+  group_by(year, Family, Genus, Species) %>% 
+  summarize(detections = sum(Present), totReads = sum(nReads), maxReads = max(nReads), meanReads = round(mean(nReads), 2), minReads = min(nReads))
+
+results <- COI %>% 
+  mutate(Present = case_when(nReads == 0 ~ F, .default = T)) %>% 
+  group_by(SampleId) %>% 
+  summarize(maxReads = max(nReads), meanReads = round(mean(nReads), 2), minReads = min(nReads), detections = sum(Present))
+
+print("total reads")
+sum(COI$nReads)
+
+COI %>% 
+  group_by(year) %>% 
+  summarize(Samples = length(unique(SampleId)))
+
+COI %>% 
+  filter(Technical_Replicate == 3) %>% # finding how many need combining
+  group_by(SampleId) %>% 
+  summarize(n = n())
+
+yrReads %>% 
+  group_by(Species) %>% 
+  filter(nReads > 0) %>% 
+  summarize(n = n()) %>% 
+  arrange(n)
+
+BLAST_check <- yrReads %>% 
+  group_by(Class, Order, Family, Genus, Species, ESV, sequence) %>% 
+  summarize(n = n())
+
+samples <- yrReads %>% 
+  group_by(year(Date_UTC), as.Date(Date_UTC)) %>% 
+  summarize(n = n()) 
+
+samples %>% 
+  group_by(year(`as.Date(Date_UTC)`)) %>% 
+  summarize(n = n())
+
+samplesc <- COI %>% 
+  group_by(year(Date_UTC), Date_UTC) %>% 
+  summarize(n = n()) 
+
+samplesc %>% 
+  group_by(year(Date_UTC)) %>% 
+  summarize(n = n())
+```
+
+
+# eDNA index
+
+## Check for samples on the same day
+
+```{r}
+# Dates with 3 or 9 samples taken (see OCNMS_eDNA_Exploration.Rmd in PMEL-Hollings-eDNA-Hypoxia-2024 to see how I got this list)
+duplDates <- as.POSIXct(c("2021-08-25 09:48:00", "2021-10-08 11:15:00", "2022-06-21 13:28:00", "2022-07-19 12:58:00", "2022-08-22 10:59:00", "2022-09-20 11:00:00", "2023-06-15 14:30:00", "2023-07-26 12:54:00"))
+
+allR_check <- allReads %>% 
+  filter(Date_local %in% duplDates) %>% 
+  filter(ESV == "ESV_067624")
+allR_check
+```
+
+## Define PCR_reps_combine
+
+```{r}
+# First, combine PCR replicates and average
+PCR_reps_combine <- function(df) {
+  # print(head(df))
+  
+  # Separate out Sample_Name into three informational columns
+  df_out <- df %>% 
+    separate(Sample_Name, 
+             into=c("E_no", "Cruise1", "PCR_Rep"), 
+             remove=F, 
+             fill = "right") %>% # sep is a regular expression which is annoying, but the default recognizes any non-alphanumeric characters so the default works here
+    mutate(.)
+  
+  # Define which columns to group by
+  id_cols1 <- colnames(df_out) # Pull out column names
+  id_cols1 <- id_cols1[! id_cols1 %in% c("X", "SampleId","Sample_Name", "PCR_Rep", "pctMatch", "JV_Sample_Name", "Technical_Replicate", "nReads", "Barcode.y", "E_no", "Depth_m", "Rosette_position", "Field_Sample_Name", "Field_Notes")] # Remove SampleId and Sample_Name, as well as other things that differ by PCR replicate. Also removed E_no, Depth, and Rosette_position because they differ by multiple samples in one day (exclusive to Niskin samples). These are all the things removed from id_cols.
+  print(id_cols1)
+  
+  df_out <- df_out %>% 
+    group_by_at(id_cols1) %>% # I am using species and datetime to group, which deletes E-no but I don't think I've been using it. This should be ok.
+    # dplyr::mutate(SampleId = dplyr::first(SampleId)) %>% 
+    dplyr::summarize(nReads = mean(nReads)) %>% 
+    relocate(nReads, .after = PI)
+    
+  df_out
+}
+```
+
+
+
+## Calculate eDNA index for 2021-2022 only
+
+```{r}
+index1dummyYr <- yrReads %>% # Quick proportions
+  dplyr::group_by(SampleId) %>% 
+  mutate(Tot = sum(nReads),
+      	Row.sums = nReads / Tot) %>% # calculate proportions - 0 reads/0 total = NaN, need to replace with 0 to make max() work
+  relocate(c(Tot, Row.sums), .after = SampleId)
+
+yrReads_PCRcomb <- PCR_reps_combine(yrReads) # Spot check E1325 was correct
+
+# Second, combine by species
+
+id_cols <- colnames(yrReads_PCRcomb) # Pull out column names
+id_cols <- id_cols[! id_cols %in% c("X", "ESV", "sequence", "nReads")] # Remove ESV + nreads because those are different within species
+
+allReads_speciesYr <- yrReads_PCRcomb %>% 
+  group_by_at(id_cols) %>% # group_by_at can take a vector
+  dplyr::summarize(TotalnReads = sum(nReads)) %>% # Removed , avgpctMatch = mean(pctMatch) because I had to remove pctMatch to combine PCR replicates. Sum nReads results in taking the sum of all ESVs within a species
+  relocate(TotalnReads, .after = PI)
+
+write_csv(allReads_speciesYr, here("Manuscript_Plots", "eDNA_index", "eDNA_index_no23.csv")) # Gonna want this later
+
+allReads_speciesYr <- allReads_speciesYr %>% 
+  mutate(Species_abbrev = sub("(\\w+)(\\S)", substring(Species, 1, 1), Species)) %>% # find word + space, replace with first letter
+  relocate(Species_abbrev, .after = Species) %>% 
+  mutate(ID_Ella = paste(Date_UTC, Amplicon, sep = "_")) %>% # just making unique IDs until grouping by it fixes the eDNA index
+  relocate(ID_Ella, .after = Species) %>% 
+  mutate(ID_Ella = gsub(" ", "_", ID_Ella)) %>% 
+  mutate(ID_Ella = gsub("-", "", ID_Ella)) %>%
+  mutate(ID_Ella = gsub(":", "", ID_Ella))
+
+length(unique(allReads_speciesYr$ID_Ella)) # should = 68634 because that's the length of the dataset
+
+all_index1Yr <- allReads_speciesYr %>%
+  dplyr::group_by(ID_Ella) %>% # bc sampleID & E_no had to be removed in the PCR replicate combination step
+  mutate(Tot = sum(TotalnReads),
+      	Row.sums = TotalnReads / Tot) %>% # calculate proportions - 0 reads/0 total = NaN, need to replace with 0 to make max() work
+  relocate(c(TotalnReads, Tot, Row.sums), .after = Species) # Move it somewhere I can see the damn thing
+
+yr_eDNA_index <- all_index1Yr %>% 
+  dplyr::group_by(Species) %>%
+  mutate(Row.sums = case_when(Row.sums == "NaN" ~ 0, 
+                                      .default = Row.sums)) %>% # Make 0/0 = 0 and not NaN
+  mutate(Colmax = max(Row.sums), Normalized.reads = Row.sums / Colmax) %>%  #transforms raw number of reads to eDNA index. Creates same divide by 0 error, so:
+  mutate(Normalized.reads = case_when(Normalized.reads == "NaN" ~ 0, 
+                                      .default = Normalized.reads)) %>% # Make 0/0 = 0 and not NaN
+  relocate(c(Colmax, Normalized.reads), .after = Row.sums)  # Move it somewhere I can see the damn thing
+
+# Filter to only copepods
+yr_eDNA_index <- yr_eDNA_index %>% 
+  rename(eDNA_index = `Normalized.reads`) # to make parsing this easier
+
+write_csv(yr_eDNA_index, here("Manuscript_Plots", "eDNA_index", "eDNA_index_no23.csv")) # Gonna want this later
+
+# envData = EnvironmentalDataset1
+# Based on eDNAxpO2.Rmd from summer project
+# copepod_eDNA_index is still essentially a version of allReads so I can use the same code I did with allReads_Species
+
+# Round environmental data and add DateMatch
+EnvRd <- envData %>% 
+  mutate(DateMatch = round_date(date, unit = "10 minutes")) # Round to the nearest 10 minutes
+DetectRdYr <- yr_eDNA_index %>% 
+  mutate(DateMatch = round_date(Date_UTC, unit = "10 minutes"), Date_local_hr = round_date(Date_local, unit = "hour")) # Spot check - looks good. 
+
+eDNAindxEnvDataYr <- left_join(DetectRdYr, EnvRd, by = join_by(DateMatch)) %>% 
+  relocate(date, .after = Date_UTC) %>% 
+  relocate(year.x, .after = Date_UTC) %>% 
+  relocate(year.y, .after = Date_UTC) %>% 
+  filter(year.x != 2023) %>% 
+  filter()
+
+investigateYr <- eDNAindxEnvDataYr %>% select(Species, DateMatch, Date_UTC, Date_local_hr, source, temperature, DO, Amplicon)
+
+system("say Data Join Without 2023 Complete")
+
+# Export the joined data
+write_csv(eDNAindxEnvDataYr, here("Manuscript_Plots", "eDNA_index", "eDNAindxEnvData_no23.csv"))
+
+# Make a version without the copepods that are only detected in 2023 because those plots are unhelpful
+eDNAindxEnvData_cleanYr <- eDNAindxEnvDataYr %>% 
+  filter(Colmax > 0) %>% 
+  mutate(Present = case_when(TotalnReads == 0 ~ F, .default = T)) %>% 
+  relocate(Present, .before = TotalnReads)
+
+# Make a split version for looping over species
+dfsplit <- split(eDNAindxEnvData_cleanYr, eDNAindxEnvData_cleanYr$Species) # Split by species
+  
+write_csv(eDNAindxEnvData_cleanYr, here("Manuscript_Plots", "eDNA_index", "eDNAindxEnvData_clean_no23.csv"))
+```
+
+```{r}
+# Find number of species
+eDNAindxEnvDataYr %>% 
+  group_by(Family, Genus, Species) %>% 
+  summarize(Reads = sum(TotalnReads))
+
+n_species <- eDNAindxEnvDataYr %>% 
+  group_by(Family, Genus, Species) %>% 
+  summarize(Reads = sum(TotalnReads)) %>% 
+  filter(Reads > 0) # 16
+```
+
+# Plots
+
+## Time series
+
+```{r}
+# Explore eDNA index by species
+ggplot(eDNAindxEnvDataYr, aes(x = Date_local, y = eDNA_index, color = Species)) +
+  geom_point(show.legend = F, size = 1) +
+  facet_wrap(facets = vars(year(Date_local)), scales = "free_x") +
+  geom_line(show.legend = F) +
+  theme_bw()
+
+ggplot(eDNAindxEnvDataYr, aes(x = Date_local, y = eDNA_index, color = Species)) +
+  geom_point(show.legend = F, size = 1) +
+  facet_wrap(facets = vars(year(Date_local)), scales = "free_x") +
+  geom_line(show.legend = F) +
+  theme_bw()
+```
+
+
+```{r}
+SOI <- c("Acartia longiremis", "Oncorhynchus kisutch", "Clupea pallasii", "Citharichthys sordidus")
+
+eDNAindxEnvData_cleanYr <- eDNAindxEnvData_cleanYr %>% 
+  filter(Species %in% SOI) %>% 
+  mutate(Hypoxic = case_when(DO < 2 ~ T, .default = F))
+
+dfsplit <- split(eDNAindxEnvData_cleanYr, eDNAindxEnvData_cleanYr$Species)
+```
+
+```{r}
+ggplot(eDNAindxEnvData_cleanYr, aes(x = eDNA_index)) +
+  geom_histogram(fill = "cornflowerblue") +
+  theme_bw() +
+  facet_wrap(facets = vars(Hypoxic), ncol = 1)
+```
+
+## DO x Temp x eDNA
+
+```{r}
+# Distinguish the zero values better in the scatterplots
+# I could do this by making a custom scale....ORRRR I could just add another layer where 0 is black lol :)
+
+for (i in 1:length(dfsplit)) { # For each species: 
+    species <- dfsplit[[i]]$Species[1] # Species name 
+    title <- paste(species, sep = " ", "eDNA Index vs Dissolved Oxygen & Temperature") # Plot title
+    print(title)
+    data <- dfsplit[[i]] %>% filter(temperature < 11)
+    
+# Plot + save
+    
+    print( # plot this species
+      ggplot(data, aes(x = temperature, 
+                                    y = DO, 
+                                    #size = eDNA_index, 
+                                    color = eDNA_index)) +
+        scale_color_viridis_c(option = "viridis", direction = -1) + # color
+        #scale_size(range = c(2, 7)) +
+        geom_point(alpha = 0.8, size = 4) +
+        geom_point(shape = 1, size = 4) + # add outline
+        geom_point(data = data %>% filter(eDNA_index != 0), 
+                   aes(x = temperature, y = DO),
+                   color = "black", size = 4, shape = 1, stroke = 1) + # add more distinctive zeroes
+        labs(x = "Temperature (C)", 
+             y = "Dissolved Oxygen (mg/L)", 
+             color = "eDNA Index", 
+             #size = "eDNA Index",
+             title = title) +
+        geom_hline(yintercept = 0.66, linetype = 2, 
+                   color = "red", linewidth = 1) + # most die
+        geom_hline(yintercept = 0.9, linetype = 2, 
+                   color = "orange", linewidth = 1) + # ~50% die
+        geom_hline(yintercept = 2.66, linetype = 2, 
+                   color = "forestgreen", linewidth = 1) + # sublethal effects
+        theme_bw() +
+        xlim(c(6.75, 9)) +
+        ylim(c(0, 5)) +
+        theme(text = element_text(size = 25), 
+              axis.text = element_text(size = 30, color = "black"), 
+              plot.title = element_text(size = 17),
+              legend.title = element_text(size = 20),
+              legend.text = element_text(size = 20))
+    )
+      
+    ggsave(filename = paste(species, sep = "_", "Scatter_noOut.png"), 
+           path = here("Manuscript_Plots", "eDNA_index", "ScatterColor"), 
+           width = 2500, height = 2000, units = "px")
+}
+```
+
+```{r}
+# Add a gray background layer for all the environmental data
+
+for (i in 1:length(dfsplit)) { # For each species: 
+    species <- dfsplit[[i]]$Species[1] # Species name 
+    title <- paste(species, sep = " ", "eDNA Index vs Dissolved Oxygen & Temperature") # Plot title
+    print(title)
+    
+# Plot + save
+    
+    print( # plot this species
+      ggplot(data = envData, aes(x = temperature, y = DO)) +
+        geom_point(color = "gray") +
+        
+        geom_point(data = dfsplit[[i]], aes(x = temperature, 
+                                    y = DO, 
+                                    #size = eDNA_index, 
+                                    color = eDNA_index), 
+                   alpha = 0.8, size = 4) +
+        scale_color_viridis_c(option = "viridis", direction = -1) + # color
+        #scale_size(range = c(2, 7)) +
+        geom_point(data = dfsplit[[i]], aes(x = temperature, 
+                                    y = DO, 
+                                    #size = eDNA_index, 
+                                    color = eDNA_index), 
+                   shape = 1) + # add outline
+        geom_point(data = dfsplit[[i]] %>% filter(eDNA_index == 0), 
+                   aes(x = temperature, y = DO),
+                   color = "black", size = 4) + # add more distinctive zeroes
+        
+        labs(x = "Temperature (C)", 
+             y = "Dissolved Oxygen (mg/L)", 
+             color = "eDNA Index", 
+             size = "eDNA Index",
+             title = title) +
+        geom_hline(yintercept = 0.66, linetype = 2, 
+                   color = "red", linewidth = 1) + # most die
+        geom_hline(yintercept = 0.9, linetype = 2, 
+                   color = "orange", linewidth = 1) + # ~50% die
+        geom_hline(yintercept = 2.66, linetype = 2, 
+                   color = "forestgreen", linewidth = 1) + # sublethal effects
+        theme_bw() +
+        scale_x_continuous(limits = c(6, 13)) +
+        scale_y_continuous(limits = c(0, 9)) +
+        theme(text = element_text(size = 25), 
+              axis.text = element_text(size = 30, color = "black"), 
+              plot.title = element_text(size = 17),
+              legend.title = element_text(size = 20),
+              legend.text = element_text(size = 20))
+    )
+      
+    ggsave(filename = paste(species, sep = "_", "eDNA_DO_Temp_ScatterSize_AllBackground.png"), 
+           path = here("Manuscript_Plots", "eDNA_index", "ScatterColor"), 
+           width = 2500, height = 2000, units = "px")
+}
+```
+
+```{r}
+for (i in 1:length(dfsplit)) { # For each species: 
+    species <- dfsplit[[i]]$Species[1] # Species name 
+    title <- paste(species, sep = " ", "eDNA Index vs Dissolved Oxygen & Temperature") # Plot title
+    print(title)
+    
+# Plot + save
+    
+    print( # plot this species
+      ggplot(dfsplit[[i]], aes(x = temperature, 
+                                    y = DO, 
+                                    color = eDNA_index)) +
+        scale_color_continuous(type = "viridis") +
+        geom_point(alpha = 0.7) +
+        geom_point(data = dfsplit[[i]] %>% filter(eDNA_index == 0), 
+                   aes(x = temperature, y = DO),
+                   color = "black") + # Not a fan of this in the non-sized one, bc it can conceal small detections at similar DO & temp values
+        ggtitle(title) +
+        geom_hline(yintercept = 0.66, linetype = 2, color = "red") + # most copepods die
+        geom_hline(yintercept = 0.9, linetype = 2, color = "orange") + # ~50% of copepods die
+        geom_hline(yintercept = 2.66, linetype = 2, color = "forestgreen") + # many copepods experience sublethal effects (e.g. less egg production)
+        theme_bw()
+    )
+      
+    ggsave(filename = paste(species, sep = "_", "eDNA_DO_Temp_Scatter.png"), 
+           path = here("Manuscript_Plots", "eDNA_index", "ScatterColor"), 
+           width = 2500, height = 2000, units = "px")
+}
+```
+
+
+## DO vs. eDNA scatter plot
+
+```{r}
+# Distinguish the zero values better in the scatterplots
+# I could do this by making a custom scale....ORRRR I could just add another layer where 0 is black lol :)
+
+for (i in 1:length(dfsplit)) { # For each species: 
+    species <- dfsplit[[i]]$Species[1] # Species name 
+    title <- paste(species, sep = " ", "eDNA Index vs Dissolved Oxygen") # Plot title
+    print(title)
+    
+# Plot + save
+    
+    print( # plot this species
+      ggplot(dfsplit[[i]], aes(x = DO, y = eDNA_index)) +
+        geom_point(size = 2) +
+        labs(x = "Dissolved Oxygen (mg/L)", 
+             y = "eDNA Index", 
+             title = title) +
+        geom_vline(xintercept = 0.66, linetype = 2, 
+                   color = "red", linewidth = 1) + # most die
+        geom_vline(xintercept = 0.9, linetype = 2, 
+                   color = "orange", linewidth = 1) + # ~50% die
+        geom_vline(xintercept = 2.66, linetype = 2, 
+                   color = "forestgreen", linewidth = 1) + # sublethal effects
+        theme_bw() +
+        theme(text = element_text(size = 25), 
+              axis.text = element_text(size = 30, color = "black"), 
+              plot.title = element_text(size = 17),
+              legend.title = element_text(size = 20),
+              legend.text = element_text(size = 20))
+    )
+      
+    ggsave(filename = paste(species, sep = "_", "eDNA_DO_Scatter.png"), 
+           path = here("Manuscript_Plots", "eDNA_index", "Scatter"), 
+           width = 2500, height = 2000, units = "px")
+}
+```
+
+## Heatmap
+
+
+### Testing
+
+```{r}
+# Goal: Make a dataset with DO (binned), temp (binned), and presences/samples in that bin
+
+testAL <- dfsplit[[1]]
+
+testAL <- testAL %>% 
+  relocate(DO, .after = Present) %>% 
+  relocate(temperature, .after = DO) %>% 
+  mutate(DO_bin = as.factor(round(DO*4) / 4)) %>% # note: these bins are CENTERED around a 0.5, so the actual range of the 1.0 bin is 0.75-1.25
+  relocate(DO_bin, .after = DO) %>% 
+  mutate(Temperature_bin = as.factor(round(temperature*4) / 4)) %>% 
+  relocate(Temperature_bin, .after = temperature)
+
+testAL_props <- testAL %>% 
+  group_by(DO_bin, Temperature_bin) %>% 
+  dplyr::summarize(Samples = n(), Detections = sum(Present), Detected = Detections/Samples)
+
+# Now plot time
+
+ggplot(testAL_props, aes(x = DO_bin, y = Temperature_bin, fill = Detected)) +
+  geom_tile() +
+  theme_bw()
+```
+
+### Exporting
+
+```{r}
+for (i in 1:length(dfsplit)) { # For each species: 
+  
+    species <- dfsplit[[i]]$Species[1] # Species name 
+    title <- paste(species, sep = " ", "eDNA Detection Density") # Plot title
+    print(title)
+    
+# Plot + save
+    
+    df <- dfsplit[[i]]
+
+    df <- df %>% 
+      drop_na(DO, temperature) %>% 
+      relocate(DO, .after = Present) %>% 
+      relocate(temperature, .after = DO) %>% 
+      mutate(DO_bin = as.factor(round(DO*4) / 4)) %>% # note: these bins are CENTERED around a 0.5, so the actual range of the 1.0 bin is 0.75-1.25
+      relocate(DO_bin, .after = DO) %>% 
+      mutate(Temperature_bin = as.factor(round(temperature*4) / 4)) %>% 
+      relocate(Temperature_bin, .after = temperature) 
+    
+    df_props <- df %>% 
+      group_by(DO_bin, Temperature_bin) %>% 
+      dplyr::summarize(Samples = n(), Detections = sum(Present), Detected = Detections/Samples)
+    
+    # Now plot time
+    
+    print(ggplot(df_props, aes(x = DO_bin, y = Temperature_bin, fill = Detected)) +
+      geom_tile() +
+      scale_fill_gradient(low = "skyblue", high = "darkblue") +
+      ggtitle(title) +
+      #xlim(c(0, 9)) +
+      #ylim(c(7, 12.25)) +
+      theme_bw() + theme(text = element_text(size = 25), 
+              axis.text = element_text(size = 20, color = "black"), 
+              axis.text.x = element_text(angle = 90), 
+              plot.title = element_text(size = 17),
+              legend.title = element_text(size = 20),
+              legend.text = element_text(size = 20)))
+      
+    ggsave(filename = paste(species, sep = "_", "eDNA_Env_Density.png"), 
+           path = here("Manuscript_Plots", "eDNA_index", "Density"), 
+           width = 2500, height = 2000, units = "px")
+}
+```
+
+```{r}
+system("say Script complete")
+```
+
