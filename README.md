@@ -65,3 +65,11 @@ This directory contains code for cleaning oceanographic data from a mooring, CTD
 - `eDNAxEnvData.Rmd`: This is an older version of eDNAxpO2.Rmd that I do not recommend using (you can adapt eDNAxpO2 to use DO [dissolved oxygen in mg/L] instead of SatPct [oxygen saturation percent] pretty easily). Cleans eDNA and environmental data so that they are compatible, and joins them by datetime (rounded to the nearest 10 minutes) and plots them on top of each other. This produces `eDNAxEnvData.csv`, a dataset with each species detection in the 4 species of interest with more than 10 detection dates + the associated environmental data from the TH042 mooring.
 
 [Hollings Project Workflow.pdf](https://github.com/user-attachments/files/16059851/Hollings.Project.Workflow.pdf)
+
+### Files in `Manuscript_Plots`
+
+These scripts are derived from scripts listed above, and are the scripts used to generate 
+the final figures for the manuscript.
+
+- `Binomial_Regressions/eDNAxEnvBinomReg_Manuscript_Plots.Rmd`: Based on `eDNAxpO2.Rmd`, specifically
+the section with binomial regressions.

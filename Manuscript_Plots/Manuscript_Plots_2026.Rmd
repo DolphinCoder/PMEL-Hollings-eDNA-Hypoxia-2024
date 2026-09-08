@@ -1,0 +1,1148 @@
+---
+title: "Manuscript Plots 2026"
+author: "Eleanor (Ella) Crotty"
+header-includes:
+  \usepackage{fvextra}
+  \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,commandchars=\\\{\}}
+output:
+  pdf_document:
+    toc: TRUE
+urlcolor: blue
+---
+
+```{r Package Imports, message = F, warning = F}
+# Warnings and startup messages suppressed
+library(tidyverse)
+library(patchwork)
+library(scales)
+library(ggrepel)
+library(ggpmisc)
+library(here)
+library(gsw)
+library(R.matlab)
+library(ggbreak)
+library(car) # Has a function for the Box-Tidwell procedure
+library(reshape2) # To make the ASV table into something that can be combined with environmental data
+```
+
+# Import data 
+
+```{r}
+Sp_ASV_18Sv4 <- read_csv(here("Manuscript_Plots", "OCNMS_final_data", "18Sv4", "Decontam_final_taxonomy_table_pr2.csv")) # 18Sv4 data cleanedd by Sam
+envData <- read_csv(here("Manuscript_Plots", "OCNMS_final_data", "18Sv4", "Decontam_final_metadata.csv")) %>% # metadata cleaned by Sam
+  mutate(year = as.factor(year(eventDate))) %>%
+    relocate(year, .after = eventDate)
+ASV_table <- read_csv(here("Manuscript_Plots", "OCNMS_final_data", "18Sv4", "Decontam_final_asv_table.csv"))
+```
+
+
+# Join the data
+
+Goal: 
+
+| sample name | lat | lon | species | detected t/f | 
+|-------------|-----|-----|---------|--------------|
+| s1          | 1.  | 2.  | fish.   | T            |
+
+```{r Data join}
+# The metadata is associated with samples so I think it doesn't need rounding
+
+# I need to combine observations with environmental data
+# ASV_table has sample names as columns
+# Reads_Species identifies sequences as species
+
+Rds_Txa_18Sv4_pre <- full_join(Sp_ASV_18Sv4, ASV_table)
+
+transpose_test <- Rds_Txa_18Sv4_pre[1:5,]
+
+transposed_test <- melt(transpose_test, id.vars = c("seq_id", "iter", "ASV", "Taxon", "Confidence"), variable.name = "Sample", value.name = "Reads")
+
+# okay, that came out right, here we go. pray for my RAM or whatever.
+
+Rds_Txa_18Sv4 <- melt(Rds_Txa_18Sv4_pre, id.vars = c("seq_id", "iter", "ASV", "Taxon", "Confidence"), variable.name = "Sample", value.name = "Reads")
+
+eDNAxEnvData <- full_join(Rds_Txa_18Sv4, envData, by = join_by(Sample == samp_name))
+```
+
+# Export the combined data
+
+```{r}
+# Take a looksee to see which dissolved things are actually collected
+# View(eDNAxEnvData[110:150])
+smaller <- eDNAxEnvData %>% select(Taxon, iter, Reads, decimalLongitude, decimalLatitude, eventDate, year, samp_weather, temp, chlorophyll, light_intensity, ph, ph_meth, salinity, tidal_stage, turbidity, water_current, wind_speed, percent_oxygen_sat, rosette_position, expedition_id, diss_oxygen, diss_oxygen_unit)
+
+system("say Data Join Complete")
+
+# Export the joined data
+write_csv(eDNAxEnvData, here("Manuscript_Plots", "OCNMS_final_Data", "18Sv4_eDNAxEnvData.csv"))
+```
+
+# Sampling Window Plots
+
+```{r}
+md <- envData
+
+unique(md$expedition_id)
+
+unique(md$samp_collect_method)
+
+md_pps <- md %>% 
+  filter(samp_collect_device == "McLane Particle and Phytoplankton Sampler")
+
+sampledatelist <- with_tz(as.POSIXct(md_pps$eventDate, 
+                             tz = "America/Los_Angeles",
+                             tryFormats = c("%m/%d/%Y")))
+
+md_ctd <- md %>% 
+  filter(samp_collect_device != "McLane Particle and Phytoplankton Sampler")
+
+ctddatelist <- with_tz(as.POSIXct(md_ctd$eventDate, 
+                             tz = "America/Los_Angeles",
+                             tryFormats = c("%m/%d/%Y")))
+```
+
+# Variables to change aesthetics
+```{r}
+widthpx <- 4000 # Width for export (pixels)
+heightpx <- 2000 # Height for export (pixels)
+
+widthpx_stacked <- 2000 # Width for export (pixels) for the stacked plots
+heightpx_stacked <- 2000 # Height for export (pixels) for the stacked plots
+
+# Rectangle windows aesthetics
+width = 1
+linecolor = "black"
+fillcolor = "navy"
+
+# CTD line or dot aesthetics
+ctdcolor = "firebrick4"
+# Add CTD as either point or line - uncomment whatever one you want
+CTD_add <- geom_point(aes(x = ctddatelist, y = 0), color = ctdcolor)
+# CTD_add <- geom_vline(aes(xintercept = ctddatelist), color = ctdcolor) # add CTD
+
+# Adding text labels
+labely <- 0
+labelsize <- 3
+```
+
+```{r}
+# Find start and end dates for expeditions
+stend <- envData %>% 
+  select(eventDate, expedition_id) %>% 
+  group_by(expedition_id) %>% 
+  summarize(start = min(eventDate), end = max(eventDate))
+stend
+stend_t <- as.data.frame(t(stend %>% select(start,end)))
+stend_t
+```
+
+
+```{r}
+# Extract sampling windows manually - sort by collection date and take earliest & latest from each expedition ID
+# Define highlight rectangles
+
+# Base of the plot
+plot <- ggplot() + 
+  theme_bw() + 
+    theme(text = element_text(size = 15), 
+          axis.text.x = element_text(angle = 45, hjust = 1), 
+          strip.text = element_text(size = 12), 
+          strip.background = element_rect(fill = "gray95"), # facet label background
+          axis.text.x.top = element_blank(), # Needed to delete the extra axis created by ggbreak
+          axis.ticks.x.top = element_blank(),
+          axis.line.x.top = element_blank(),
+          axis.text.y = element_text(color = "white")) +
+    # scale break is breaking coord_cartesian(lim) https://github.com/YuLab-SMU/ggbreak/issues/59 put cartesian before
+    scale_x_datetime(breaks = "month", date_labels = "%b-%y", limits = as.POSIXct(c("2021-05-01", "2024-11-01"))) +
+    scale_x_break(as.POSIXct(c("2021-11-01", "2022-05-01"))) +
+    scale_x_break(as.POSIXct(c("2022-11-01", "2023-05-01"))) +
+    scale_x_break(as.POSIXct(c("2023-11-01", "2024-05-01"))) +
+    #coord_cartesian(ylim = c(-0.5, 0.5)) + # Zooms in the plot without deleting rectangle
+    ylim(c(-0.5, 0.5)) +
+    # clip = "off" allows data points to be drawn in the margins
+    # expand = 0 doesn't add an expansion factor to the limits to keep the data off the axes
+    ggtitle("PPS Deployment Windows") 
+
+plot_list = list()
+
+for (i in 1:length(colnames(stend_t))) {
+  print("------------------")
+  v <- colnames(stend_t[i])
+  print(v)
+  print("Print column")
+  x <- stend_t %>% select(v)
+  print(x)
+  
+  start <- as.POSIXct(x[1,], tz = "America/Los_Angeles")
+  print("start date")
+  print(start)
+  
+  end <- as.POSIXct(x[2,], tz = "America/Los_Angeles")
+  print("end date")
+  print(end)
+  
+  sampleHighlight <- tibble(xb = start, xe = end,
+                            y1 = -Inf, y2 = +Inf) # INF IS NECESSARY TO KEEP THE RECTANGLES RUNNING OFF THE PAGE
+  
+  varname <- paste("SampHighlight", sep = "", i)
+  rectname <- paste("Rect", sep = "", i)
+  print(varname)
+  print(rectname)
+  rect <- geom_rect(data = sampleHighlight,
+                            #inherit.aes = FALSE,
+                            mapping = aes(xmin = start, # okay so the problem is that within the gg object, it is storing the variable name, and therefore only plotting the last start and end when it comes time to call it. not sure how to make it actually assign the dates within the loop :(
+                                                 # fix ideas: https://stackoverflow.com/questions/4856849/looping-over-variables-in-ggplot
+                                          xmax = end,
+                                          ymin = y1, 
+                                          ymax = y2),
+                            color = linecolor,
+                            fill = fillcolor,
+                            linewidth = width,
+                            alpha = 0.2)
+  assign(varname, rect)
+  rectangles <- list(rectangles, rect)
+  
+  plot <- plot +
+    rect
+  
+  print(plot)
+  
+  plot_list[[i]] <- plot
+}
+
+# https://stackoverflow.com/questions/26034177/save-multiple-ggplots-using-a-for-loop
+# Another option: create pdf where each page is a separate plot.
+pdf("deploymentwindowstest.pdf")
+for (i in 1:3) {
+    print(plot_list[[i]])
+}
+dev.off()
+```
+
+```{r, eval = F}
+SampHighlight1 <- geom_rect(data = sampleHighlight,
+                            inherit.aes = FALSE,
+                            mapping = aes(xmin = stend_t$V1[1], xmax = stend_t$V1[2],
+                                          ymin = y1, ymax = y2),
+                            color = linecolor,
+                            fill = fillcolor,
+                            linewidth = width,
+                            alpha = 0.2)
+SampHighlight2 <- geom_rect(data = sampleHighlight,
+                            inherit.aes = FALSE,
+                            mapping = aes(xmin = stend_t$V2[1], xmax = stend_t$V1[2],
+                                          ymin = y1, ymax = y2),
+                            color = linecolor,
+                            fill = fillcolor,
+                            linewidth = width,
+                            alpha = 0.2)
+SampHighlight3 <- geom_rect(data = sampleHighlight,
+                            inherit.aes = FALSE,
+                            mapping = aes(xmin = x3b, xmax = x3e,
+                                          ymin = y1, ymax = y2),
+                            color = linecolor,
+                            fill = fillcolor,
+                            linewidth = width,
+                            alpha = 0.2)
+SampHighlight4 <- geom_rect(data = sampleHighlight,
+                            inherit.aes = FALSE,
+                            mapping = aes(xmin = x4b, xmax = x4e,
+                                          ymin = y1, ymax = y2),
+                            color = linecolor,
+                            fill = fillcolor,
+                            linewidth = width,
+                            alpha = 0.2)
+```
+
+
+# geom_rect
+
+```{r}
+# Graph 1: Shaded gray sampling windows
+
+ggplot() + 
+  list(rectangles) +
+  theme_bw() +
+  theme(text = element_text(size = 15), 
+        axis.text.x = element_text(angle = 45, hjust = 1), 
+        strip.text = element_text(size = 12), 
+        strip.background = element_rect(fill = "gray95"), # facet label background
+        axis.text.x.top = element_blank(), # Needed to delete the extra axis created by ggbreak
+        axis.ticks.x.top = element_blank(),
+        axis.line.x.top = element_blank(),
+        axis.text.y = element_text(color = "white")) +
+  # scale break is breaking coord_cartesian(lim) https://github.com/YuLab-SMU/ggbreak/issues/59 put cartesian before
+  scale_x_datetime(breaks = "month", date_labels = "%b-%y", limits = as.POSIXct(c("2021-05-01", "2023-11-01"))) +
+  #coord_cartesian(ylim = c(-0.5, 0.5)) + # Zooms in the plot without deleting rectangle
+  ylim(c(-0.5, 0.5)) +
+  # clip = "off" allows data points to be drawn in the margins
+  # expand = 0 doesn't add an expansion factor to the limits to keep the data off the axes
+  ggtitle("PPS Deployment Windows") +
+  xlab("Date") +
+  scale_x_break(as.POSIXct(c("2021-11-01", "2022-05-01"))) +
+  scale_x_break(as.POSIXct(c("2022-11-01", "2023-05-01"))) 
+
+ggsave(filename = here("Manuscript_Plots/Deployment_Window/DeploymentWindowsBoxes.png"), 
+           width = widthpx, 
+           height = heightpx, 
+           units = "px")
+```
+
+
+## Stacked Years
+
+```{r}
+# Graph 2: Stacked Years
+
+plt1 <- ggplot() +
+  SampHighlight2 + # in 2021
+  theme_bw() +
+  theme(text = element_text(size = 15), 
+        axis.text.x = element_text(angle = 45, hjust = 1), 
+        strip.text = element_text(size = 12), 
+        strip.background = element_rect(fill = "gray95"), # facet label background
+        axis.text.x.top = element_blank(), # Needed to delete the extra axis created by ggbreak
+        axis.ticks.x.top = element_blank(),
+        axis.line.x.top = element_blank(),
+        axis.text.y = element_text(color = "white")) +
+  # scale break is breaking coord_cartesian(lim) https://github.com/YuLab-SMU/ggbreak/issues/59 put cartesian before
+  scale_x_datetime(breaks = "month", date_labels = "%b-%y", limits = as.POSIXct(c("2021-05-01", "2021-11-01"))) +
+  #coord_cartesian(ylim = c(-0.5, 0.5)) + # Zooms in the plot without deleting rectangle
+  ylim(c(-0.5, 0.5)) +
+  # clip = "off" allows data points to be drawn in the margins
+  # expand = 0 doesn't add an expansion factor to the limits to keep the data off the axes
+  ggtitle("PPS Deployment Windows") 
+
+plt1
+
+plt2 <- ggplot() +
+  SampHighlight1 + # in 2022
+  SampHighlight4 +
+  theme_bw() +
+  theme(text = element_text(size = 15), 
+        axis.text.x = element_text(angle = 45, hjust = 1), 
+        strip.text = element_text(size = 12), 
+        strip.background = element_rect(fill = "gray95"), # facet label background
+        axis.text.x.top = element_blank(), # Needed to delete the extra axis created by ggbreak
+        axis.ticks.x.top = element_blank(),
+        axis.line.x.top = element_blank(),
+        axis.text.y = element_text(color = "white")) +
+  # scale break is breaking coord_cartesian(lim) https://github.com/YuLab-SMU/ggbreak/issues/59 put cartesian before
+  scale_x_datetime(breaks = "month", date_labels = "%b-%y", limits = as.POSIXct(c("2022-05-01", "2022-11-01"))) +
+  #coord_cartesian(ylim = c(-0.5, 0.5)) + # Zooms in the plot without deleting rectangle
+  ylim(c(-0.5, 0.5))
+  # clip = "off" allows data points to be drawn in the margins
+  # expand = 0 doesn't add an expansion factor to the limits to keep the data off the axes
+
+plt2
+
+plt3 <- ggplot() +
+  SampHighlight3 + # in 2023
+  theme_bw() +
+  theme(text = element_text(size = 15), 
+        axis.text.x = element_text(angle = 45, hjust = 1), 
+        strip.text = element_text(size = 12), 
+        strip.background = element_rect(fill = "gray95"), # facet label background
+        axis.text.x.top = element_blank(), # Needed to delete the extra axis created by ggbreak
+        axis.ticks.x.top = element_blank(),
+        axis.line.x.top = element_blank(),
+        axis.text.y = element_text(color = "white")) +
+  # scale break is breaking coord_cartesian(lim) https://github.com/YuLab-SMU/ggbreak/issues/59 put cartesian before
+  scale_x_datetime(breaks = "month", date_labels = "%b-%y", limits = as.POSIXct(c("2023-05-01", "2023-11-01"))) +
+  #coord_cartesian(ylim = c(-0.5, 0.5)) + # Zooms in the plot without deleting rectangle
+  ylim(c(-0.5, 0.5)) +
+  # clip = "off" allows data points to be drawn in the margins
+  # expand = 0 doesn't add an expansion factor to the limits to keep the data off the axes
+  xlab("Date")
+
+plt3
+
+plt1/plt2/plt3
+
+ggsave(filename = here("Manuscript_Plots/Deployment_Window/DeploymentWindowsBoxesStacked.png"), 
+           width = widthpx_stacked, 
+           height = heightpx_stacked, 
+           units = "px")
+```
+
+# Each Sample Marked
+
+```{r}
+# Graph 3: Each sample marked
+
+ggplot() +
+  SampHighlight1 +
+  SampHighlight2 +
+  SampHighlight3 +
+  SampHighlight4 +
+  geom_vline(aes(xintercept = sampledatelist)) +
+  theme_bw() +
+  theme(text = element_text(size = 15), 
+        axis.text.x = element_text(angle = 45, hjust = 1), 
+        strip.text = element_text(size = 12), 
+        strip.background = element_rect(fill = "gray95"), # facet label background
+        axis.text.x.top = element_blank(), # Needed to delete the extra axis created by ggbreak
+        axis.ticks.x.top = element_blank(),
+        axis.line.x.top = element_blank(),
+        axis.text.y = element_text(color = "white")) +
+  # scale break is breaking coord_cartesian(lim) https://github.com/YuLab-SMU/ggbreak/issues/59 put cartesian before
+  scale_x_datetime(breaks = "month", date_labels = "%b-%y", limits = as.POSIXct(c("2021-05-01", "2023-11-01"))) +
+  #coord_cartesian(ylim = c(-0.5, 0.5)) + # Zooms in the plot without deleting rectangle
+  ylim(c(-0.5, 0.5)) +
+  # clip = "off" allows data points to be drawn in the margins
+  # expand = 0 doesn't add an expansion factor to the limits to keep the data off the axes
+  ggtitle("PPS Deployment Windows") +
+  xlab("Date") +
+  scale_x_break(as.POSIXct(c("2021-11-01", "2022-05-01"))) +
+  scale_x_break(as.POSIXct(c("2022-11-01", "2023-05-01"))) 
+
+ggsave(filename = here("Manuscript_Plots/Deployment_Window/DeploymentWindowsBoxesLines.png"), 
+           width = widthpx, 
+           height = heightpx, 
+           units = "px")
+```
+
+
+## Stacked Years
+
+```{r}
+# Graph 4: Each Sample Marked + Stacked Years
+
+plt1 <- ggplot() +
+  SampHighlight2 + # in 2021
+  geom_vline(aes(xintercept = sampledatelist)) +
+  theme_bw() +
+  theme(text = element_text(size = 15), 
+        axis.text.x = element_text(angle = 45, hjust = 1), 
+        strip.text = element_text(size = 12), 
+        strip.background = element_rect(fill = "gray95"), # facet label background
+        axis.text.x.top = element_blank(), # Needed to delete the extra axis created by ggbreak
+        axis.ticks.x.top = element_blank(),
+        axis.line.x.top = element_blank(),
+        axis.text.y = element_text(color = "white")) +
+  # scale break is breaking coord_cartesian(lim) https://github.com/YuLab-SMU/ggbreak/issues/59 put cartesian before
+  scale_x_datetime(breaks = "month", date_labels = "%b-%y", limits = as.POSIXct(c("2021-05-01", "2021-11-01"))) +
+  #coord_cartesian(ylim = c(-0.5, 0.5)) + # Zooms in the plot without deleting rectangle
+  ylim(c(-0.5, 0.5)) +
+  # clip = "off" allows data points to be drawn in the margins
+  # expand = 0 doesn't add an expansion factor to the limits to keep the data off the axes
+  ggtitle("PPS Deployment Windows") 
+
+plt1
+
+plt2 <- ggplot() +
+  SampHighlight1 + # in 2022
+  SampHighlight4 +
+  geom_vline(aes(xintercept = sampledatelist)) +
+  theme_bw() +
+  theme(text = element_text(size = 15), 
+        axis.text.x = element_text(angle = 45, hjust = 1), 
+        strip.text = element_text(size = 12), 
+        strip.background = element_rect(fill = "gray95"), # facet label background
+        axis.text.x.top = element_blank(), # Needed to delete the extra axis created by ggbreak
+        axis.ticks.x.top = element_blank(),
+        axis.line.x.top = element_blank(),
+        axis.text.y = element_text(color = "white")) +
+  # scale break is breaking coord_cartesian(lim) https://github.com/YuLab-SMU/ggbreak/issues/59 put cartesian before
+  scale_x_datetime(breaks = "month", date_labels = "%b-%y", limits = as.POSIXct(c("2022-05-01", "2022-11-01"))) +
+  #coord_cartesian(ylim = c(-0.5, 0.5)) + # Zooms in the plot without deleting rectangle
+  ylim(c(-0.5, 0.5))
+  # clip = "off" allows data points to be drawn in the margins
+  # expand = 0 doesn't add an expansion factor to the limits to keep the data off the axes
+
+plt2
+
+plt3 <- ggplot() +
+  SampHighlight3 + # in 2023
+  geom_vline(aes(xintercept = sampledatelist)) +
+  theme_bw() +
+  theme(text = element_text(size = 15), 
+        axis.text.x = element_text(angle = 45, hjust = 1), 
+        strip.text = element_text(size = 12), 
+        strip.background = element_rect(fill = "gray95"), # facet label background
+        axis.text.x.top = element_blank(), # Needed to delete the extra axis created by ggbreak
+        axis.ticks.x.top = element_blank(),
+        axis.line.x.top = element_blank(),
+        axis.text.y = element_text(color = "white")) +
+  # scale break is breaking coord_cartesian(lim) https://github.com/YuLab-SMU/ggbreak/issues/59 put cartesian before
+  scale_x_datetime(breaks = "month", date_labels = "%b-%y", limits = as.POSIXct(c("2023-05-01", "2023-11-01"))) +
+  #coord_cartesian(ylim = c(-0.5, 0.5)) + # Zooms in the plot without deleting rectangle
+  ylim(c(-0.5, 0.5)) +
+  # clip = "off" allows data points to be drawn in the margins
+  # expand = 0 doesn't add an expansion factor to the limits to keep the data off the axes
+  xlab("Date")
+
+plt3
+
+plt1/plt2/plt3
+
+ggsave(filename = here("Manuscript_Plots/Deployment_Window/DeploymentWindowsBoxesLinesStacked.png"), 
+           width = widthpx_stacked, 
+           height = heightpx_stacked, 
+           units = "px")
+```
+
+
+# CTD + geom_rect
+
+```{r}
+# Graph 5: Shaded gray sampling windows + CTD lines
+
+ggplot() +
+  SampHighlight1 +
+  SampHighlight2 +
+  SampHighlight3 +
+  SampHighlight4 +
+  geom_vline(aes(xintercept = ctddatelist), color = ctdcolor) + # add CTD
+  theme_bw() +
+  theme(text = element_text(size = 15), 
+        axis.text.x = element_text(angle = 45, hjust = 1), 
+        strip.text = element_text(size = 12), 
+        strip.background = element_rect(fill = "gray95"), # facet label background
+        axis.text.x.top = element_blank(), # Needed to delete the extra axis created by ggbreak
+        axis.ticks.x.top = element_blank(),
+        axis.line.x.top = element_blank(),
+        axis.text.y = element_text(color = "white"),
+        axis.title.y = element_text(color = "white")) +
+  # scale break is breaking coord_cartesian(lim) https://github.com/YuLab-SMU/ggbreak/issues/59 put cartesian before
+  scale_x_datetime(breaks = "month", date_labels = "%b-%y", limits = as.POSIXct(c("2021-05-01", "2023-11-01"))) +
+  #coord_cartesian(ylim = c(-0.5, 0.5)) + # Zooms in the plot without deleting rectangle
+  ylim(c(-0.5, 0.5)) +
+  # clip = "off" allows data points to be drawn in the margins
+  # expand = 0 doesn't add an expansion factor to the limits to keep the data off the axes
+  ggtitle("PPS Deployment Windows") +
+  xlab("Date") +
+  scale_x_break(as.POSIXct(c("2021-11-01", "2022-05-01"))) +
+  scale_x_break(as.POSIXct(c("2022-11-01", "2023-05-01"))) 
+
+ggsave(filename = here("Manuscript_Plots/Deployment_Window/DeploymentWindowsBoxesCTD.png"), 
+           width = widthpx, 
+           height = heightpx, 
+           units = "px")
+```
+
+
+## CTD as dots
+
+```{r}
+# Graph 6: Shaded gray sampling windows with CTD as dots
+
+CTD_dots <- geom_point(aes(x = ctddatelist, y = 0), color = ctdcolor) # make CTDs dots to distinguish, since they're ususally on the borders of deployment windows
+
+ggplot() +
+  SampHighlight1 +
+  SampHighlight2 +
+  SampHighlight3 +
+  SampHighlight4 +
+  CTD_dots +
+  theme_bw() +
+  theme(text = element_text(size = 15), 
+        axis.text.x = element_text(angle = 45, hjust = 1), 
+        strip.text = element_text(size = 12), 
+        strip.background = element_rect(fill = "gray95"), # facet label background
+        axis.text.x.top = element_blank(), # Needed to delete the extra axis created by ggbreak
+        axis.ticks.x.top = element_blank(),
+        axis.line.x.top = element_blank(),
+        axis.text.y = element_text(color = "white"),
+        axis.title.y = element_text(color = "white")) +
+  # scale break is breaking coord_cartesian(lim) https://github.com/YuLab-SMU/ggbreak/issues/59 put cartesian before
+  scale_x_datetime(breaks = "month", date_labels = "%b-%y", limits = as.POSIXct(c("2021-05-01", "2023-11-01"))) +
+  #coord_cartesian(ylim = c(-0.5, 0.5)) + # Zooms in the plot without deleting rectangle
+  ylim(c(-0.5, 0.5)) +
+  # clip = "off" allows data points to be drawn in the margins
+  # expand = 0 doesn't add an expansion factor to the limits to keep the data off the axes
+  ggtitle("PPS Deployment Windows") +
+  xlab("Date") +
+  scale_x_break(as.POSIXct(c("2021-11-01", "2022-05-01"))) +
+  scale_x_break(as.POSIXct(c("2022-11-01", "2023-05-01"))) 
+
+ggsave(filename = here("Manuscript_Plots/Deployment_Window/DeploymentWindowsBoxesCTDDots.png"), 
+           width = widthpx, 
+           height = heightpx, 
+           units = "px")
+```
+
+## CTD + Stacked Years
+
+```{r}
+# Graph 7: Shaded gray sampling windows with CTD as dots + Stacked Years
+
+plt1 <- ggplot() +
+  SampHighlight2 + # in 2021
+  CTD_add +
+  theme_bw() +
+  theme(text = element_text(size = 15), 
+        axis.text.x = element_text(angle = 45, hjust = 1), 
+        strip.text = element_text(size = 12), 
+        strip.background = element_rect(fill = "gray95"), # facet label background
+        axis.text.x.top = element_blank(), # Needed to delete the extra axis created by ggbreak
+        axis.ticks.x.top = element_blank(),
+        axis.line.x.top = element_blank(),
+        axis.text.y = element_text(color = "white"),
+        axis.title.y = element_text(color = "white")) +
+  # scale break is breaking coord_cartesian(lim) https://github.com/YuLab-SMU/ggbreak/issues/59 put cartesian before
+  scale_x_datetime(breaks = "month", date_labels = "%b-%y", limits = as.POSIXct(c("2021-05-01", "2021-11-01"))) +
+  #coord_cartesian(ylim = c(-0.5, 0.5)) + # Zooms in the plot without deleting rectangle
+  ylim(c(-0.5, 0.5)) +
+  # clip = "off" allows data points to be drawn in the margins
+  # expand = 0 doesn't add an expansion factor to the limits to keep the data off the axes
+  ggtitle("PPS Deployment Windows") 
+
+plt1
+
+plt2 <- ggplot() +
+  SampHighlight1 + # in 2022
+  SampHighlight4 +
+  CTD_add +
+  theme_bw() +
+  theme(text = element_text(size = 15), 
+        axis.text.x = element_text(angle = 45, hjust = 1), 
+        strip.text = element_text(size = 12), 
+        strip.background = element_rect(fill = "gray95"), # facet label background
+        axis.text.x.top = element_blank(), # Needed to delete the extra axis created by ggbreak
+        axis.ticks.x.top = element_blank(),
+        axis.line.x.top = element_blank(),
+        axis.text.y = element_text(color = "white"),
+        axis.title.y = element_text(color = "white")) +
+  # scale break is breaking coord_cartesian(lim) https://github.com/YuLab-SMU/ggbreak/issues/59 put cartesian before
+  scale_x_datetime(breaks = "month", date_labels = "%b-%y", limits = as.POSIXct(c("2022-05-01", "2022-11-01"))) +
+  #coord_cartesian(ylim = c(-0.5, 0.5)) + # Zooms in the plot without deleting rectangle
+  ylim(c(-0.5, 0.5))
+  # clip = "off" allows data points to be drawn in the margins
+  # expand = 0 doesn't add an expansion factor to the limits to keep the data off the axes
+
+plt2
+
+plt3 <- ggplot() +
+  SampHighlight3 + # in 2023
+  CTD_add +
+  theme_bw() +
+  theme(text = element_text(size = 15), 
+        axis.text.x = element_text(angle = 45, hjust = 1), 
+        strip.text = element_text(size = 12), 
+        strip.background = element_rect(fill = "gray95"), # facet label background
+        axis.text.x.top = element_blank(), # Needed to delete the extra axis created by ggbreak
+        axis.ticks.x.top = element_blank(),
+        axis.line.x.top = element_blank(),
+        axis.text.y = element_text(color = "white"),
+        axis.title.y = element_text(color = "white")) +
+  # scale break is breaking coord_cartesian(lim) https://github.com/YuLab-SMU/ggbreak/issues/59 put cartesian before
+  scale_x_datetime(breaks = "month", date_labels = "%b-%y", limits = as.POSIXct(c("2023-05-01", "2023-11-01"))) +
+  #coord_cartesian(ylim = c(-0.5, 0.5)) + # Zooms in the plot without deleting rectangle
+  ylim(c(-0.5, 0.5)) +
+  # clip = "off" allows data points to be drawn in the margins
+  # expand = 0 doesn't add an expansion factor to the limits to keep the data off the axes
+  xlab("Date")
+
+plt3
+
+plt1/plt2/plt3
+
+ggsave(filename = here("Manuscript_Plots/Deployment_Window/DeploymentWindowsBoxesStackedCTD.png"), 
+           width = widthpx_stacked, 
+           height = heightpx_stacked, 
+           units = "px")
+```
+
+# CTD + Each Sample Marked
+
+```{r}
+# Graph 8: Each sample marked + CTD
+
+ggplot() +
+  SampHighlight1 +
+  SampHighlight2 +
+  SampHighlight3 +
+  SampHighlight4 +
+  CTD_add +
+  geom_vline(aes(xintercept = sampledatelist)) +
+  theme_bw() +
+  theme(text = element_text(size = 15), 
+        axis.text.x = element_text(angle = 45, hjust = 1), 
+        strip.text = element_text(size = 12), 
+        strip.background = element_rect(fill = "gray95"), # facet label background
+        axis.text.x.top = element_blank(), # Needed to delete the extra axis created by ggbreak
+        axis.ticks.x.top = element_blank(),
+        axis.line.x.top = element_blank(),
+        axis.text.y = element_text(color = "white"),
+        axis.title.y = element_text(color = "white")) +
+  # scale break is breaking coord_cartesian(lim) https://github.com/YuLab-SMU/ggbreak/issues/59 put cartesian before
+  scale_x_datetime(breaks = "month", date_labels = "%b-%y", limits = as.POSIXct(c("2021-05-01", "2023-11-01"))) +
+  #coord_cartesian(ylim = c(-0.5, 0.5)) + # Zooms in the plot without deleting rectangle
+  ylim(c(-0.5, 0.5)) +
+  # clip = "off" allows data points to be drawn in the margins
+  # expand = 0 doesn't add an expansion factor to the limits to keep the data off the axes
+  ggtitle("PPS Deployment Windows") +
+  xlab("Date") +
+  scale_x_break(as.POSIXct(c("2021-11-01", "2022-05-01"))) +
+  scale_x_break(as.POSIXct(c("2022-11-01", "2023-05-01"))) 
+
+ggsave(filename = here("Manuscript_Plots/Deployment_Window/DeploymentWindowsBoxesLinesCTD.png"), 
+           width = widthpx, 
+           height = heightpx, 
+           units = "px")
+```
+
+
+## CTD + Stacked Years
+
+```{r}
+# Graph 9: Each sample as a line + CTD + Stacked Years
+
+plt1 <- ggplot() +
+  SampHighlight2 + # in 2021
+  CTD_add +
+  geom_vline(aes(xintercept = sampledatelist)) +
+  theme_bw() +
+  theme(text = element_text(size = 15), 
+        axis.text.x = element_text(angle = 45, hjust = 1), 
+        strip.text = element_text(size = 12), 
+        strip.background = element_rect(fill = "gray95"), # facet label background
+        axis.text.x.top = element_blank(), # Needed to delete the extra axis created by ggbreak
+        axis.ticks.x.top = element_blank(),
+        axis.line.x.top = element_blank(),
+        axis.text.y = element_text(color = "white"), # removing some labels I don't want
+        axis.title.y = element_text(color = "white"),
+        axis.title.x = element_text(color = "white")) +
+  # scale break is breaking coord_cartesian(lim) https://github.com/YuLab-SMU/ggbreak/issues/59 put cartesian before
+  scale_x_datetime(breaks = "month", date_labels = "%b-%y", limits = as.POSIXct(c("2021-05-01", "2021-11-01"))) +
+  #coord_cartesian(ylim = c(-0.5, 0.5)) + # Zooms in the plot without deleting rectangle
+  ylim(c(-0.5, 0.5)) +
+  # clip = "off" allows data points to be drawn in the margins
+  # expand = 0 doesn't add an expansion factor to the limits to keep the data off the axes
+  ggtitle("PPS Deployment Windows") 
+
+plt1
+
+plt2 <- ggplot() +
+  SampHighlight1 + # in 2022
+  SampHighlight4 +
+  CTD_add +
+  geom_vline(aes(xintercept = sampledatelist)) +
+  theme_bw() +
+  theme(text = element_text(size = 15), 
+        axis.text.x = element_text(angle = 45, hjust = 1), 
+        strip.text = element_text(size = 12), 
+        strip.background = element_rect(fill = "gray95"), # facet label background
+        axis.text.x.top = element_blank(), # Needed to delete the extra axis created by ggbreak
+        axis.ticks.x.top = element_blank(),
+        axis.line.x.top = element_blank(),
+        axis.text.y = element_text(color = "white"),
+        axis.title.y = element_text(color = "white"),
+        axis.title.x = element_text(color = "white")) +
+  # scale break is breaking coord_cartesian(lim) https://github.com/YuLab-SMU/ggbreak/issues/59 put cartesian before
+  scale_x_datetime(breaks = "month", date_labels = "%b-%y", limits = as.POSIXct(c("2022-05-01", "2022-11-01"))) +
+  #coord_cartesian(ylim = c(-0.5, 0.5)) + # Zooms in the plot without deleting rectangle
+  ylim(c(-0.5, 0.5))
+  # clip = "off" allows data points to be drawn in the margins
+  # expand = 0 doesn't add an expansion factor to the limits to keep the data off the axes
+
+plt2
+
+plt3 <- ggplot() +
+  SampHighlight3 + # in 2023
+  CTD_add +
+  geom_vline(aes(xintercept = sampledatelist)) +
+  theme_bw() +
+  theme(text = element_text(size = 15), 
+        axis.text.x = element_text(angle = 45, hjust = 1), 
+        strip.text = element_text(size = 12), 
+        strip.background = element_rect(fill = "gray95"), # facet label background
+        axis.text.x.top = element_blank(), # Needed to delete the extra axis created by ggbreak
+        axis.ticks.x.top = element_blank(),
+        axis.line.x.top = element_blank(),
+        axis.text.y = element_text(color = "white"),
+        axis.title.y = element_text(color = "white")) +
+  # scale break is breaking coord_cartesian(lim) https://github.com/YuLab-SMU/ggbreak/issues/59 put cartesian before
+  scale_x_datetime(breaks = "month", date_labels = "%b-%y", limits = as.POSIXct(c("2023-05-01", "2023-11-01"))) +
+  #coord_cartesian(ylim = c(-0.5, 0.5)) + # Zooms in the plot without deleting rectangle
+  ylim(c(-0.5, 0.5)) +
+  # clip = "off" allows data points to be drawn in the margins
+  # expand = 0 doesn't add an expansion factor to the limits to keep the data off the axes
+  xlab("Date")
+
+plt3
+
+plt1/plt2/plt3
+
+ggsave(filename = here("Manuscript_Plots/Deployment_Window/DeploymentWindowsBoxesLinesStackedCTD.png"), 
+           width = widthpx_stacked, 
+           height = heightpx_stacked, 
+           units = "px")
+```
+
+# geom_rect + Date Labels
+
+```{r}
+# Graph 10: Shaded gray sampling windows + dates on windows marked
+
+sh <- sampleHighlight # shorten variable name
+labeldf <- # define labels
+  tibble(Date = c(sh$x1b, sh$x1e, 
+                  sh$x2b, sh$x2e, 
+                  sh$x3b, sh$x3e, 
+                  sh$x4b, sh$x4e),
+         Label = c(sh$x1b, sh$x1e, 
+                  sh$x2b, sh$x2e, 
+                  sh$x3b, sh$x3e, 
+                  sh$x4b, sh$x4e)
+         )
+
+ggplot() +
+  SampHighlight1 +
+  SampHighlight2 +
+  SampHighlight3 +
+  SampHighlight4 +
+  
+  theme_bw() +
+  theme(text = element_text(size = 15), 
+        axis.text.x = element_text(angle = 45, hjust = 1), 
+        strip.text = element_text(size = 12), 
+        strip.background = element_rect(fill = "gray95"), # facet label background
+        axis.text.x.top = element_blank(), # Needed to delete the extra axis created by ggbreak
+        axis.ticks.x.top = element_blank(),
+        axis.line.x.top = element_blank(),
+        axis.text.y = element_text(color = "white"),
+        axis.title.y = element_text(color = "white")) +
+  # scale break is breaking coord_cartesian(lim) https://github.com/YuLab-SMU/ggbreak/issues/59 put cartesian before
+  scale_x_datetime(breaks = "month", date_labels = "%b-%y", limits = as.POSIXct(c("2021-05-01", "2023-11-01"))) +
+  #coord_cartesian(ylim = c(-0.5, 0.5)) + # Zooms in the plot without deleting rectangle
+  ylim(c(-0.5, 0.5)) +
+  # clip = "off" allows data points to be drawn in the margins
+  # expand = 0 doesn't add an expansion factor to the limits to keep the data off the axes
+  ggtitle("PPS Deployment Windows") +
+  xlab("Date") +
+  
+  scale_x_break(as.POSIXct(c("2021-11-01", "2022-05-01"))) +
+  scale_x_break(as.POSIXct(c("2022-11-01", "2023-05-01"))) +
+  
+  # Add labels
+  geom_label(data = labeldf, 
+            aes(x=Date, y=labely, label=Label),
+            inherit.aes = T,
+            vjust = 0.5,
+            angle = 90,
+            size = labelsize)
+
+ggsave(filename = here("Manuscript_Plots/Deployment_Window/DeploymentWindowsBoxesDates.png"), 
+           width = widthpx, 
+           height = heightpx, 
+           units = "px")
+```
+
+
+## Stacked Years + Date Labels
+
+```{r}
+# Graph 11: Shaded gray sampling windows + dates on windows marked + Stacked Years
+
+plt1 <- ggplot() +
+  SampHighlight2 + # in 2021
+  theme_bw() +
+  theme(text = element_text(size = 15), 
+        axis.text.x = element_text(angle = 45, hjust = 1), 
+        strip.text = element_text(size = 12), 
+        strip.background = element_rect(fill = "gray95"), # facet label background
+        axis.text.x.top = element_blank(), # Needed to delete the extra axis created by ggbreak
+        axis.ticks.x.top = element_blank(),
+        axis.line.x.top = element_blank(),
+        axis.text.y = element_text(color = "white"),
+        axis.title.y = element_text(color = "white"),
+        axis.title.x = element_text(color = "white")) +
+  scale_x_datetime(breaks = "month", date_labels = "%b-%y", 
+                   limits = as.POSIXct(c("2021-05-01", "2021-11-01"))) +
+  ylim(c(-0.5, 0.5)) +
+  ggtitle("PPS Deployment Windows") +
+  
+  # Add labels
+  geom_label(data = labeldf, 
+            aes(x=Date, y=labely, label=Label),
+            inherit.aes = T,
+            vjust = 0.5,
+            angle = 90,
+            size = labelsize)
+
+plt1
+
+plt2 <- ggplot() +
+  SampHighlight1 + # in 2022
+  SampHighlight4 +
+  theme_bw() +
+  theme(text = element_text(size = 15), 
+        axis.text.x = element_text(angle = 45, hjust = 1), 
+        strip.text = element_text(size = 12), 
+        strip.background = element_rect(fill = "gray95"), # facet label background
+        axis.text.x.top = element_blank(), # Needed to delete the extra axis created by ggbreak
+        axis.ticks.x.top = element_blank(),
+        axis.line.x.top = element_blank(),
+        axis.text.y = element_text(color = "white"),
+        axis.title.y = element_text(color = "white"),
+        axis.title.x = element_text(color = "white")) +
+  scale_x_datetime(breaks = "month", date_labels = "%b-%y", 
+                   limits = as.POSIXct(c("2022-05-01", "2022-11-01"))) +
+  ylim(c(-0.5, 0.5)) +
+  
+  # Add labels
+  geom_label(data = labeldf, 
+            aes(x=Date, y=labely, label=Label),
+            inherit.aes = T,
+            vjust = 0.5,
+            angle = 90,
+            size = labelsize)
+
+plt2
+
+plt3 <- ggplot() +
+  SampHighlight3 + # in 2023
+  theme_bw() +
+  theme(text = element_text(size = 15), 
+        axis.text.x = element_text(angle = 45, hjust = 1), 
+        strip.text = element_text(size = 12), 
+        strip.background = element_rect(fill = "gray95"), # facet label background
+        axis.text.x.top = element_blank(), # Needed to delete the extra axis created by ggbreak
+        axis.ticks.x.top = element_blank(),
+        axis.line.x.top = element_blank(),
+        axis.text.y = element_text(color = "white"),
+        axis.title.y = element_text(color = "white")) +
+  scale_x_datetime(breaks = "month", date_labels = "%b-%y", 
+                   limits = as.POSIXct(c("2023-05-01", "2023-11-01"))) +
+  ylim(c(-0.5, 0.5)) +
+  xlab("Date") +
+  
+  # Add labels
+  geom_label(data = labeldf, 
+            aes(x=Date, y=labely, label=Label),
+            inherit.aes = T,
+            vjust = 0.5,
+            angle = 90,
+            size = labelsize)
+
+plt3
+
+plt1/plt2/plt3
+
+ggsave(filename = here("Manuscript_Plots/Deployment_Window/DeploymentWindowsBoxesStackedDates.png"), 
+           width = widthpx_stacked, 
+           height = heightpx_stacked, 
+           units = "px")
+```
+
+# Point plots
+
+## Temp vs DO
+```{r}
+ggplot(envData, aes(x = temperature, y = DO)) +
+  geom_point() +
+    theme_bw() +
+  theme(text = element_text(size = 20),
+        axis.text.x = element_text(size = 25),
+        axis.text.y = element_text(size = 25)
+        ) +
+  geom_smooth(method = "lm", se = F) +
+  labs(title = "Oxygen vs Temperature", x = "Temperature (ºC)", y = "Dissolved Oxygen (Saturation %)")
+
+ggsave(here("Manuscript_Plots", "Binomial_Regressions", "Oxygen_Temperature.png"), width = 2000, height = 2000, units = "px")
+```
+
+## Filter for species of interest
+
+```{r, eval = T}
+# later replace this with some vector from a spreadsheet
+SOI <- c("Acartia longiremis", "Oncorhynchus kisutch", "Clupea pallasii", "Citharichthys sordidus")
+
+eDNAxEnvData <- eDNAxEnvData %>% 
+  filter(Species %in% SOI)
+```
+
+# Binomial Regression
+
+**Binomial Regression Assumptions**
+
+1. Independent observations - *Check!*
+2. No multicollinearity: Continuous independent variables should not be correlated with each other - *NOT MET - shouldn't do a DO x Temp x Presence model*
+3. Binomial dependent variable, with two **mutually exclusive** values - *Check!*
+4. Continuous independent variable - *Check!*
+5. Linearity between the binomial and continuous variables - this is checked with a logit transformation - *See below, this varies by species*
+6. Sufficient obeservations - the source I found recommends > 15 - *Check! 10 should be alright but I will note it in the results*
+7. No outliers - *One outlier, which appears to be part of a real heatwave - I have not filtered it out yet*
+
+
+## Check for outliers
+
+```{r}
+ggplot(envData, aes(x = DO, y = temperature)) +
+  geom_point(color = "gray90", alpha = 0.5) +
+  geom_point(eDNAxEnvData, mapping = aes(x = DO, y = temperature, color = Present, shape = Present), inherit.aes = F) +
+    scale_shape_manual(values = c(1, 19)) +
+  theme_bw() +
+  theme(text = element_text(size = 15), strip.text = element_text(size = 8), strip.background = element_rect(fill = "gray95")) +
+  labs(title = "Dissolved Oxygen vs. Temp + Species Presence", y = "Temperature") +
+  facet_wrap(facets = vars(Species))
+ggsave(filename = here("Manuscript_Plots", "Binomial_Regressions", "SpeciesPresence_TempxDO.png"), width = 2500, height = 2000, units = "px")
+```
+
+## Filter out outliers & other cleaning 
+
+```{r, eval = T}
+eDNAxEnvData <- eDNAxEnvData %>% 
+  filter(temperature < 11)
+
+eDNAxEnvData <- eDNAxEnvData %>% 
+  mutate(year = as.factor(year)) %>% # Clean for boxtidwell
+  filter(!is.na(Present) & !is.na(DO) & !is.na(year)) %>%  # Clean for NA values
+  filter(temperature < 11)
+```
+
+```{r}
+ggplot(envData, aes(x = DO, y = temperature)) +
+  geom_point(color = "gray90", alpha = 0.5) +
+  geom_point(eDNAxEnvData, mapping = aes(x = DO, y = temperature, color = Present, shape = Present), inherit.aes = F) +
+    scale_shape_manual(values = c(1, 19)) +
+  theme_bw() +
+  theme(text = element_text(size = 15), strip.text = element_text(size = 8), strip.background = element_rect(fill = "gray95")) +
+  labs(title = "Dissolved Oxygen vs. Temp + Species Presence", y = "Temperature") +
+  facet_wrap(facets = vars(Species))
+```
+
+
+## Check for linearity
+
+"Assumption #5 involves the necessity of a linear relationship between the continuous independent variables and the logit transformation of the dependent variable. This linearity assumption implies that **for continuous independent variables** like income level, hours of exercise per week, and blood sugar levels, **there should be a linear relationship with the logit of the dependent variable**, such as the probability of developing diabetes. Various methods can be employed to assess this linearity, with one common approach being the **Box-Tidwell procedure.** This technique involves creating interaction terms between each continuous independent variable and its natural logarithm and adding these to the logistic regression model. This technique can be implemented using software like **SPSS Statistics, which offers the Binary Logistic procedure to test for this assumption.** The results of this test are then interpreted to decide the next steps in the analysis, depending on whether the linearity assumption holds or is violated. If the assumption is met, the analysis can proceed as planned. However, if the assumption is not met, adjustments to the model or alternative methods may be necessary to address the non-linearity appropriately." - [Binomial Logistic Regression](https://www.amstatisticalconsulting.com/binomial-logistic-regression/)
+
+
+Basically, this equation needs to have a somewhat linear relationship with the independent variable: 
+
+$$g(p) = log\left( \frac{p}{1-p} \right)$$
+Where p = probability of 1 (if 1, p. if 0, 1-p)?
+
+
+## Looped Binomial Regression
+
+```{r}
+# First, filter for more than 50 detections
+
+Detect15Sum <- eDNAxEnvData %>% 
+  group_by(Species) %>% 
+  summarize(Detections = sum(Present)) %>% 
+  arrange(desc(Detections)) %>% 
+  filter(Detections > 15 & !is.na(Species)) 
+Detect15Species <- Detect15Sum$Species # 37 species
+
+Detect15 <- eDNAxEnvData %>% 
+  filter(Species %in% Detect15Species) %>% 
+  mutate(year = as.factor(year)) %>% # Clean for boxtidwell
+  filter(!is.na(Present) & !is.na(DO) & !is.na(year))
+
+Detect15Split <- split(Detect15, Detect15$Species) # Split by species
+
+# Make a function that'll do the binomial regression AND put the results in a dataframe
+
+SpeciesMod <- c()
+InterceptP <- c()
+SlopeP <- c()
+SampleSizes <- c()
+
+#modtest <- glm(Detect15Split[[1]], formula = Present ~ DO, family = "binomial")
+#modsum <- summary(modtest)
+#Coefficients: modsum$coeffifients[1 = intercept/2 = slope, 4]
+
+for (i in 1:length(Detect15Split)) {
+  SpName <- names(Detect15Split)[i]
+  SpeciesMod <- c(SpeciesMod, SpName)
+  
+  df <- Detect15Split[[i]]
+  
+  SampleSize <- sum(df$Present)
+  SampleSizes <- c(SampleSizes, SampleSize)
+  
+  # lapply(joinSpeciesList, glm, formula = Present ~ DO, family = "binomial")
+  mod <- glm(df, formula = Present ~ DO, family = "binomial")
+  modsum <- summary(mod)
+  
+  Intercept <- round(modsum$coefficients[1,4], digits = 5)
+  Slope <- round(modsum$coefficients[2,4], digits = 5)
+  InterceptP <- c(InterceptP, Intercept)
+  SlopeP <- c(SlopeP, Slope)
+}
+
+BinomialRegressionResults <- data.frame(Species = SpeciesMod, InterceptP, SlopeP, n = SampleSizes)
+
+SignificantSlopes <- BinomialRegressionResults %>% filter(SlopeP < 0.05)
+SignificantIntercepts <- BinomialRegressionResults %>% filter(InterceptP < 0.05)
+
+SigSp <- SignificantSlopes$Species
+SigSpDf <- eDNAxEnvData %>% 
+  filter(Species %in% SigSp)
+```
+
+## Box Tidwell Loop
+```{r}
+SigSpBox <- eDNAxEnvData %>%
+  filter(!is.na(DO)) %>% 
+  filter(Species %in% c("Aphanomyces astaci", "Aureococcus anophagefferens", "Thecamonas trahens", "Chaetoceros socialis", "Lithodesmium intricatum", "Cyphoderia ampulla", "Bathycoccus prasinos", "Clytia gregaria", "Paramoeba branchiphila", "Citharichthys sordidus",  "Thermocyclops inversus", "Pennaria disticha", "Clupea pallasii")) # Species I actually want to run this on, NA values removed
+
+fail <- c("Acartia longiremis", "Chrysochromulina sp. NIES-1333", "Stephanopyxis turris", "Vannella sp.", "Heterosigma akashiwo", "Parvamoeba rugata") # Species where box-tidwell failed - they have DO NA values but the drop_na should fix that
+
+LinearSplit <- split(SigSpBox, SigSpBox$Species) # Split by species, deleting species that broke the Box-Tidwell test for now
+
+LinearSplit <- lapply(LinearSplit, drop_na, c(DO, Present, year))
+
+test <- LinearSplit[[1]]
+test2 <- LinearSplit[[2]]
+
+# Do a box Tidwell test on everything that had significant slopes
+# This only works on some of the species for some reason?
+SpeciesBox <- c()
+BoxTidwellP <- c()
+
+for (i in 1:length(LinearSplit)) {
+  print(paste(names(LinearSplit)[i], sep = " ", "Presence vs Oxygen"))
+  box <- boxTidwell(Present ~ DO, 
+                    other.x = ~ year, # it breaks if i don't do this idk
+                    data = LinearSplit[[i]], 
+                    na.action = na.exclude)
+  
+  x <- round(box$result[3], digits = 5)
+  SpeciesBox <- c(SpeciesBox, names(LinearSplit)[i])
+  BoxTidwellP <- c(BoxTidwellP, x)
+}
+
+BoxTidwellResults <- data.frame(SpeciesBox, BoxTidwellP) %>% arrange(desc(BoxTidwellP))
+
+BoxTidwellSuccess <- BoxTidwellResults %>% filter(BoxTidwellP > 0.05)
+```
+
+# Graph binomial regression
+
+# Loop to graph binom regresion
+```{r}
+AllSplit <- split(eDNAxEnvData, eDNAxEnvData$Species)
+# Add title
+# Add better axis labels
+for (i in 1:length(AllSplit)) {
+  df <- AllSplit[[i]] %>% mutate(PresentBin = case_when(Present == T ~ 1, Present == F ~ 0)) %>%  # Select one species and mutate to 0/1 so that the regression will run
+    filter(temperature < 11) # Filter out the outlier
+  
+  species <- as.character(AllSplit[[i]][1,7]) # Extract species name for title + export filename
+
+  ggplot(df, aes(x = DO, y = PresentBin, color = PresentBin)) +
+    geom_point(size = 4) +
+    scale_color_gradient(high = "dodgerblue3", low = "orange2", guide = "legend", na.value = "black") + # Color to match presence/absence graphs
+    geom_smooth(method = "glm", method.args = list(family = "binomial"), se = F) +
+    # Print the binomial regression
+    stat_poly_eq(use_label(c("R2", "P")), size = 6, label.y = 0.75, label.x = 60) + # Print R^2 and p-value from the model
+    theme_bw() +
+    theme(text = element_text(size = 20)) +
+    labs(title = species, x = "Oxygen Saturation (%)", y = "Species Present?")
+  
+    ggsave(filename = here("Manuscript_Plots", "Binomial_Regressions",
+                           paste(species, sep = ".", "png")), # Save graph
+           width = 2300, 
+           height = 2000, 
+           units = "px")
+}
+
+system("say Binomial Regression Graphs Complete!")
+```
+
+To kill the talking enter in terminal `while true; do pkill -9 say; done`
