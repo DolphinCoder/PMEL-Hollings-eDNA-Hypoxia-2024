@@ -36,7 +36,7 @@ ASV_table <- read_csv(here("Manuscript_Plots", "OCNMS_final_data", "18Sv4", "Dec
 ```
 
 
-# Join the data
+# Transpose & Join the data
 
 Goal: 
 
