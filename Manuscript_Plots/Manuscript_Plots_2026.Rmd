@@ -23,15 +23,18 @@ library(R.matlab)
 library(ggbreak)
 library(car) # Has a function for the Box-Tidwell procedure
 library(reshape2) # To make the ASV table into something that can be combined with environmental data
+library(stringr)
 ```
 
 # Import data 
 
 ```{r}
 Sp_ASV_18Sv4 <- read_csv(here("Manuscript_Plots", "OCNMS_final_data", "18Sv4", "Decontam_final_taxonomy_table_pr2.csv")) # 18Sv4 data cleanedd by Sam
-envData <- read_csv(here("Manuscript_Plots", "OCNMS_final_data", "18Sv4", "Decontam_final_metadata.csv")) %>% # metadata cleaned by Sam
+envData_BIG <- read_csv(here("Manuscript_Plots", "OCNMS_final_data", "18Sv4", "Decontam_final_metadata.csv")) %>% # metadata cleaned by Sam
   mutate(year = as.factor(year(eventDate))) %>%
     relocate(year, .after = eventDate)
+envData <- envData_BIG %>%
+  select(samp_name, pcr_plate_id, filename, eventDate, year, input_read_count, output_read_count, decimalLongitude, station_id, decimalLatitude, verbatimLongitude, verbatimLatitude, verbatimCoordinateSystem, geo_loc_name, verbatimEventDate, samp_collect_device, samp_size, samp_size_unit, minimumDepthInMeters, maximumDepthInMeters, DepthInMeters_method, tot_depth_water_col, temp, salinity, diss_oxygen, diss_oxygen_unit, replicate_number, expedition_id, measurements_from, region)
 ASV_table <- read_csv(here("Manuscript_Plots", "OCNMS_final_data", "18Sv4", "Decontam_final_asv_table.csv"))
 ```
 
@@ -66,12 +69,19 @@ eDNAxEnvData <- full_join(Rds_Txa_18Sv4, envData, by = join_by(Sample == samp_na
 system("say Data Join 1 complete")
 ```
 
-# Export the combined data
+# Filter & Export the combined data
 
 ```{r}
 # Take a looksee to see which dissolved things are actually collected
+# Basically only oxygen, the other columns are just for standardization
 # View(eDNAxEnvData[110:150])
-smaller <- eDNAxEnvData %>% select(Taxon, iter, Reads, decimalLongitude, decimalLatitude, eventDate, year, samp_weather, temp, chlorophyll, light_intensity, ph, ph_meth, salinity, tidal_stage, turbidity, water_current, wind_speed, percent_oxygen_sat, rosette_position, expedition_id, diss_oxygen, diss_oxygen_unit)
+# Select the columns I care more about, and add a Taxon column with only the most specific taxon. Also, remove unassigned taxa, I don't care because I'm not doing eDNA index right now. Note to self, re-add unassigned taxa if doing eDNA index for total reads situation
+smaller <- eDNAxEnvData %>% select(Taxon, iter, Reads, decimalLongitude, decimalLatitude, eventDate, year, temp, salinity, expedition_id, diss_oxygen, diss_oxygen_unit) %>%
+  filter(Taxon != "Unassigned") %>%
+  filter(Taxon != "Eukaryota") %>%
+  mutate(Lowest_taxon = str_split_i(string = Taxon, pattern = ';', i = -1)) %>%
+  relocate(Lowest_taxon, .before = iter) %>%
+  relocate(Taxon, .after = diss_oxygen_unit)
 
 system("say Data Join 2 Complete")
 
@@ -433,32 +443,108 @@ ggsave(plot = winplt_stk_mrk_ctd, filename = here("Manuscript_Plots/Deployment_W
            units = "px")
 ```
 
+# Data exploration
+```{r}
+eDNAxEnvData %>% 
+  group_by(eventDate) %>%
+  summarize(taxa = n())
+# too tired to parse what that means
+```
+
+
 # Point plots
+
+```{r}
+Pwoblems <- smaller %>%
+  filter(temp == "missing: not collected" | diss_oxygen == "missing: not collected")
+Pwoblems %>%
+  group_by(expedition_id) %>%
+  summarize(N = n())
+# Ok I know about the problem in 2023, but wtf is up with 2021? I thought we had a handle on that :(
+```
+
 
 ## Temp vs DO
 ```{r}
-ggplot(envData, aes(x = temperature, y = DO)) +
+ggplot(envData %>% filter(diss_oxygen != "missing: not collected"), 
+       aes(x = as.numeric(temp), y = as.numeric(diss_oxygen))) +
   geom_point() +
     theme_bw() +
   theme(text = element_text(size = 20),
         axis.text.x = element_text(size = 25),
         axis.text.y = element_text(size = 25)
         ) +
-  geom_smooth(method = "lm", se = F) +
-  labs(title = "Oxygen vs Temperature", x = "Temperature (ºC)", y = "Dissolved Oxygen (Saturation %)")
+  #geom_smooth(method = "lm", se = F) +
+  labs(title = "Oxygen vs Temperature", x = "Temperature (ºC)", y = "Dissolved Oxygen")
 
 ggsave(here("Manuscript_Plots", "Binomial_Regressions", "Oxygen_Temperature.png"), width = 2000, height = 2000, units = "px")
 ```
 
+## Add model data
+```{r}
+eDNAxEnvData <- eDNAxEnvData %>%
+  mutate(source = "Mooring", temp = as.numeric(temp), diss_oxygen = as.numeric(diss_oxygen))
+
+model_37m <- read_csv(here("Manuscript_Plots", "LiveOcean_TH042_2021_2023_DepthClean_2.csv")) %>% 
+  mutate(DateMatch = Date_UTC) %>% # name for the join to work
+  mutate(source = "Model")
+
+eDNAxEnvDataJoin <- eDNAxEnvData %>%
+  mutate(DateMatch = round_date(eventDate, unit = "hour"))
+
+eDNAxEnv_Model1 <- left_join(eDNAxEnvDataJoin, model_37m, by = join_by(DateMatch)) 
+
+  # trying to double-check with just the environmental data
+envDataJoin <- envData %>%
+  mutate(DateMatch = round_date(eventDate, unit = "hour")) %>%
+  mutate(source = "Mooring")
+envData_Model <- left_join(envDataJoin, model_37m, by = join_by(DateMatch)) %>%
+  mutate(source = case_when(source.x == "Mooring" ~ "Mooring", source.y == "Model" ~ "Model"))
+# envData doesn't include the dates with the mooring broken maybe? not critical.
+```
+
+```{r}
+eDNAxEnv_Model <- eDNAxEnv_Model1 %>%
+  mutate(temp_comb = case_when(is.na(temp) ~ Temp_C, .default = Temp_C),
+         DO_comb = case_when(is.na(diss_oxygen) ~ Oxygen_mg_L, .default = Oxygen_mg_L))
+
+Pwoblems2 <- eDNAxEnv_Model %>%
+  filter(is.na(temp) | is.na(diss_oxygen))
+Pwoblems2 %>%
+  group_by(expedition_id) %>%
+  summarize(N = n())
+Pwoblems2 %>%
+  group_by(DateMatch) %>%
+  summarize(N = n())
+```
+
+## Temp vs DO again
+```{r}
+ggplot(envData_Model %>% filter(diss_oxygen != "missing: not collected"), 
+       aes(x = as.numeric(temp), y = as.numeric(diss_oxygen), color = source)) +
+  geom_point() +
+    theme_bw() +
+  theme(text = element_text(size = 20),
+        axis.text.x = element_text(size = 25),
+        axis.text.y = element_text(size = 25)
+        ) +
+  #geom_smooth(method = "lm", se = F) +
+  labs(title = "Oxygen vs Temperature (incl. model)", x = "Temperature (ºC)", y = "Dissolved Oxygen")
+
+ggsave(here("Manuscript_Plots", "Binomial_Regressions", "Oxygen_Temperature_Model.png"), width = 2000, height = 2000, units = "px")
+```
+
+
 ## Filter for species of interest
 
-```{r, eval = T}
+```{r, eval = F}
 # later replace this with some vector from a spreadsheet
 SOI <- c("Acartia longiremis", "Oncorhynchus kisutch", "Clupea pallasii", "Citharichthys sordidus")
 
 eDNAxEnvData <- eDNAxEnvData %>% 
   filter(Species %in% SOI)
 ```
+
 
 # Binomial Regression
 

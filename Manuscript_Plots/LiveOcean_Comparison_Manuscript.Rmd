@@ -1,0 +1,114 @@
+---
+title: "LiveOcean_Comparison_Manuscript"
+output: html_document
+---
+
+---
+title: "LiveOcean vs. TH042 Comparisons"
+author: "Eleanor (Ella) Crotty"
+header-includes:
+  \usepackage{fvextra}
+  \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,commandchars=\\\{\}}
+output:
+  pdf_document:
+    toc: TRUE
+urlcolor: blue
+---
+
+# Setup
+
+```{r Package Imports, message = F, warning = F}
+# Warnings and startup messages suppressed
+library(tidyverse)
+library(patchwork)
+library(scales)
+library(ggrepel)
+library(readxl)
+library(here)
+library(mgcv)
+library(gratia)
+library(ggpmisc)
+```
+
+```{r}
+OME <- read_csv(here("Manuscript_Plots", "OCNMS_final_Data", "18Sv4_eDNAxEnvData.csv")) %>%
+  filter(diss_oxygen != "missing: not collected" & temp != "missing: not collected") %>%
+  mutate(source = "Mooring?") %>%
+  mutate(DateMatch = round_date(eventDate, unit = "hour"))
+model_37m <- read_csv(here("Manuscript_Plots", "LiveOcean_TH042_2021_2023_DepthClean_2.csv")) %>% 
+  mutate(DateMatch = Date_UTC) %>% # this is the one I'm actually using
+  mutate(source = "Model")
+```
+
+```{r}
+ggplot(data = OME, aes(x = eventDate, y = as.numeric(diss_oxygen))) +
+  geom_line(color = "navyblue", size = 0.5) +
+  geom_line(data = model_37m, aes(x = Date_UTC, y = as.numeric(Oxygen_mg_L)),
+            color = "orange", size = 0.5, alpha = 0.5) +
+  labs(title = "TH042 Mooring vs. LiveOcean Model (DO)", caption = "Model in orange, mooring(?) in dark blue. 37m depth.") +
+  theme_bw() 
+
+ggsave(here("LiveOcean_Plots_37", "Mooring_vs_Model_DO_37.png"))
+
+ggplot(data = OME, aes(x = eventDate, y = as.numeric(temp))) +
+  geom_line(color = "navyblue", size = 0.5) +
+  geom_line(data = model_37m, aes(x = Date_UTC, y = as.numeric(Temp_C)),
+            color = "orange", size = 0.5, alpha = 0.5) +
+  labs(title = "TH042 Mooring vs. LiveOcean Model (Temp)", caption = "Model in orange, mooring(?) in dark blue. 37m depth.") +
+  theme_bw() 
+
+ggsave(here("LiveOcean_Plots_37", "Mooring_vs_Model_Temp_37.png"))
+```
+
+## Regression
+
+```{r, eval = F}
+# Not currently working because it's old code
+compare <- left_join(OME, model_37m, by = join_by(Date_UTC))
+  
+  # Compare temp predictions
+  temp_mod <- lm(as.numeric(Temp_C) ~ as.numeric(temp), compare)
+  #print(summary(temp_mod))
+  rsq <- summary(temp_mod)$r.squared
+  print(paste("Temp R squared: ", rsq))
+  t_RMSE <- sqrt(mean(temp_mod$residuals^2))
+  t_bias <- mean(temp_mod$residuals)
+
+  print(ggplot(compare, aes(x = as.numeric(temp), y = as.numeric(Temp_C))) +
+          geom_point() +
+          geom_smooth(method = "lm") +
+          ggtitle("Temperature at 37 m") +
+          annotate("text", x = 9, y = 12, 
+                   label = paste("R^2 = ", round(rsq, 3)), size = 10) +
+          annotate("text", x = 9, y = 11, 
+                   label = paste("RMSE = ", round(t_RMSE, 3)), size = 10) +
+          theme_bw())
+  
+  ggsave("Temp_LiveOcean_37.png", 
+         path = here("LiveOcean_Plots_37"),
+         width = 3000, height = 2500, units = "px")
+  
+  # Compare DO predictions
+  ox_mod <- lm(as.numeric(Oxygen_mg_L) ~ as.numeric(diss_oxygen), compare)
+  #print(summary(ox_mod))
+  o_rsq <- summary(ox_mod)$r.squared
+  o_RMSE <- sqrt(mean(ox_mod$residuals^2))
+  print(paste("DO R squared: ", o_rsq))
+
+  print(ggplot(compare, aes(x = as.numeric(diss_oxygen), y = as.numeric(Oxygen_mg_L))) +
+          geom_point() +
+          geom_smooth(method = "lm") +
+          ggtitle("Oxygen at 37 m") +
+          annotate("text", x = 7, y = 1, 
+                   label = paste("R^2 = ", round(o_rsq, 3)), size = 10) +
+          annotate("text", x = 7, y = 0.5, 
+                   label = paste("RMSE = ", round(o_RMSE, 3)), size = 10) +
+          theme_bw())
+  
+  ggsave(filename = "Oxygen_LiveOcean_37.png", 
+         path = here("LiveOcean_Plots_37"),
+         width = 3000, height = 2500, units = "px")
+  
+
+```
+

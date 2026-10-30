@@ -1,0 +1,50 @@
+---
+title: "LiveOcean vs. TH042 Comparisons"
+author: "Eleanor (Ella) Crotty"
+header-includes:
+  \usepackage{fvextra}
+  \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,commandchars=\\\{\}}
+output:
+  pdf_document:
+    toc: TRUE
+urlcolor: blue
+---
+
+# Setup
+
+```{r Package Imports, message = F, warning = F}
+# Warnings and startup messages suppressed
+library(tidyverse)
+library(patchwork)
+library(scales)
+library(ggrepel)
+library(readxl)
+library(here)
+library(mgcv)
+library(gratia)
+library(ggpmisc)
+```
+
+```{r}
+# Import LiveOcean data (turned into dataframe in NetCDF_to_DF.R)
+model_alldepths <- read_csv(here("Manuscript_Plots", "LiveOceanTH042_2021_2023_2.csv")) %>% 
+  mutate(DateMatch = Date_UTC) # for join later
+model <- model_alldepths %>% 
+  filter(s_rho < -0.92 & s_rho > -0.97) 
+
+model_37m <- read_csv(here("Manuscript_Plots", "LiveOcean_TH042_2021_2023_DepthClean_2.csv")) %>% 
+  mutate(DateMatch = Date_UTC) # this is the one I'm actually using
+
+
+# s_rho is a depth coordinate system where the bottom is -1 and the surface is 0
+# https://www.mathworks.com/matlabcentral/answers/2056554-from-s-coordinate-at-rho-points-to-depth
+# i do Not wanna do all that math. mooring is close to the bottom so let's use -0.95 rho
+```
+
+```{r}
+ggplot(data = model_37m, aes(x = Date_UTC, y = Oxygen_mg_L)) +
+  geom_line(color = "navyblue", size = 0.5) +
+  labs(title = "LiveOcean Model (DO)", caption = "Model in dark blue. 37m depth.") +
+  theme_bw() 
+```
+
