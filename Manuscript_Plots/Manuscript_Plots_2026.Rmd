@@ -21,7 +21,6 @@ library(here)
 library(gsw)
 library(R.matlab)
 library(ggbreak)
-library(car) # Has a function for the Box-Tidwell procedure
 library(reshape2) # To make the ASV table into something that can be combined with environmental data
 library(stringr)
 ```
@@ -448,7 +447,9 @@ ggsave(plot = winplt_stk_mrk_ctd, filename = here("Manuscript_Plots/Deployment_W
 eDNAxEnvData %>% 
   group_by(eventDate) %>%
   summarize(taxa = n())
-# too tired to parse what that means
+# 8378 is normal
+# are the other dates from CTD samples?
+# Looks like yes - all PPS samples have a standard 8378 taxa, but there are many additional taxa collected by Niskin bottles. That could be problematic for eDNA index.
 ```
 
 
@@ -460,13 +461,23 @@ Pwoblems <- smaller %>%
 Pwoblems %>%
   group_by(expedition_id) %>%
   summarize(N = n())
-# Ok I know about the problem in 2023, but wtf is up with 2021? I thought we had a handle on that :(
+Pwoblems %>% 
+  group_by(eventDate) %>%
+  summarize(N = n())
+# Ok I know about the problem in 2023, and we don't really worry about Cape Elizabeth in this analysis, but wtf is up with 2021? I thought we had a handle on that :(
+```
+
+```{r}
+envData %>% filter(year == 2021) %>% group_by(eventDate) %>% summarize(n = n())
+eDNAxEnvData %>% filter(year == 2021) %>% group_by(eventDate) %>% summarize(n = n())
+envData %>% filter(year == 2023) %>% group_by(eventDate) %>% summarize(n = n())
 ```
 
 
 ## Temp vs DO
 ```{r}
-ggplot(envData %>% filter(diss_oxygen != "missing: not collected"), 
+ggplot(envData %>% filter(diss_oxygen != "missing: not collected" & 
+                            temp != "missing: not collected"), 
        aes(x = as.numeric(temp), y = as.numeric(diss_oxygen))) +
   geom_point() +
     theme_bw() +
@@ -482,46 +493,58 @@ ggsave(here("Manuscript_Plots", "Binomial_Regressions", "Oxygen_Temperature.png"
 
 ## Add model data
 ```{r}
-eDNAxEnvData <- eDNAxEnvData %>%
-  mutate(source = "Mooring", temp = as.numeric(temp), diss_oxygen = as.numeric(diss_oxygen))
+eDNAxEnvDataJoin1 <- eDNAxEnvData %>%
+  mutate(source = "Mooring", temp = as.numeric(temp), diss_oxygen = as.numeric(diss_oxygen)) # missing has been converted to NA
 
 model_37m <- read_csv(here("Manuscript_Plots", "LiveOcean_TH042_2021_2023_DepthClean_2.csv")) %>% 
-  mutate(DateMatch = Date_UTC) %>% # name for the join to work
-  mutate(source = "Model")
+  mutate(DateMatch = Date_UTC) %>% # name the column the same for the join to work
+  mutate(source = "Model") # this has every hour on the hour
 
-eDNAxEnvDataJoin <- eDNAxEnvData %>%
-  mutate(DateMatch = round_date(eventDate, unit = "hour"))
+eDNAxEnvDataJoin <- eDNAxEnvDataJoin1 %>%
+  mutate(DateMatch = round_date(eventDate, unit = "hour")) # need to round to the nearest hour to be able to join with model_37m
 
-eDNAxEnv_Model1 <- left_join(eDNAxEnvDataJoin, model_37m, by = join_by(DateMatch)) 
+eDNAxEnv_Model1 <- left_join(eDNAxEnvDataJoin, model_37m, by = join_by(DateMatch))
 
-  # trying to double-check with just the environmental data
-envDataJoin <- envData %>%
-  mutate(DateMatch = round_date(eventDate, unit = "hour")) %>%
-  mutate(source = "Mooring")
-envData_Model <- left_join(envDataJoin, model_37m, by = join_by(DateMatch)) %>%
-  mutate(source = case_when(source.x == "Mooring" ~ "Mooring", source.y == "Model" ~ "Model"))
-# envData doesn't include the dates with the mooring broken maybe? not critical.
+eDNAxEnv_Model1 %>%
+  group_by(DateMatch) %>%
+  summarize(TEMP = mean(temp), O2 = mean(diss_oxygen))
+
+pers_pwobwems <- eDNAxEnv_Model1 %>%
+  filter(is.na(temp) | is.na(diss_oxygen)) %>%
+  group_by(DateMatch) %>%
+  summarize(TEMP = mean(temp), O2 = mean(diss_oxygen))
+
+pwob_dates <- pers_pwobwems$DateMatch
+model_37m %>% filter(DateMatch %in% pwob_dates)
+eDNAxEnvDataJoin %>% filter(DateMatch %in% pwob_dates)
+
+# I think I just need to create new columns?
 ```
 
 ```{r}
+# lowercase is from the metadata, Temp_C and Oxygen_mg_L are from the model
 eDNAxEnv_Model <- eDNAxEnv_Model1 %>%
-  mutate(temp_comb = case_when(is.na(temp) ~ Temp_C, .default = Temp_C),
-         DO_comb = case_when(is.na(diss_oxygen) ~ Oxygen_mg_L, .default = Oxygen_mg_L))
+  mutate(temp_comb = case_when(is.na(temp) ~ Temp_C, .default = temp),
+         DO_comb = case_when(is.na(diss_oxygen) ~ Oxygen_mg_L, .default = diss_oxygen),
+         temp_source = case_when(is.na(temp) ~ "Model", .default = "Mooring"),
+         DO_source = case_when(is.na(diss_oxygen) ~ "Model", .default = "Mooring"))
 
 Pwoblems2 <- eDNAxEnv_Model %>%
-  filter(is.na(temp) | is.na(diss_oxygen))
+  filter(is.na(temp_comb) | is.na(DO_comb))
 Pwoblems2 %>%
   group_by(expedition_id) %>%
   summarize(N = n())
 Pwoblems2 %>%
   group_by(DateMatch) %>%
   summarize(N = n())
+
+check <- eDNAxEnv_Model %>% select(DateMatch, temp, Temp_C, temp_comb, temp_source, diss_oxygen, Oxygen_mg_L, DO_comb, DO_source) # Spot check looks correct, there are no longer empty spaces!
 ```
 
 ## Temp vs DO again
 ```{r}
-ggplot(envData_Model %>% filter(diss_oxygen != "missing: not collected"), 
-       aes(x = as.numeric(temp), y = as.numeric(diss_oxygen), color = source)) +
+ggplot(eDNAxEnv_Model) +
+       aes(x = as.numeric(temp_comb), y = as.numeric(DO_comb), color = temp_source) +
   geom_point() +
     theme_bw() +
   theme(text = element_text(size = 20),
@@ -532,209 +555,24 @@ ggplot(envData_Model %>% filter(diss_oxygen != "missing: not collected"),
   labs(title = "Oxygen vs Temperature (incl. model)", x = "Temperature (ºC)", y = "Dissolved Oxygen")
 
 ggsave(here("Manuscript_Plots", "Binomial_Regressions", "Oxygen_Temperature_Model.png"), width = 2000, height = 2000, units = "px")
-```
 
-
-## Filter for species of interest
-
-```{r, eval = F}
-# later replace this with some vector from a spreadsheet
-SOI <- c("Acartia longiremis", "Oncorhynchus kisutch", "Clupea pallasii", "Citharichthys sordidus")
-
-eDNAxEnvData <- eDNAxEnvData %>% 
-  filter(Species %in% SOI)
-```
-
-
-# Binomial Regression
-
-**Binomial Regression Assumptions**
-
-1. Independent observations - *Check!*
-2. No multicollinearity: Continuous independent variables should not be correlated with each other - *NOT MET - shouldn't do a DO x Temp x Presence model*
-3. Binomial dependent variable, with two **mutually exclusive** values - *Check!*
-4. Continuous independent variable - *Check!*
-5. Linearity between the binomial and continuous variables - this is checked with a logit transformation - *See below, this varies by species*
-6. Sufficient obeservations - the source I found recommends > 15 - *Check! 10 should be alright but I will note it in the results*
-7. No outliers - *One outlier, which appears to be part of a real heatwave - I have not filtered it out yet*
-
-
-## Check for outliers
-
-```{r}
-ggplot(envData, aes(x = DO, y = temperature)) +
-  geom_point(color = "gray90", alpha = 0.5) +
-  geom_point(eDNAxEnvData, mapping = aes(x = DO, y = temperature, color = Present, shape = Present), inherit.aes = F) +
-    scale_shape_manual(values = c(1, 19)) +
-  theme_bw() +
-  theme(text = element_text(size = 15), strip.text = element_text(size = 8), strip.background = element_rect(fill = "gray95")) +
-  labs(title = "Dissolved Oxygen vs. Temp + Species Presence", y = "Temperature") +
-  facet_wrap(facets = vars(Species))
-ggsave(filename = here("Manuscript_Plots", "Binomial_Regressions", "SpeciesPresence_TempxDO.png"), width = 2500, height = 2000, units = "px")
-```
-
-## Filter out outliers & other cleaning 
-
-```{r, eval = T}
-eDNAxEnvData <- eDNAxEnvData %>% 
-  filter(temperature < 11)
-
-eDNAxEnvData <- eDNAxEnvData %>% 
-  mutate(year = as.factor(year)) %>% # Clean for boxtidwell
-  filter(!is.na(Present) & !is.na(DO) & !is.na(year)) %>%  # Clean for NA values
-  filter(temperature < 11)
-```
-
-```{r}
-ggplot(envData, aes(x = DO, y = temperature)) +
-  geom_point(color = "gray90", alpha = 0.5) +
-  geom_point(eDNAxEnvData, mapping = aes(x = DO, y = temperature, color = Present, shape = Present), inherit.aes = F) +
-    scale_shape_manual(values = c(1, 19)) +
-  theme_bw() +
-  theme(text = element_text(size = 15), strip.text = element_text(size = 8), strip.background = element_rect(fill = "gray95")) +
-  labs(title = "Dissolved Oxygen vs. Temp + Species Presence", y = "Temperature") +
-  facet_wrap(facets = vars(Species))
-```
-
-
-## Check for linearity
-
-"Assumption #5 involves the necessity of a linear relationship between the continuous independent variables and the logit transformation of the dependent variable. This linearity assumption implies that **for continuous independent variables** like income level, hours of exercise per week, and blood sugar levels, **there should be a linear relationship with the logit of the dependent variable**, such as the probability of developing diabetes. Various methods can be employed to assess this linearity, with one common approach being the **Box-Tidwell procedure.** This technique involves creating interaction terms between each continuous independent variable and its natural logarithm and adding these to the logistic regression model. This technique can be implemented using software like **SPSS Statistics, which offers the Binary Logistic procedure to test for this assumption.** The results of this test are then interpreted to decide the next steps in the analysis, depending on whether the linearity assumption holds or is violated. If the assumption is met, the analysis can proceed as planned. However, if the assumption is not met, adjustments to the model or alternative methods may be necessary to address the non-linearity appropriately." - [Binomial Logistic Regression](https://www.amstatisticalconsulting.com/binomial-logistic-regression/)
-
-
-Basically, this equation needs to have a somewhat linear relationship with the independent variable: 
-
-$$g(p) = log\left( \frac{p}{1-p} \right)$$
-Where p = probability of 1 (if 1, p. if 0, 1-p)?
-
-
-## Looped Binomial Regression
-
-```{r}
-# First, filter for more than 50 detections
-
-Detect15Sum <- eDNAxEnvData %>% 
-  group_by(Species) %>% 
-  summarize(Detections = sum(Present)) %>% 
-  arrange(desc(Detections)) %>% 
-  filter(Detections > 15 & !is.na(Species)) 
-Detect15Species <- Detect15Sum$Species # 37 species
-
-Detect15 <- eDNAxEnvData %>% 
-  filter(Species %in% Detect15Species) %>% 
-  mutate(year = as.factor(year)) %>% # Clean for boxtidwell
-  filter(!is.na(Present) & !is.na(DO) & !is.na(year))
-
-Detect15Split <- split(Detect15, Detect15$Species) # Split by species
-
-# Make a function that'll do the binomial regression AND put the results in a dataframe
-
-SpeciesMod <- c()
-InterceptP <- c()
-SlopeP <- c()
-SampleSizes <- c()
-
-#modtest <- glm(Detect15Split[[1]], formula = Present ~ DO, family = "binomial")
-#modsum <- summary(modtest)
-#Coefficients: modsum$coeffifients[1 = intercept/2 = slope, 4]
-
-for (i in 1:length(Detect15Split)) {
-  SpName <- names(Detect15Split)[i]
-  SpeciesMod <- c(SpeciesMod, SpName)
-  
-  df <- Detect15Split[[i]]
-  
-  SampleSize <- sum(df$Present)
-  SampleSizes <- c(SampleSizes, SampleSize)
-  
-  # lapply(joinSpeciesList, glm, formula = Present ~ DO, family = "binomial")
-  mod <- glm(df, formula = Present ~ DO, family = "binomial")
-  modsum <- summary(mod)
-  
-  Intercept <- round(modsum$coefficients[1,4], digits = 5)
-  Slope <- round(modsum$coefficients[2,4], digits = 5)
-  InterceptP <- c(InterceptP, Intercept)
-  SlopeP <- c(SlopeP, Slope)
-}
-
-BinomialRegressionResults <- data.frame(Species = SpeciesMod, InterceptP, SlopeP, n = SampleSizes)
-
-SignificantSlopes <- BinomialRegressionResults %>% filter(SlopeP < 0.05)
-SignificantIntercepts <- BinomialRegressionResults %>% filter(InterceptP < 0.05)
-
-SigSp <- SignificantSlopes$Species
-SigSpDf <- eDNAxEnvData %>% 
-  filter(Species %in% SigSp)
-```
-
-## Box Tidwell Loop
-```{r}
-SigSpBox <- eDNAxEnvData %>%
-  filter(!is.na(DO)) %>% 
-  filter(Species %in% c("Aphanomyces astaci", "Aureococcus anophagefferens", "Thecamonas trahens", "Chaetoceros socialis", "Lithodesmium intricatum", "Cyphoderia ampulla", "Bathycoccus prasinos", "Clytia gregaria", "Paramoeba branchiphila", "Citharichthys sordidus",  "Thermocyclops inversus", "Pennaria disticha", "Clupea pallasii")) # Species I actually want to run this on, NA values removed
-
-fail <- c("Acartia longiremis", "Chrysochromulina sp. NIES-1333", "Stephanopyxis turris", "Vannella sp.", "Heterosigma akashiwo", "Parvamoeba rugata") # Species where box-tidwell failed - they have DO NA values but the drop_na should fix that
-
-LinearSplit <- split(SigSpBox, SigSpBox$Species) # Split by species, deleting species that broke the Box-Tidwell test for now
-
-LinearSplit <- lapply(LinearSplit, drop_na, c(DO, Present, year))
-
-test <- LinearSplit[[1]]
-test2 <- LinearSplit[[2]]
-
-# Do a box Tidwell test on everything that had significant slopes
-# This only works on some of the species for some reason?
-SpeciesBox <- c()
-BoxTidwellP <- c()
-
-for (i in 1:length(LinearSplit)) {
-  print(paste(names(LinearSplit)[i], sep = " ", "Presence vs Oxygen"))
-  box <- boxTidwell(Present ~ DO, 
-                    other.x = ~ year, # it breaks if i don't do this idk
-                    data = LinearSplit[[i]], 
-                    na.action = na.exclude)
-  
-  x <- round(box$result[3], digits = 5)
-  SpeciesBox <- c(SpeciesBox, names(LinearSplit)[i])
-  BoxTidwellP <- c(BoxTidwellP, x)
-}
-
-BoxTidwellResults <- data.frame(SpeciesBox, BoxTidwellP) %>% arrange(desc(BoxTidwellP))
-
-BoxTidwellSuccess <- BoxTidwellResults %>% filter(BoxTidwellP > 0.05)
-```
-
-# Graph binomial regression
-
-# Loop to graph binom regresion
-```{r}
-AllSplit <- split(eDNAxEnvData, eDNAxEnvData$Species)
-# Add title
-# Add better axis labels
-for (i in 1:length(AllSplit)) {
-  df <- AllSplit[[i]] %>% mutate(PresentBin = case_when(Present == T ~ 1, Present == F ~ 0)) %>%  # Select one species and mutate to 0/1 so that the regression will run
-    filter(temperature < 11) # Filter out the outlier
-  
-  species <- as.character(AllSplit[[i]][1,7]) # Extract species name for title + export filename
-
-  ggplot(df, aes(x = DO, y = PresentBin, color = PresentBin)) +
-    geom_point(size = 4) +
-    scale_color_gradient(high = "dodgerblue3", low = "orange2", guide = "legend", na.value = "black") + # Color to match presence/absence graphs
-    geom_smooth(method = "glm", method.args = list(family = "binomial"), se = F) +
-    # Print the binomial regression
-    stat_poly_eq(use_label(c("R2", "P")), size = 6, label.y = 0.75, label.x = 60) + # Print R^2 and p-value from the model
+ggplot(eDNAxEnv_Model) +
+       aes(x = as.numeric(temp_comb), y = as.numeric(DO_comb), color = DO_source) +
+  geom_point() +
     theme_bw() +
-    theme(text = element_text(size = 20)) +
-    labs(title = species, x = "Oxygen Saturation (%)", y = "Species Present?")
-  
-    ggsave(filename = here("Manuscript_Plots", "Binomial_Regressions",
-                           paste(species, sep = ".", "png")), # Save graph
-           width = 2300, 
-           height = 2000, 
-           units = "px")
-}
+  theme(text = element_text(size = 20),
+        axis.text.x = element_text(size = 25),
+        axis.text.y = element_text(size = 25)
+        ) +
+  #geom_smooth(method = "lm", se = F) +
+  labs(title = "Oxygen vs Temperature (incl. model)", x = "Temperature (ºC)", y = "Dissolved Oxygen")
 
-system("say Binomial Regression Graphs Complete!")
+ggsave(here("Manuscript_Plots", "Binomial_Regressions", "Oxygen_Temperature_Model2.png"), width = 2000, height = 2000, units = "px")
 ```
 
-To kill the talking enter in terminal `while true; do pkill -9 say; done`
+# Export the joined, cleaned, and model-included data
+
+```{r}
+# Export the joined data
+write_csv(eDNAxEnv_Model, here("Manuscript_Plots", "OCNMS_final_Data", "18Sv4_eDNAxEnvData_Full.csv"))
+```
