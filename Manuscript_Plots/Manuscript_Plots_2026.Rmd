@@ -573,6 +573,59 @@ ggsave(here("Manuscript_Plots", "Binomial_Regressions", "Oxygen_Temperature_Mode
 # Export the joined, cleaned, and model-included data
 
 ```{r}
+eDNAxEnv_Model_sp <- eDNAxEnv_Model %>%
+  mutate(Lowest_Taxon = sub('.+;(.+)', '\\1', Taxon))
+
+eDNAxEnv_Model_sp %>% select(Taxon, Lowest_Taxon)
+```
+
+
+```{r}
+eDNAxEnv_Model_export <- eDNAxEnv_Model_sp %>%
+  mutate(Temp_Celsius = temp_comb, DO_mg_L = DO_comb) %>%
+  select(Lowest_Taxon, Sample, Reads, eventDate, DateMatch, year, 
+         station_id, samp_collect_device,
+         Temp_Celsius, DO_mg_L, temp_source, DO_source,
+         seq_id, iter, ASV, Taxon, Confidence, pcr_plate_id, filename, 
+         input_read_count, output_read_count, decimalLongitude, decimalLatitude,
+         verbatimLongitude, verbatimLatitude, verbatimCoordinateSystem, 
+         geo_loc_name, verbatimEventDate, samp_size, samp_size_unit,
+         minimumDepthInMeters, maximumDepthInMeters, DepthInMeters_method,
+         tot_depth_water_col, replicate_number, expedition_id, measurements_from, region, Date_UTC, Depth) 
+
+eDNAxEnv_Model_small <- eDNAxEnv_Model_sp %>%
+  mutate(Temp_Celsius = temp_comb, DO_mg_L = DO_comb) %>%
+  select(Lowest_Taxon, Sample, Reads, eventDate, DateMatch, year, 
+         station_id, samp_collect_device,
+         Temp_Celsius, DO_mg_L, temp_source, DO_source,
+         iter, Taxon, decimalLongitude,
+         decimalLatitude, replicate_number, expedition_id, Depth)
+
+# Group by lowest taxon, add up across ASVs
+eDNAxEnv_Model_small <- eDNAxEnv_Model_sp %>%
+  mutate(Temp_Celsius = temp_comb, DO_mg_L = DO_comb) %>%
+  group_by(eventDate, Lowest_Taxon, 
+           replicate_number, samp_collect_device) %>%
+  summarize(totReads = sum(Reads), 
+            Sample = paste(unique(Sample), collapse = ', '), 
+            DateMatch = paste(unique(DateMatch), collapse = ', '), 
+            year = paste(unique(year), collapse = ', '), 
+            station_id = paste(unique(station_id), collapse = ', '), 
+            Temp_Celsius = mean(Temp_Celsius), 
+            DO_mg_L = mean(DO_mg_L), 
+            temp_source = paste(unique(temp_source), collapse = ', '), 
+            DO_source = paste(unique(DO_source), collapse = ', '),
+            iter = paste(unique(iter), collapse = ', '), 
+            Taxon = paste(unique(Taxon), collapse = ', '), 
+            decimalLongitude = paste(unique(decimalLongitude), collapse = ', '),
+            decimalLatitude = paste(unique(decimalLatitude), collapse = ', '), 
+            expedition_id = paste(unique(expedition_id), collapse = ', '), 
+            Depth = paste(unique(Depth), collapse = ', '))
+```
+
+
+```{r}
 # Export the joined data
-write_csv(eDNAxEnv_Model, here("Manuscript_Plots", "OCNMS_final_Data", "18Sv4_eDNAxEnvData_Full.csv"))
+write_csv(eDNAxEnv_Model_export, here("Manuscript_Plots", "OCNMS_final_Data", "18Sv4_eDNAxEnvData_Full.csv"))
+write_csv(eDNAxEnv_Model_small, here("Manuscript_Plots", "OCNMS_final_Data", "18Sv4_eDNAxEnvData_Full_small.csv"))
 ```

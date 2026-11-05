@@ -24,12 +24,13 @@ library(ggbreak)
 library(car) # Has a function for the Box-Tidwell procedure
 library(reshape2) # To make the ASV table into something that can be combined with environmental data
 library(stringr)
+library(plotly) # make interactive plots to inspect
 ```
 
 # Import data
 
 ```{r}
-eDNAxEnvData <- read_csv(here("Manuscript_Plots", "OCNMS_final_data", "18Sv4_eDNAxEnvData_Full.csv")) # 18Sv4 data cleaned, combined with metadata, and combined with LiveOcean model to fill in the gaps in the metadata
+eDNAxEnvData_import <- read_csv(here("Manuscript_Plots", "OCNMS_final_data", "18Sv4_eDNAxEnvData_Full_Small.csv")) # 18Sv4 data cleaned, combined with metadata, and combined with LiveOcean model to fill in the gaps in the metadata in 2021-2023
 ```
 
 
@@ -37,19 +38,41 @@ eDNAxEnvData <- read_csv(here("Manuscript_Plots", "OCNMS_final_data", "18Sv4_eDN
 
 ## Filter for species of interest
 
+```{r, eval = T}
+eDNAxEnvData <- eDNAxEnvData_import %>% 
+  mutate(year = as.factor(year)) %>% # Clean for boxtidwell
+  mutate(Present = case_when(totReads > 0 ~ T, .default = F))
+```
+
 ```{r, eval = F}
 # later replace this with some vector from a spreadsheet
 SOI <- c("Acartia longiremis", "Oncorhynchus kisutch", "Clupea pallasii", "Citharichthys sordidus")
 
-eDNAxEnvData <- eDNAxEnvData %>% 
+eDNAxEnvData <- eDNAxEnvData_import %>% 
   filter(Species %in% SOI)
 ```
 
 ```{r}
-eDNAxEnv_Model %>%
-  group_by()
+# For now, just pick species with >10 detections with >10 reads
+reads_per_taxon <- eDNAxEnvData %>%
+  filter(totReads != 0) %>%
+  group_by(Lowest_Taxon) %>%
+  summarize(N = n(), AvgReads = mean(totReads)) 
+
+SOI <- reads_per_taxon %>%
+  filter(N > 10, AvgReads > 10)
+
+eDNAxEnvData <- eDNAxEnvData %>%
+  filter(Lowest_Taxon %in% SOI$Lowest_Taxon)
 ```
 
+```{r}
+eDNAxEnvData_PPS <- eDNAxEnvData %>%
+  filter(samp_collect_device == "McLane Particle and Phytoplankton Sampler")
+
+eDNAxEnvData_CTD <- eDNAxEnvData %>%
+  filter(samp_collect_device == "Nalgene Bottle" | samp_collect_device == "Niskin Bottle")
+```
 
 
 # Binomial Regression
@@ -68,38 +91,76 @@ eDNAxEnv_Model %>%
 ## Check for outliers
 
 ```{r}
-ggplot(envData, aes(x = DO, y = temperature)) +
-  geom_point(color = "gray90", alpha = 0.5) +
+envData <- eDNAxEnvData %>% 
+  group_by(eventDate) %>%
+  summarize(temperature = mean(Temp_Celsius), DO = mean(DO_mg_L))
+```
+
   geom_point(eDNAxEnvData, mapping = aes(x = DO, y = temperature, color = Present, shape = Present), inherit.aes = F) +
     scale_shape_manual(values = c(1, 19)) +
-  theme_bw() +
-  theme(text = element_text(size = 15), strip.text = element_text(size = 8), strip.background = element_rect(fill = "gray95")) +
-  labs(title = "Dissolved Oxygen vs. Temp + Species Presence", y = "Temperature") +
-  facet_wrap(facets = vars(Species))
-ggsave(filename = here("Manuscript_Plots", "Binomial_Regressions", "SpeciesPresence_TempxDO.png"), width = 2500, height = 2000, units = "px")
-```
-
-## Filter out outliers & other cleaning 
-
-```{r, eval = T}
-eDNAxEnvData <- eDNAxEnvData %>% 
-  filter(temperature < 11)
-
-eDNAxEnvData <- eDNAxEnvData %>% 
-  mutate(year = as.factor(year)) %>% # Clean for boxtidwell
-  filter(!is.na(Present) & !is.na(DO) & !is.na(year)) %>%  # Clean for NA values
-  filter(temperature < 11)
-```
 
 ```{r}
 ggplot(envData, aes(x = DO, y = temperature)) +
-  geom_point(color = "gray90", alpha = 0.5) +
-  geom_point(eDNAxEnvData, mapping = aes(x = DO, y = temperature, color = Present, shape = Present), inherit.aes = F) +
-    scale_shape_manual(values = c(1, 19)) +
+  geom_point(color = "black", alpha = 0.5) +
   theme_bw() +
-  theme(text = element_text(size = 15), strip.text = element_text(size = 8), strip.background = element_rect(fill = "gray95")) +
+  theme(text = element_text(size = 15), strip.text = element_text(size = 8), strip.background = element_rect(fill = "gray")) +
+  labs(title = "Dissolved Oxygen vs. Temp on Sample Dates", y = "Temperature") 
+
+ggsave(filename = here("Manuscript_Plots", "Binomial_Regressions", "TempxDO.png"), width = 2500, height = 2000, units = "px")
+```
+
+
+```{r}
+# Subset of species to test presence/absence graphs
+x <- ggplot(envData, aes(x = DO, y = temperature)) +
+  geom_point(color = "gray90", alpha = 0.5) +
+  geom_point(eDNAxEnvData %>% filter(Lowest_Taxon %in% c("Oithona_similis", "Dinophysis")), 
+             mapping = aes(x = DO_mg_L, y = Temp_Celsius, 
+                           color = Present, shape = Present), 
+             inherit.aes = F) +
+  scale_color_manual(values = c("black", "green")) +
+  scale_shape_manual(values = c(1, 19)) +
+  theme_bw() +
+  theme(text = element_text(size = 15), 
+        strip.text = element_text(size = 8), 
+        strip.background = element_rect(fill = "gray95")) +
   labs(title = "Dissolved Oxygen vs. Temp + Species Presence", y = "Temperature") +
-  facet_wrap(facets = vars(Species))
+  facet_wrap(facets = vars(Lowest_Taxon))
+
+x
+ggplotly(x)
+
+ggplot(envData, aes(x = DO, y = temperature)) +
+  geom_point(color = "gray90", alpha = 0.5) +
+  geom_point(eDNAxEnvData_PPS %>% filter(Lowest_Taxon %in% c("Oithona_similis", "Dinophysis")), 
+             mapping = aes(x = DO_mg_L, y = Temp_Celsius, 
+                           color = Present, shape = Present), 
+             inherit.aes = F) +
+  scale_color_manual(values = c("black", "green")) +
+  scale_shape_manual(values = c(1, 19)) +
+  theme_bw() +
+  theme(text = element_text(size = 15), 
+        strip.text = element_text(size = 8), 
+        strip.background = element_rect(fill = "gray95")) +
+  labs(title = "Dissolved Oxygen vs. Temp + Species Presence (PPS Only)", y = "Temperature") +
+  facet_wrap(facets = vars(Lowest_Taxon))
+
+ggplot(envData, aes(x = DO, y = temperature)) +
+  geom_point(color = "gray90", alpha = 0.5) +
+  geom_point(eDNAxEnvData_CTD %>% filter(Lowest_Taxon %in% c("Oithona_similis", "Dinophysis")), 
+             mapping = aes(x = DO_mg_L, y = Temp_Celsius, 
+                           color = Present, shape = Present), 
+             inherit.aes = F) +
+  scale_color_manual(values = c("black", "green")) +
+  scale_shape_manual(values = c(1, 19)) +
+  theme_bw() +
+  theme(text = element_text(size = 15), 
+        strip.text = element_text(size = 8), 
+        strip.background = element_rect(fill = "gray95")) +
+  labs(title = "Dissolved Oxygen vs. Temp + Species Presence (CTD/Nalgene Only)", y = "Temperature") +
+  facet_wrap(facets = vars(Lowest_Taxon))
+
+# Overlap may result from samples with multiple replicates, which I have not merged, but I fixed most replicates by combining ASVs
 ```
 
 
