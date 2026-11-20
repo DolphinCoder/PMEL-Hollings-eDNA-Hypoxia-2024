@@ -66,12 +66,55 @@ eDNAxEnvData <- eDNAxEnvData %>%
   filter(Lowest_Taxon %in% SOI$Lowest_Taxon)
 ```
 
+## PPS vs. CTD
+
 ```{r}
 eDNAxEnvData_PPS <- eDNAxEnvData %>%
   filter(samp_collect_device == "McLane Particle and Phytoplankton Sampler")
 
 eDNAxEnvData_CTD <- eDNAxEnvData %>%
   filter(samp_collect_device == "Nalgene Bottle" | samp_collect_device == "Niskin Bottle")
+```
+
+```{r}
+# Find the difference between the PPS and CTD data - not counting species with >10 detections for now
+
+eDNAxEnvData_PPS_detect <- eDNAxEnvData_PPS %>%
+  group_by(Lowest_Taxon) %>%
+  summarize(p = sum(Present)) %>%
+  filter(p>10)
+eDNAxEnvData_CTD_detect <- eDNAxEnvData_CTD %>%
+  group_by(Lowest_Taxon) %>%
+  summarize(p = sum(Present)) %>%
+  filter(p>10)
+PPS_sp <- unique(eDNAxEnvData_PPS_detect$Lowest_Taxon)
+CTD_sp <- unique(eDNAxEnvData_CTD_detect$Lowest_Taxon)
+total_sp <- unique(eDNAxEnvData$Lowest_Taxon)
+
+# setdiff(x, y) finds all rows in x that aren't in y.
+PPS_sp_ONLY_10 <- setdiff(PPS_sp, CTD_sp)
+CTD_sp_ONLY_10 <- setdiff(CTD_sp, PPS_sp)
+
+print("PPS only:")
+print(PPS_sp_ONLY_10)
+print("CTD only:")
+print(CTD_sp_ONLY_10)
+
+eDNAxEnvData_PPS_detect1 <- eDNAxEnvData_PPS %>%
+  group_by(Lowest_Taxon) %>%
+  summarize(p = sum(Present)) %>%
+  filter(p>10)
+eDNAxEnvData_CTD_detect1 <- eDNAxEnvData_CTD %>%
+  group_by(Lowest_Taxon) %>%
+  summarize(p = sum(Present)) %>%
+  filter(p>10)
+PPS_sp1 <- unique(eDNAxEnvData_PPS_detect1$Lowest_Taxon)
+CTD_sp1 <- unique(eDNAxEnvData_CTD_detect1$Lowest_Taxon)
+total_sp <- unique(eDNAxEnvData$Lowest_Taxon)
+
+# setdiff(x, y) finds all rows in x that aren't in y.
+PPS_sp_ONLY <- setdiff(PPS_sp1, CTD_sp1)
+CTD_sp_ONLY <- setdiff(CTD_sp1, PPS_sp1)
 ```
 
 
@@ -181,25 +224,25 @@ Where p = probability of 1 (if 1, p. if 0, 1-p)?
 # First, filter for more than 50 detections
 
 Detect15Sum <- eDNAxEnvData %>% 
-  group_by(Species) %>% 
+  group_by(Lowest_Taxon) %>% 
   summarize(Detections = sum(Present)) %>% 
   arrange(desc(Detections)) %>% 
-  filter(Detections > 15 & !is.na(Species)) 
-Detect15Species <- Detect15Sum$Species # 37 species
+  filter(Detections > 15 & !is.na(Lowest_Taxon)) 
+Detect15Species <- Detect15Sum$Lowest_Taxon # 37 species
 
 Detect15 <- eDNAxEnvData %>% 
-  filter(Species %in% Detect15Species) %>% 
+  filter(Lowest_Taxon %in% Detect15Species) %>% 
   mutate(year = as.factor(year)) %>% # Clean for boxtidwell
-  filter(!is.na(Present) & !is.na(DO) & !is.na(year))
+  filter(!is.na(Present) & !is.na(DO_mg_L) & !is.na(year))
 
-Detect15Split <- split(Detect15, Detect15$Species) # Split by species
+Detect15Split <- split(Detect15, Detect15$Lowest_Taxon) # Split by species
 
 # Make a function that'll do the binomial regression AND put the results in a dataframe
 
-SpeciesMod <- c()
-InterceptP <- c()
-SlopeP <- c()
-SampleSizes <- c()
+SpeciesMod_DO <- c()
+InterceptP_DO <- c()
+SlopeP_DO <- c()
+SampleSizes_DO <- c()
 
 #modtest <- glm(Detect15Split[[1]], formula = Present ~ DO, family = "binomial")
 #modsum <- summary(modtest)
@@ -207,44 +250,81 @@ SampleSizes <- c()
 
 for (i in 1:length(Detect15Split)) {
   SpName <- names(Detect15Split)[i]
-  SpeciesMod <- c(SpeciesMod, SpName)
+  SpeciesMod_DO <- c(SpeciesMod, SpName)
   
   df <- Detect15Split[[i]]
   
   SampleSize <- sum(df$Present)
-  SampleSizes <- c(SampleSizes, SampleSize)
+  SampleSizes_DO <- c(SampleSizes, SampleSize)
   
   # lapply(joinSpeciesList, glm, formula = Present ~ DO, family = "binomial")
-  mod <- glm(df, formula = Present ~ DO, family = "binomial")
+  mod <- glm(df, formula = Present ~ Temp_Celsius, family = "binomial")
   modsum <- summary(mod)
   
   Intercept <- round(modsum$coefficients[1,4], digits = 5)
   Slope <- round(modsum$coefficients[2,4], digits = 5)
-  InterceptP <- c(InterceptP, Intercept)
-  SlopeP <- c(SlopeP, Slope)
+  InterceptP_DO <- c(InterceptP, Intercept)
+  SlopeP_DO <- c(SlopeP, Slope)
 }
 
-BinomialRegressionResults <- data.frame(Species = SpeciesMod, InterceptP, SlopeP, n = SampleSizes)
+BinomialRegressionResults_DO <- data.frame(Lowest_Taxon = SpeciesMod_DO, InterceptP_DO, SlopeP_DO, n = SampleSizes_DO)
 
-SignificantSlopes <- BinomialRegressionResults %>% filter(SlopeP < 0.05)
-SignificantIntercepts <- BinomialRegressionResults %>% filter(InterceptP < 0.05)
+SignificantSlopes_DO <- BinomialRegressionResults_DO %>% filter(SlopeP_DO < 0.05)
+SignificantIntercepts_DO <- BinomialRegressionResults_DO %>% filter(InterceptP_DO < 0.05)
 
-SigSp <- SignificantSlopes$Species
-SigSpDf <- eDNAxEnvData %>% 
-  filter(Species %in% SigSp)
+SigSp_DO <- SignificantSlopes_DO$Lowest_Taxon
+SigSpDf_DO <- eDNAxEnvData %>% 
+  filter(Lowest_Taxon %in% SigSp_DO)
+
+# Now with temperature
+SpeciesMod_T <- c()
+InterceptP_T <- c()
+SlopeP_T <- c()
+SampleSizes_T <- c()
+
+#modtest <- glm(Detect15Split[[1]], formula = Present ~ DO, family = "binomial")
+#modsum <- summary(modtest)
+#Coefficients: modsum$coeffifients[1 = intercept/2 = slope, 4]
+
+for (i in 1:length(Detect15Split)) {
+  SpName <- names(Detect15Split)[i]
+  SpeciesMod_T <- c(SpeciesMod, SpName)
+  
+  df <- Detect15Split[[i]]
+  
+  SampleSize <- sum(df$Present)
+  SampleSizes_T <- c(SampleSizes, SampleSize)
+  
+  # lapply(joinSpeciesList, glm, formula = Present ~ DO, family = "binomial")
+  mod <- glm(df, formula = Present ~ Temp_Celsius, family = "binomial")
+  modsum <- summary(mod)
+  
+  Intercept <- round(modsum$coefficients[1,4], digits = 5)
+  Slope <- round(modsum$coefficients[2,4], digits = 5)
+  InterceptP_T <- c(InterceptP, Intercept)
+  SlopeP_T <- c(SlopeP, Slope)
+}
+
+BinomialRegressionResults_T <- data.frame(Lowest_Taxon = SpeciesMod_T, InterceptP_T, SlopeP_T, n = SampleSizes_T)
+
+SignificantSlopes_T <- BinomialRegressionResults_T %>% filter(SlopeP_T < 0.05)
+SignificantIntercepts_T <- BinomialRegressionResults_T %>% filter(InterceptP_T < 0.05)
+
+SigSp_T <- SignificantSlopes_T$Lowest_Taxon
+SigSpDf_T <- eDNAxEnvData %>% 
+  filter(Lowest_Taxon %in% SigSp_T)
 ```
 
 ## Box Tidwell Loop
-```{r}
+```{r, eval = F}
 SigSpBox <- eDNAxEnvData %>%
-  filter(!is.na(DO)) %>% 
-  filter(Species %in% c("Aphanomyces astaci", "Aureococcus anophagefferens", "Thecamonas trahens", "Chaetoceros socialis", "Lithodesmium intricatum", "Cyphoderia ampulla", "Bathycoccus prasinos", "Clytia gregaria", "Paramoeba branchiphila", "Citharichthys sordidus",  "Thermocyclops inversus", "Pennaria disticha", "Clupea pallasii")) # Species I actually want to run this on, NA values removed
+  filter(!is.na(DO_mg_L)) 
 
-fail <- c("Acartia longiremis", "Chrysochromulina sp. NIES-1333", "Stephanopyxis turris", "Vannella sp.", "Heterosigma akashiwo", "Parvamoeba rugata") # Species where box-tidwell failed - they have DO NA values but the drop_na should fix that
+# fail <- c("Acartia longiremis", "Chrysochromulina sp. NIES-1333", "Stephanopyxis turris", "Vannella sp.", "Heterosigma akashiwo", "Parvamoeba rugata") # Species where box-tidwell failed - they have DO NA values but the drop_na should fix that
 
-LinearSplit <- split(SigSpBox, SigSpBox$Species) # Split by species, deleting species that broke the Box-Tidwell test for now
+LinearSplit <- split(SigSpBox, SigSpBox$Lowest_Taxon) # Split by species, deleting species that broke the Box-Tidwell test for now
 
-LinearSplit <- lapply(LinearSplit, drop_na, c(DO, Present, year))
+LinearSplit <- lapply(LinearSplit, drop_na, c(DO_mg_L, Present, year))
 
 test <- LinearSplit[[1]]
 test2 <- LinearSplit[[2]]
@@ -256,7 +336,7 @@ BoxTidwellP <- c()
 
 for (i in 1:length(LinearSplit)) {
   print(paste(names(LinearSplit)[i], sep = " ", "Presence vs Oxygen"))
-  box <- boxTidwell(Present ~ DO, 
+  box <- boxTidwell(Present ~ DO_mg_L, 
                     other.x = ~ year, # it breaks if i don't do this idk
                     data = LinearSplit[[i]], 
                     na.action = na.exclude)
@@ -275,16 +355,29 @@ BoxTidwellSuccess <- BoxTidwellResults %>% filter(BoxTidwellP > 0.05)
 
 # Loop to graph binom regresion
 ```{r}
-AllSplit <- split(eDNAxEnvData, eDNAxEnvData$Species)
+AllSplit <- split(eDNAxEnvData, eDNAxEnvData$Lowest_Taxon)
+```
+
+```{r, eval = F}
+for (i in 1:length(AllSplit)) {
+  df <- AllSplit[[i]] %>% mutate(PresentBin = case_when(Present == T ~ 1, Present == F ~ 0))  # Select one species and mutate to 0/1 so that the regression will run
+
+  species <- as.character(AllSplit[[i]][1,2]) # Extract species name for title + export filename
+  print(species)
+}
+```
+
+
+```{r}
 # Add title
 # Add better axis labels
 for (i in 1:length(AllSplit)) {
-  df <- AllSplit[[i]] %>% mutate(PresentBin = case_when(Present == T ~ 1, Present == F ~ 0)) %>%  # Select one species and mutate to 0/1 so that the regression will run
-    filter(temperature < 11) # Filter out the outlier
-  
-  species <- as.character(AllSplit[[i]][1,7]) # Extract species name for title + export filename
+  df <- AllSplit[[i]] %>% mutate(PresentBin = case_when(Present == T ~ 1, Present == F ~ 0))  # Select one species and mutate to 0/1 so that the regression will run
 
-  ggplot(df, aes(x = DO, y = PresentBin, color = PresentBin)) +
+  species <- as.character(AllSplit[[i]][1,2]) # Extract species name for title + export filename
+  #print(species)
+
+  ggplot(df, aes(x = DO_mg_L, y = PresentBin, color = PresentBin)) +
     geom_point(size = 4) +
     scale_color_gradient(high = "dodgerblue3", low = "orange2", guide = "legend", na.value = "black") + # Color to match presence/absence graphs
     geom_smooth(method = "glm", method.args = list(family = "binomial"), se = F) +
@@ -292,9 +385,39 @@ for (i in 1:length(AllSplit)) {
     stat_poly_eq(use_label(c("R2", "P")), size = 6, label.y = 0.75, label.x = 60) + # Print R^2 and p-value from the model
     theme_bw() +
     theme(text = element_text(size = 20)) +
-    labs(title = species, x = "Oxygen Saturation (%)", y = "Species Present?")
+    labs(title = species, x = "Dissolved Oxygen (mg/L)", y = "Species Present?")
   
-    ggsave(filename = here("Manuscript_Plots", "Binomial_Regressions",
+  #print(paste(species, "graph done"))
+  
+    ggsave(filename = here("Manuscript_Plots", "Binomial_Regressions_DO",
+                           paste(species, sep = ".", "png")), # Save graph
+           width = 2300, 
+           height = 2000, 
+           units = "px")
+}
+
+system("say Binomial Regression Graphs Complete!")
+```
+
+```{r}
+# Add title
+# Add better axis labels
+for (i in 1:length(AllSplit)) {
+  df <- AllSplit[[i]] %>% mutate(PresentBin = case_when(Present == T ~ 1, Present == F ~ 0)) # Select one species and mutate to 0/1 so that the regression will run
+
+  species <- as.character(AllSplit[[i]][1,2]) # Extract species name for title + export filename
+
+  ggplot(df, aes(x = Temp_Celsius, y = PresentBin, color = PresentBin)) +
+    geom_point(size = 4) +
+    scale_color_gradient(high = "dodgerblue3", low = "orange2", guide = "legend", na.value = "black") + # Color to match presence/absence graphs
+    geom_smooth(method = "glm", method.args = list(family = "binomial"), se = F) +
+    # Print the binomial regression
+    stat_poly_eq(use_label(c("R2", "P")), size = 6, label.y = 0.75, label.x = 60) + # Print R^2 and p-value from the model
+    theme_bw() +
+    theme(text = element_text(size = 20)) +
+    labs(title = species, x = "Temperature (C)", y = "Species Present?")
+  
+    ggsave(filename = here("Manuscript_Plots", "Binomial_Regressions_Temp",
                            paste(species, sep = ".", "png")), # Save graph
            width = 2300, 
            height = 2000, 
