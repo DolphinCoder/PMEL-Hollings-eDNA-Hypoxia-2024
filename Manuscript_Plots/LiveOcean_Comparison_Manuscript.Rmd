@@ -53,7 +53,7 @@ ggplot(data = OME, aes(x = eventDate, y = as.numeric(diss_oxygen))) +
   labs(title = "TH042 Mooring vs. LiveOcean Model (DO)", caption = "Model in orange, mooring(?) in dark blue. 37m depth.") +
   theme_bw() 
 
-ggsave(here("LiveOcean_Plots_37", "Mooring_vs_Model_DO_37.png"))
+ggsave(here("Manuscript_Plots", "LiveOcean_Plots_37", "Mooring_vs_Model_DO_37.png"))
 
 ggplot(data = OME, aes(x = eventDate, y = as.numeric(temp))) +
   geom_line(color = "navyblue", size = 0.5) +
@@ -62,7 +62,7 @@ ggplot(data = OME, aes(x = eventDate, y = as.numeric(temp))) +
   labs(title = "TH042 Mooring vs. LiveOcean Model (Temp)", caption = "Model in orange, mooring(?) in dark blue. 37m depth.") +
   theme_bw() 
 
-ggsave(here("LiveOcean_Plots_37", "Mooring_vs_Model_Temp_37.png"))
+ggsave(here("Manuscript_Plots", "LiveOcean_Plots_37", "Mooring_vs_Model_Temp_37.png"))
 ```
 
 ## Regression
@@ -90,7 +90,8 @@ compare <- left_join(OME, model_37m, by = join_by(Date_UTC))
           theme_bw())
   
   ggsave("Temp_LiveOcean_37.png", 
-         path = here("LiveOcean_Plots_37"),
+         path = here("Manuscript_Plots",
+                     "LiveOcean_Plots_37"),
          width = 3000, height = 2500, units = "px")
   
   # Compare DO predictions
@@ -111,7 +112,8 @@ compare <- left_join(OME, model_37m, by = join_by(Date_UTC))
           theme_bw())
   
   ggsave(filename = "Oxygen_LiveOcean_37.png", 
-         path = here("LiveOcean_Plots_37"),
+         path = here("Manuscript_Plots",
+                     "LiveOcean_Plots_37"),
          width = 3000, height = 2500, units = "px")
   
 
