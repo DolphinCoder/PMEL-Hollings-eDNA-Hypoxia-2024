@@ -250,12 +250,12 @@ SampleSizes_DO <- c()
 
 for (i in 1:length(Detect15Split)) {
   SpName <- names(Detect15Split)[i]
-  SpeciesMod_DO <- c(SpeciesMod, SpName)
+  SpeciesMod_DO <- c(SpeciesMod_DO, SpName)
   
   df <- Detect15Split[[i]]
   
   SampleSize <- sum(df$Present)
-  SampleSizes_DO <- c(SampleSizes, SampleSize)
+  SampleSizes_DO <- c(SampleSizes_DO, SampleSize)
   
   # lapply(joinSpeciesList, glm, formula = Present ~ DO, family = "binomial")
   mod <- glm(df, formula = Present ~ Temp_Celsius, family = "binomial")
@@ -263,8 +263,8 @@ for (i in 1:length(Detect15Split)) {
   
   Intercept <- round(modsum$coefficients[1,4], digits = 5)
   Slope <- round(modsum$coefficients[2,4], digits = 5)
-  InterceptP_DO <- c(InterceptP, Intercept)
-  SlopeP_DO <- c(SlopeP, Slope)
+  InterceptP_DO <- c(InterceptP_DO, Intercept)
+  SlopeP_DO <- c(SlopeP_DO, Slope)
 }
 
 BinomialRegressionResults_DO <- data.frame(Lowest_Taxon = SpeciesMod_DO, InterceptP_DO, SlopeP_DO, n = SampleSizes_DO)
@@ -288,12 +288,12 @@ SampleSizes_T <- c()
 
 for (i in 1:length(Detect15Split)) {
   SpName <- names(Detect15Split)[i]
-  SpeciesMod_T <- c(SpeciesMod, SpName)
+  SpeciesMod_T <- c(SpeciesMod_T, SpName)
   
   df <- Detect15Split[[i]]
   
   SampleSize <- sum(df$Present)
-  SampleSizes_T <- c(SampleSizes, SampleSize)
+  SampleSizes_T <- c(SampleSizes_T, SampleSize)
   
   # lapply(joinSpeciesList, glm, formula = Present ~ DO, family = "binomial")
   mod <- glm(df, formula = Present ~ Temp_Celsius, family = "binomial")
@@ -301,8 +301,8 @@ for (i in 1:length(Detect15Split)) {
   
   Intercept <- round(modsum$coefficients[1,4], digits = 5)
   Slope <- round(modsum$coefficients[2,4], digits = 5)
-  InterceptP_T <- c(InterceptP, Intercept)
-  SlopeP_T <- c(SlopeP, Slope)
+  InterceptP_T <- c(InterceptP_T, Intercept)
+  SlopeP_T <- c(SlopeP_T, Slope)
 }
 
 BinomialRegressionResults_T <- data.frame(Lowest_Taxon = SpeciesMod_T, InterceptP_T, SlopeP_T, n = SampleSizes_T)
@@ -396,7 +396,7 @@ for (i in 1:length(AllSplit)) {
            units = "px")
 }
 
-system("say Binomial Regression Graphs Complete!")
+# system("say Binomial Regression Graphs Complete!")
 ```
 
 ```{r}
@@ -424,7 +424,118 @@ for (i in 1:length(AllSplit)) {
            units = "px")
 }
 
-system("say Binomial Regression Graphs Complete!")
+# system("say Binomial Regression Graphs Complete!")
+```
+
+# Presence/absence graphs
+
+```{r}
+for (i in 1:length(AllSplit)) {
+  df <- AllSplit[[i]] %>% mutate(PresentBin = case_when(Present == T ~ 1, Present == F ~ 0)) # Select one species and mutate to 0/1 so that the regression will run
+  
+  species <- as.character(AllSplit[[i]][1,2]) # Extract species name for title + export filename
+  
+  # Presence/absence graphs
+  ggplot(envData, aes(x = DO, y = temperature)) +
+    geom_point(color = "gray90", alpha = 0.5) +
+    geom_point(df, 
+               mapping = aes(x = DO_mg_L, y = Temp_Celsius, 
+                             color = Present, shape = Present), 
+               inherit.aes = F) +
+    scale_color_manual(values = c("black", "green")) +
+    scale_shape_manual(values = c(1, 19)) +
+    theme_bw() +
+    theme(text = element_text(size = 15), 
+          strip.text = element_text(size = 8), 
+          strip.background = element_rect(fill = "gray95")) +
+    labs(title = "Dissolved Oxygen vs. Temp + Species Presence", y = "Temperature") +
+    facet_wrap(facets = vars(Lowest_Taxon))
+  
+  ggsave(filename = here("Manuscript_Plots",
+                         "Presence_Absence_Temp_DO",
+                         paste(species, sep = ".", "png")), # Save graph
+             width = 2300, 
+             height = 2000, 
+             units = "px")
+  
+    # Presence/absence graphs
+  ggplot(envData, aes(x = DO, y = temperature)) +
+    geom_point(color = "gray90", alpha = 0.5) +
+    geom_point(df, 
+               mapping = aes(x = DO_mg_L, y = Temp_Celsius, 
+                             color = samp_collect_device, shape = Present), 
+               inherit.aes = F) +
+    scale_color_manual(values = c("purple", "pink", "pink")) +
+    scale_shape_manual(values = c(1, 19)) +
+    theme_bw() +
+    theme(text = element_text(size = 15), 
+          strip.text = element_text(size = 8), 
+          strip.background = element_rect(fill = "gray95")) +
+    labs(title = "Dissolved Oxygen vs. Temp + Species Presence", y = "Temperature") +
+    facet_wrap(facets = vars(Lowest_Taxon))
+  
+  ggsave(filename = here("Manuscript_Plots",
+                         "Presence_Absence_Temp_DO_Sources",
+                         paste(species, sep = ".", "png")), # Save graph
+             width = 2300, 
+             height = 2000, 
+             units = "px")
+
+  ggplot(envData, aes(x = DO, y = temperature)) +
+    geom_point(color = "gray90", alpha = 0.5) +
+    geom_point(df %>%
+                 filter(samp_collect_device == 
+                          "McLane Particle and Phytoplankton Sampler"),
+               mapping = aes(x = DO_mg_L, y = Temp_Celsius, 
+                             color = Present, shape = Present), 
+               inherit.aes = F) +
+    scale_color_manual(values = c("black", 
+                                  "green")) +
+    scale_shape_manual(values = c(1, 
+                                  19)) +
+    theme_bw() +
+    theme(text = element_text(size = 15), 
+          strip.text = element_text(size = 8), 
+          strip.background = element_rect(fill = "gray95")) +
+    labs(title = "Dissolved Oxygen vs. Temp + Species Presence (PPS Only)", 
+         y = "Temperature") +
+    facet_wrap(facets = vars(Lowest_Taxon))
+  
+  ggsave(filename = here("Manuscript_Plots",
+                         "Presence_Absence_Temp_DO_PPS",
+                         paste(species, sep = ".", "png")), # Save graph
+             width = 2300, 
+             height = 2000, 
+             units = "px")
+  
+  ggplot(envData, aes(x = DO, y = temperature)) +
+    geom_point(color = "gray90", alpha = 0.5) +
+    geom_point(df %>%
+                 filter(samp_collect_device == 
+                          "Nalgene Bottle" 
+                        | samp_collect_device == 
+                          "Niskin Bottle"), , 
+               mapping = aes(x = DO_mg_L, y = Temp_Celsius, 
+                             color = Present, shape = Present), 
+               inherit.aes = F) +
+    scale_color_manual(values = c("black", "green")) +
+    scale_shape_manual(values = c(1, 19)) +
+    theme_bw() +
+    theme(text = element_text(size = 15), 
+          strip.text = element_text(size = 8), 
+          strip.background = element_rect(fill = "gray95")) +
+    labs(title = "Dissolved Oxygen vs. Temp + Species Presence (CTD/Nalgene Only)", y = "Temperature") +
+    facet_wrap(facets = vars(Lowest_Taxon))
+  
+  # Overlap may result from samples with multiple replicates, which I have not merged, but I fixed most replicates by combining ASVs
+  
+  ggsave(filename = here("Manuscript_Plots",
+                         "Presence_Absence_Temp_DO_CTD",
+                         paste(species, sep = ".", "png")), # Save graph
+             width = 2300, 
+             height = 2000, 
+             units = "px")
+}
 ```
 
 To kill the talking enter in terminal `while true; do pkill -9 say; done`
